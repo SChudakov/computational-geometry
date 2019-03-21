@@ -1,10 +1,10 @@
-package com.chudakov;
+package com.chudakov.common;
 
-public class Point {
-    final double first;
-    final double second;
+public class Point2D {
+    public final double first;
+    public final double second;
 
-    Point(double x, double y) {
+    public Point2D(double x, double y) {
         this.first = x;
         this.second = y;
     }

@@ -1,22 +1,33 @@
 package com.chudakov;
 
+import com.chudakov.alg.ConvexHull;
+import com.chudakov.common.Point2D;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+//        List<Point2D> a = new ArrayList<>();
+//        a.add(new Point2D(-5, -15));
+//        a.add(new Point2D(-5, -5));
+//        a.add(new Point2D(-5, 5));
+//        a.add(new Point2D(0, 0));
+//        a.add(new Point2D(5, -20));
+//        a.sort(new ConvexHull.AntiClockwiseOrderComparator(new Point2D(-2.0, -7.0)));
+//        System.out.println(a);
         ConvexHull hull = new ConvexHull();
-        List<Point> a = new ArrayList<>();
-        a.add(new Point(0, 0));
-        a.add(new Point(1, -4));
-        a.add(new Point(-1, -5));
-        a.add(new Point(-5, -3));
-        a.add(new Point(-3, -1));
-        a.add(new Point(-1, -3));
-        a.add(new Point(-2, -2));
-        a.add(new Point(-1, -1));
-        a.add(new Point(-2, -1));
-        a.add(new Point(-1, 1));
+        List<Point2D> a = new ArrayList<>();
+        a.add(new Point2D(0, 0));
+        a.add(new Point2D(1, -4));
+        a.add(new Point2D(-1, -5));
+        a.add(new Point2D(-5, -3));
+        a.add(new Point2D(-3, -1));
+        a.add(new Point2D(-1, -3));
+        a.add(new Point2D(-2, -2));
+        a.add(new Point2D(-1, -1));
+        a.add(new Point2D(-2, -1));
+        a.add(new Point2D(-1, 1));
 
         a.sort((x, y) -> {
             if (x.first < y.first || (!(y.first < x.first) && x.second < y.second)) {
@@ -27,15 +38,9 @@ public class Main {
             }
             return 1;
         });
-//        for (Point point : a) {
-//            System.out.print(point);
-//        }
-//        System.out.println();
-        List<Point> ans = hull.divide(a);
-        System.out.print("convex hull: ");
-        for (Point an : ans) {
-            System.out.print(an);
-        }
-        System.out.println();
+        System.out.println("sorted points: " + a);
+
+        List<Point2D> ans = hull.divide(a);
+        System.out.print("convex hull: " + ans);
     }
 }

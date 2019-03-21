@@ -1,13 +1,12 @@
-package com.chudakov;
+package com.chudakov.alg;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.chudakov.common.Point2D;
+
+import java.util.*;
 
 public class ConvexHull {
 
-    private int quad(Point p) {
+    private static int quad(Point2D p) {
         if (p.first >= 0 && p.second >= 0)
             return 1;
         if (p.first <= 0 && p.second >= 0)
@@ -17,7 +16,7 @@ public class ConvexHull {
         return 4;
     }
 
-    private int orientation(Point a, Point b, Point c) {
+    private int orientation(Point2D a, Point2D b, Point2D c) {
         double res = (b.second - a.second) * (c.first - b.first) -
                 (c.second - b.second) * (b.first - a.first);
 
@@ -28,7 +27,7 @@ public class ConvexHull {
         return -1;
     }
 
-    private List<Point> merger(List<Point> a, List<Point> b) {
+    private List<Point2D> merger(List<Point2D> a, List<Point2D> b) {
         // n1 -> number of points in polygon a 
         // n2 -> number of points in polygon b 
         int n1 = a.size(), n2 = b.size();
@@ -81,7 +80,7 @@ public class ConvexHull {
         }
 
         int lowera = inda, lowerb = indb;
-        List<Point> ret = new ArrayList<>();
+        List<Point2D> ret = new ArrayList<>();
 
         //ret contains the convex hull after merging the two convex hulls 
         //with the points sorted in anti-clockwise order 
@@ -102,23 +101,21 @@ public class ConvexHull {
 
     }
 
-    private List<Point> bruteHull(List<Point> a) {
-        System.out.print("input: ");
-        for (Point point : a) {
-            System.out.print(point);
-        }
-        System.out.println();
-        // Take any pair of points from the set and check 
+    private List<Point2D> bruteHull(List<Point2D> a) {
+//        System.out.println("input: " + a);
+        // Take any pair of points from the set and check
         // whether it is the edge of the convex hull or not. 
         // if all the remaining points are on the same side 
         // of the line then the line is the edge of convex 
         // hull otherwise not 
-        Set<Point> s = new HashSet<>();
+        Set<Point2D> s = new HashSet<>();
 
         for (int i = 0; i < a.size(); i++) {
             for (int j = i + 1; j < a.size(); j++) {
+
                 double x1 = a.get(i).first;
                 double y1 = a.get(i).second;
+
                 double x2 = a.get(j).first;
                 double y2 = a.get(j).second;
 
@@ -126,7 +123,7 @@ public class ConvexHull {
                 double b1 = x2 - x1;
                 double c1 = x1 * y2 - y1 * x2;
                 int pos = 0, neg = 0;
-                for (Point point : a) {
+                for (Point2D point : a) {
                     double v = a1 * point.first + b1 * point.second + c1;
                     if (v <= 0) {
                         neg++;
@@ -142,42 +139,36 @@ public class ConvexHull {
             }
         }
 
-        List<Point> ret = new ArrayList<>();
+        List<Point2D> ret = new ArrayList<>();
         int n = s.size();
-        double midFirst = 0;
-        double midSecond = 0;
-        for (Point p : s) {
+
+        double midFirst = 0.0;
+        double midSecond = 0.0;
+        for (Point2D p : s) {
+
             midFirst += p.first;
             midSecond += p.second;
-            ret.add(new Point(p.first * n, p.second * n));
+
+            ret.add(new Point2D(p.first * n, p.second * n));
         }
-        Point mid = new Point(midFirst, midSecond);
+//        System.out.println("mid first: " + midFirst);
+//        System.out.println("mid second: " + midSecond);
+        Point2D mid = new Point2D(midFirst, midSecond);
 
-        ret.sort((o1, o2) -> {
-            Point p = new Point(o1.first - mid.first, o1.second - mid.second);
-            Point q = new Point(o2.first - mid.first, o2.second - mid.second);
+//        System.out.println("pre sort: " + ret);
+        ret.sort(new AntiClockwiseOrderComparator(mid));
+//        System.out.println("after sort: " + ret);
 
-            int one = quad(p);
-            int two = quad(q);
 
-            if (one != two) {
-                return one < two ? 1 : 0;
-            }
-            return p.second * q.first < q.second * p.first ? 1 : 0;
-        });
         for (int i = 0; i < n; i++) {
-            ret.set(i, new Point(ret.get(i).first / n, ret.get(i).second / n));
+            ret.set(i, new Point2D(ret.get(i).first / n, ret.get(i).second / n));
         }
 
-        System.out.print("output: ");
-        for (Point point : ret) {
-            System.out.print(point);
-        }
-        System.out.println();
+//        System.out.println("output: " + ret);
         return ret;
     }
 
-    public List<Point> divide(List<Point> a) {
+    public List<Point2D> divide(List<Point2D> a) {
         // If the number of points is less than 6 then the 
         // function uses the brute algorithm to find the 
         // convex hull 
@@ -186,8 +177,8 @@ public class ConvexHull {
 
         // left contains the left half points 
         // right contains the right half points 
-        List<Point> left = new ArrayList<>();
-        List<Point> right = new ArrayList<>();
+        List<Point2D> left = new ArrayList<>();
+        List<Point2D> right = new ArrayList<>();
         for (int i = 0; i < a.size() / 2; i++) {
             left.add(a.get(i));
         }
@@ -195,10 +186,32 @@ public class ConvexHull {
             right.add(a.get(i));
         }
         // convex hull for the left and right sets 
-        List<Point> left_hull = divide(left);
-        List<Point> right_hull = divide(right);
+        List<Point2D> left_hull = divide(left);
+        List<Point2D> right_hull = divide(right);
 
         // merging the convex hulls 
         return merger(left_hull, right_hull);
+    }
+
+    static class AntiClockwiseOrderComparator implements Comparator<Point2D> {
+        private final Point2D mid;
+
+        AntiClockwiseOrderComparator(Point2D mid) {
+            this.mid = mid;
+        }
+
+        @Override
+        public int compare(Point2D p1, Point2D q1) {
+            Point2D p = new Point2D(p1.first - mid.first, p1.second - mid.second);
+            Point2D q = new Point2D(q1.first - mid.first, q1.second - mid.second);
+
+            int one = quad(p);
+            int two = quad(q);
+
+            if (one != two) {
+                return Integer.compare(one, two);
+            }
+            return Double.compare(p.second * q.first, q.second * p.first);
+        }
     }
 }
