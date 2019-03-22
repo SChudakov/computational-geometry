@@ -1,3 +1,6 @@
+src/test/resources/convexhull/input/*
+src/test/resources/convexhull/output/*
+
 # Created by https://www.gitignore.io/api/java,linux,maven,intellij+all
 # Edit at https://www.gitignore.io/?templates=java,linux,maven,intellij+all
 

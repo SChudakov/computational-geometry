@@ -27,7 +27,7 @@ public class ConvexHull {
         return -1;
     }
 
-    private List<Point2D> merger(List<Point2D> a, List<Point2D> b) {
+    private List<Point2D> merge(List<Point2D> a, List<Point2D> b) {
         // n1 -> number of points in polygon a 
         // n2 -> number of points in polygon b 
         int n1 = a.size(), n2 = b.size();
@@ -101,7 +101,7 @@ public class ConvexHull {
 
     }
 
-    private List<Point2D> bruteHull(List<Point2D> a) {
+    private List<Point2D> bruteForceHull(List<Point2D> a) {
 //        System.out.println("input: " + a);
         // Take any pair of points from the set and check
         // whether it is the edge of the convex hull or not. 
@@ -125,6 +125,9 @@ public class ConvexHull {
                 int pos = 0, neg = 0;
                 for (Point2D point : a) {
                     double v = a1 * point.first + b1 * point.second + c1;
+                    if (v < 1e-10) {
+                        v = 0.0;
+                    }
                     if (v <= 0) {
                         neg++;
                     }
@@ -168,12 +171,12 @@ public class ConvexHull {
         return ret;
     }
 
-    public List<Point2D> divide(List<Point2D> a) {
+    public List<Point2D> getConvexHull(List<Point2D> a) {
         // If the number of points is less than 6 then the 
         // function uses the brute algorithm to find the 
         // convex hull 
         if (a.size() <= 5)
-            return bruteHull(a);
+            return bruteForceHull(a);
 
         // left contains the left half points 
         // right contains the right half points 
@@ -186,11 +189,11 @@ public class ConvexHull {
             right.add(a.get(i));
         }
         // convex hull for the left and right sets 
-        List<Point2D> left_hull = divide(left);
-        List<Point2D> right_hull = divide(right);
+        List<Point2D> left_hull = getConvexHull(left);
+        List<Point2D> right_hull = getConvexHull(right);
 
         // merging the convex hulls 
-        return merger(left_hull, right_hull);
+        return merge(left_hull, right_hull);
     }
 
     static class AntiClockwiseOrderComparator implements Comparator<Point2D> {

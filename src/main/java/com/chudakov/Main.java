@@ -8,14 +8,6 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-//        List<Point2D> a = new ArrayList<>();
-//        a.add(new Point2D(-5, -15));
-//        a.add(new Point2D(-5, -5));
-//        a.add(new Point2D(-5, 5));
-//        a.add(new Point2D(0, 0));
-//        a.add(new Point2D(5, -20));
-//        a.sort(new ConvexHull.AntiClockwiseOrderComparator(new Point2D(-2.0, -7.0)));
-//        System.out.println(a);
         ConvexHull hull = new ConvexHull();
         List<Point2D> a = new ArrayList<>();
         a.add(new Point2D(0, 0));
@@ -38,9 +30,9 @@ public class Main {
             }
             return 1;
         });
-        System.out.println("sorted points: " + a);
+//        System.out.println("sorted points: " + a);
 
-        List<Point2D> ans = hull.divide(a);
+        List<Point2D> ans = hull.getConvexHull(a);
         System.out.print("convex hull: " + ans);
     }
 }
