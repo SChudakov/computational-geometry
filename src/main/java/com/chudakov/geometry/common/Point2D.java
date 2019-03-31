@@ -1,4 +1,4 @@
-package com.chudakov.common;
+package com.chudakov.geometry.common;
 
 import java.util.Objects;
 

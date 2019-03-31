@@ -1,14 +1,13 @@
-package com.chudakov;
+package com.chudakov.geometry;
 
-import com.chudakov.alg.ConvexHull;
-import com.chudakov.common.Point2D;
+import com.chudakov.geometry.alg.convexhull.simple.ParallelConvexHull2D;
+import com.chudakov.geometry.common.Point2D;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        ConvexHull hull = new ConvexHull();
         List<Point2D> a = new ArrayList<>();
         a.add(new Point2D(0, 0));
         a.add(new Point2D(1, -4));
@@ -21,18 +20,9 @@ public class Main {
         a.add(new Point2D(-2, -1));
         a.add(new Point2D(-1, 1));
 
-        a.sort((x, y) -> {
-            if (x.first < y.first || (!(y.first < x.first) && x.second < y.second)) {
-                return -1;
-            }
-            if (x.first == y.first && x.second == y.second) {
-                return 0;
-            }
-            return 1;
-        });
-//        System.out.println("sorted points: " + a);
+        ParallelConvexHull2D convexHull = new ParallelConvexHull2D();
+        List<Point2D> ans = convexHull.solve(a);
 
-        List<Point2D> ans = hull.getConvexHull(a);
         System.out.print("convex hull: " + ans);
     }
 }

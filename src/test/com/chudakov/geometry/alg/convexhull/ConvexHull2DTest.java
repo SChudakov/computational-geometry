@@ -1,25 +1,39 @@
-package com.chudakov.alg;
+package com.chudakov.geometry.alg.convexhull;
 
-import com.chudakov.common.Point2D;
-import org.junit.Assert;
+import com.chudakov.geometry.alg.convexhull.simple.ParallelConvexHull2D;
+import com.chudakov.geometry.alg.convexhull.simple.SequentialConvexHull2D;
+import com.chudakov.geometry.common.Point2D;
+import com.chudakov.geometry.framework.DaCExecutionSpecifics;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class ConvexHullTest {
+public class ConvexHull2DTest {
     private static final String TEST_CASES_INPUT_DIR = "/home/semen/drive/workspace.java/computational-geometry/src/test/resources/convexhull/input";
     private static final String TEST_CASES_OUTPUT_DIR = "/home/semen/drive/workspace.java/computational-geometry/src/test/resources/convexhull/output";
 
     @Test
-    public void testConvexHull() {
-        ConvexHull hull = new ConvexHull();
+    public void tesSequentialConvexHull() {
+        testConvexHull(new SequentialConvexHull2D());
+    }
+
+    @Test
+    public void tesParallelConvexHull() {
+        testConvexHull(new ParallelConvexHull2D());
+    }
+
+    private void testConvexHull(DaCExecutionSpecifics<Point2D> specifics) {
 
         File testCasesInputsDir = new File(TEST_CASES_INPUT_DIR);
 
@@ -41,24 +55,47 @@ public class ConvexHullTest {
                 List<Point2D> expectedOutput = reader.readPoints(outputFilePath);
                 System.out.println("expected output: " + expectedOutput);
 
-                List<Point2D> output = hull.getConvexHull(input);
+                List<Point2D> actualOutput = specifics.solve(input);
+                System.out.println("actual output: " + expectedOutput);
 
-                assertEqual(expectedOutput, output);
+                assertEqual(expectedOutput, actualOutput);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    @Test
+    public void testOnRandomPoints() {
+        Random random = new Random(17);
+        testOnRandomPoints(new SequentialConvexHull2D(), random);
+        testOnRandomPoints(new ParallelConvexHull2D(), random);
+    }
+
+    private void testOnRandomPoints(DaCExecutionSpecifics<Point2D> specifics, Random random) {
+        for (int i = 0; i < 10; i++) {
+            List<Point2D> points = getRandomPoints(10000, random);
+            specifics.solve(points);
+        }
+    }
+
+    private List<Point2D> getRandomPoints(int size, Random random) {
+        List<Point2D> points = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            points.add(new Point2D((int) (random.nextDouble() * 1_000_000), (int) (random.nextDouble() * 1_000_000)));
+        }
+        return points;
+    }
+
     private void assertEqual(List<Point2D> first, List<Point2D> second) {
         assertEquals(first.size(), second.size());
-        Iterator<Point2D> fit = first.iterator();
-        Iterator<Point2D> sit = second.iterator();
-        while (fit.hasNext()) {
-            Point2D f = fit.next();
-            Point2D s = sit.next();
-            assertEquals(f.first, s.first, 1e-9);
-            assertEquals(f.second, s.second, 1e-9);
+        Iterator<Point2D> firstIt = first.iterator();
+        Iterator<Point2D> secondIt = second.iterator();
+        while (firstIt.hasNext() && secondIt.hasNext()) {
+            Point2D firstPoint = firstIt.next();
+            Point2D secondPoint = secondIt.next();
+            assertEquals(firstPoint.first, secondPoint.first, 1e-9);
+            assertEquals(firstPoint.second, secondPoint.second, 1e-9);
         }
     }
 
