@@ -3,7 +3,7 @@ package com.chudakov.geometry.alg.convexhull;
 import com.chudakov.geometry.alg.convexhull.simple.ParallelConvexHull2D;
 import com.chudakov.geometry.alg.convexhull.simple.SequentialConvexHull2D;
 import com.chudakov.geometry.common.Point2D;
-import com.chudakov.geometry.framework.DaCExecutionSpecifics;
+import com.chudakov.geometry.core.DaCExecutionSpecifics;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -33,7 +33,7 @@ public class ConvexHull2DTest {
         testConvexHull(new ParallelConvexHull2D());
     }
 
-    private void testConvexHull(DaCExecutionSpecifics<Point2D> specifics) {
+    private void testConvexHull(DaCExecutionSpecifics<List<Point2D>, List<Point2D>> specifics) {
 
         File testCasesInputsDir = new File(TEST_CASES_INPUT_DIR);
 
@@ -72,7 +72,7 @@ public class ConvexHull2DTest {
         testOnRandomPoints(new ParallelConvexHull2D(), random);
     }
 
-    private void testOnRandomPoints(DaCExecutionSpecifics<Point2D> specifics, Random random) {
+    private void testOnRandomPoints(DaCExecutionSpecifics<List<Point2D>, List<Point2D>> specifics, Random random) {
         for (int i = 0; i < 10; i++) {
             List<Point2D> points = getRandomPoints(10000, random);
             specifics.solve(points);

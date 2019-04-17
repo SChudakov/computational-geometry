@@ -1,7 +1,7 @@
 package com.chudakov.geometry.alg.convexhull.simple;
 
 import com.chudakov.geometry.common.Point2D;
-import com.chudakov.geometry.framework.DaCAlgorithm;
+import com.chudakov.geometry.core.DaCAlgorithm;
 import com.chudakov.geometry.util.Pair;
 
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ConvexHull2D implements DaCAlgorithm<Point2D> {
+public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> {
     @Override
-    public boolean isBaseCase(List<Point2D> points) {
-        return points.size() <= 5;
+    public boolean isBaseCase(List<Point2D> input) {
+        return input.size() <= 5;
     }
 
     @Override
@@ -100,35 +100,35 @@ public class ConvexHull2D implements DaCAlgorithm<Point2D> {
     }
 
     @Override
-    public Pair<List<Point2D>, List<Point2D>> divide(List<Point2D> points) {
-        int mid = points.size() / 2;
-        return Pair.of(points.subList(0, mid), points.subList(mid, points.size()));
+    public Pair<List<Point2D>, List<Point2D>> divide(List<Point2D> input) {
+        int mid = input.size() / 2;
+        return Pair.of(input.subList(0, mid), input.subList(mid, input.size()));
     }
 
     @Override
-    public void precompute(List<Point2D> points) {
-        points.sort(new LexicographicalOrderPointComparator());
+    public void precompute(List<Point2D> input) {
+        input.sort(new LexicographicalOrderPointComparator());
     }
 
     @Override
-    public List<Point2D> solveBaseCase(List<Point2D> points) {
+    public List<Point2D> solveBaseCase(List<Point2D> input) {
 //        System.out.println("input: " + points);
         Set<Point2D> s = new HashSet<>();
 
-        for (int i = 0; i < points.size(); i++) {
-            for (int j = i + 1; j < points.size(); j++) {
+        for (int i = 0; i < input.size(); i++) {
+            for (int j = i + 1; j < input.size(); j++) {
 
-                double x1 = points.get(i).first;
-                double y1 = points.get(i).second;
+                double x1 = input.get(i).first;
+                double y1 = input.get(i).second;
 
-                double x2 = points.get(j).first;
-                double y2 = points.get(j).second;
+                double x2 = input.get(j).first;
+                double y2 = input.get(j).second;
 
                 double a1 = y1 - y2;
                 double b1 = x2 - x1;
                 double c1 = x1 * y2 - y1 * x2;
                 int pos = 0, neg = 0;
-                for (Point2D point : points) {
+                for (Point2D point : input) {
                     double v = a1 * point.first + b1 * point.second + c1;
                     if (Math.abs(v) < 1e-10) {
                         v = 0.0;
@@ -140,9 +140,9 @@ public class ConvexHull2D implements DaCAlgorithm<Point2D> {
                         pos++;
                     }
                 }
-                if (pos == points.size() || neg == points.size()) {
-                    s.add(points.get(i));
-                    s.add(points.get(j));
+                if (pos == input.size() || neg == input.size()) {
+                    s.add(input.get(i));
+                    s.add(input.get(j));
                 }
             }
         }
