@@ -11,5 +11,5 @@ public interface DaCAlgorithm<IT, OT> {
 
     Pair<IT, IT> divide(IT input);
 
-    void precompute(IT input);
+    IT precompute(IT input);
 }

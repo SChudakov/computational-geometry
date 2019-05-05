@@ -2,13 +2,13 @@ package com.chudakov.geometry.common;
 
 import java.util.Objects;
 
-public class Point2D {
-    public final double first;
-    public final double second;
+public class Point2D implements Comparable<Point2D> {
+    public final double x;
+    public final double y;
 
     public Point2D(double x, double y) {
-        this.first = x;
-        this.second = y;
+        this.x = x;
+        this.y = y;
     }
 
     @Override
@@ -16,17 +16,28 @@ public class Point2D {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Point2D point2D = (Point2D) o;
-        return Double.compare(point2D.first, first) == 0 &&
-                Double.compare(point2D.second, second) == 0;
+        return Double.compare(point2D.x, x) == 0 &&
+                Double.compare(point2D.y, y) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(first, second);
+        return Objects.hash(x, y);
     }
 
     @Override
     public String toString() {
-        return "(" + first + ";" + second + ")";
+        return "(" + x + ";" + y + ")";
+    }
+
+    @Override
+    public int compareTo(Point2D p) {
+        if (x < p.x || (x == p.x && y < p.y)) {
+            return -1;
+        }
+        if (x == p.x && y == p.y) {
+            return 0;
+        }
+        return 1;
     }
 }

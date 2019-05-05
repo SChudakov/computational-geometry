@@ -29,14 +29,14 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
         int ib = 0;
         // ia -> rightmost point of b
         for (int i = 1; i < n1; i++) {
-            if (a.get(i).first > a.get(ia).first) {
+            if (a.get(i).x > a.get(ia).x) {
                 ia = i;
             }
         }
 
         // ib -> leftmost point of b
         for (int i = 1; i < n2; i++) {
-            if (b.get(i).first < b.get(ib).first) {
+            if (b.get(i).x < b.get(ib).x) {
                 ib = i;
             }
         }
@@ -106,8 +106,9 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
     }
 
     @Override
-    public void precompute(List<Point2D> input) {
+    public List<Point2D> precompute(List<Point2D> input) {
         input.sort(new LexicographicalOrderPointComparator());
+        return input;
     }
 
     @Override
@@ -118,18 +119,18 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
         for (int i = 0; i < input.size(); i++) {
             for (int j = i + 1; j < input.size(); j++) {
 
-                double x1 = input.get(i).first;
-                double y1 = input.get(i).second;
+                double x1 = input.get(i).x;
+                double y1 = input.get(i).y;
 
-                double x2 = input.get(j).first;
-                double y2 = input.get(j).second;
+                double x2 = input.get(j).x;
+                double y2 = input.get(j).y;
 
                 double a1 = y1 - y2;
                 double b1 = x2 - x1;
                 double c1 = x1 * y2 - y1 * x2;
                 int pos = 0, neg = 0;
                 for (Point2D point : input) {
-                    double v = a1 * point.first + b1 * point.second + c1;
+                    double v = a1 * point.x + b1 * point.y + c1;
                     if (Math.abs(v) < 1e-10) {
                         v = 0.0;
                     }
@@ -153,17 +154,17 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
         double midFirst = 0.0;
         double midSecond = 0.0;
         for (Point2D p : s) {
-            midFirst += p.first;
-            midSecond += p.second;
+            midFirst += p.x;
+            midSecond += p.y;
 
-            result.add(new Point2D(p.first * n, p.second * n));
+            result.add(new Point2D(p.x * n, p.y * n));
         }
 
         Point2D mid = new Point2D(midFirst, midSecond);
         result.sort(new AntiClockwiseOrderPointComparator(mid));
 
         for (int i = 0; i < n; i++) {
-            result.set(i, new Point2D(result.get(i).first / n, result.get(i).second / n));
+            result.set(i, new Point2D(result.get(i).x / n, result.get(i).y / n));
         }
 //        System.out.println("output: " + result);
         return result;
@@ -184,8 +185,8 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
     }
 
     private static int orientation(Point2D a, Point2D b, Point2D c) {
-        double result = (b.second - a.second) * (c.first - b.first) -
-                (c.second - b.second) * (b.first - a.first);
+        double result = (b.y - a.y) * (c.x - b.x) -
+                (c.y - b.y) * (b.x - a.x);
 
         if (result == 0) {
             return 0;
@@ -201,10 +202,10 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
 
         @Override
         public int compare(Point2D x, Point2D y) {
-            if (x.first < y.first || (x.first == y.first && x.second < y.second)) {
+            if (x.x < y.x || (x.x == y.x && x.y < y.y)) {
                 return -1;
             }
-            if (x.first == y.first && x.second == y.second) {
+            if (x.x == y.x && x.y == y.y) {
                 return 0;
             }
             return 1;
@@ -220,11 +221,11 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
 
         @Override
         public int compare(Point2D p1, Point2D q1) {
-            double x1 = p1.first - mid.first;
-            double y1 = p1.second - mid.second;
+            double x1 = p1.x - mid.x;
+            double y1 = p1.y - mid.y;
 
-            double x2 = q1.first - mid.first;
-            double y2 = q1.second - mid.second;
+            double x2 = q1.x - mid.x;
+            double y2 = q1.y - mid.y;
 
             int one = quad(x1, y1);
             int two = quad(x2, y2);
