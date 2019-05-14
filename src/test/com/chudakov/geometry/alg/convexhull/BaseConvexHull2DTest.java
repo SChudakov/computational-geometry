@@ -18,8 +18,8 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 public class BaseConvexHull2DTest {
-    private static final String TEST_CASES_INPUT_DIR = "/home/semen/drive/workspace.java/computational-geometry/src/test/resources/convexhull/input";
-    private static final String TEST_CASES_OUTPUT_DIR = "/home/semen/drive/workspace.java/computational-geometry/src/test/resources/convexhull/output";
+    private static final String TEST_CASES_INPUT_DIR = "/home/semen/drive/workspace.java/computational-geometry/src/test/resources/convexhull/100_d/input/";
+    private static final String TEST_CASES_OUTPUT_DIR = "/home/semen/drive/workspace.java/computational-geometry/src/test/resources/convexhull/100_d/output/";
 
     protected void testConvexHull1(DaCExecutionSpecifics<List<Point2D>, List<Point2D>> specifics) {
         PointReader reader = new PointReader();
@@ -29,7 +29,7 @@ public class BaseConvexHull2DTest {
         int numberOfTestCases = testCasesInputs.length;
 
         try {
-            for (int i = 0; i < numberOfTestCases; i++) {
+            for (int i = 0; i < numberOfTestCases; ++i) {
                 System.out.println("test: " + i);
 
                 String testCaseName = i + ".txt";
@@ -60,7 +60,8 @@ public class BaseConvexHull2DTest {
         int numberOfTestCases = testCasesInputs.length;
 
         try {
-            for (int i = 0; i < numberOfTestCases; i++) {
+            for (int i = 0; i < numberOfTestCases; ++i) {
+//                if (i == 33767) {
                 System.out.println("test: " + i);
 
                 String testCaseName = i + ".txt";
@@ -75,6 +76,7 @@ public class BaseConvexHull2DTest {
                 ConvexHull actualOutput = specifics.solve(input);
 
                 assertEqual(expectedOutput, actualOutput);
+//                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,8 +91,8 @@ public class BaseConvexHull2DTest {
         }
 
         expected.sort(Point2D::compareTo);
-        System.out.println("expected output: " + expected);
-        System.out.println("actual output: " + actualList);
+//        System.out.println("expected output: " + expected);
+//        System.out.println("actual output: " + actualList);
 
         Set<Point2D> actualPoints = new HashSet<>(actualList);
 

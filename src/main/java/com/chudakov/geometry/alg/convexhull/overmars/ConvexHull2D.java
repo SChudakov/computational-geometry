@@ -45,7 +45,7 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
                     upper.add(third);
                     lower.add(second);
                 }
-            } else {
+            } else if(leftSlope > rightSlope){
                 if (first.y < second.y) {
                     upper.add(second);
                     upper.add(third);
@@ -53,6 +53,14 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
                 } else {
                     upper.add(first);
                     upper.add(second);
+                    lower.add(third);
+                }
+            } else{ // leftSlope == rightSlope
+                if (first.y < second.y) {
+                    upper.add(third);
+                    lower.add(first);
+                } else {
+                    upper.add(first);
                     lower.add(third);
                 }
             }
@@ -81,7 +89,7 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
         removeDuplicated(points, Comparator.comparingDouble(p -> p.y));
         points.sort(Point2D::compareTo);
         removeDuplicated(points, Comparator.comparingDouble(p -> p.x));
-        System.out.println("precomputed: " + points);
+//        System.out.println("precomputed: " + points);
         return points;
     }
 
