@@ -1,4 +1,4 @@
-package com.chudakov.geometry.alg.convexhull.overmars;
+package com.chudakov.geometry.datastructure;
 
 import java.util.Comparator;
 
@@ -8,22 +8,22 @@ import static org.junit.Assert.assertNotNull;
 public class CQUtil {
 
 
-    static <T> void setFields(ConcatenableQueue.Node<T> node,
-                              ConcatenableQueue.Node<T> left,
-                              ConcatenableQueue.Node<T> right,
-                              ConcatenableQueue.Node<T> lMax,
+    static <T> void setFields(ConcatenableQueue.CQNode<T> node,
+                              ConcatenableQueue.CQNode<T> left,
+                              ConcatenableQueue.CQNode<T> right,
+                              ConcatenableQueue.CQNode<T> lMax,
                               int height, boolean isLeaf) {
         node.left = left;
         node.right = right;
-        node.lMax = lMax;
+        node.leftSubtreeMax = lMax;
         node.height = height;
         node.isLeaf = isLeaf;
     }
 
     static <T> void setFields(ConcatenableQueue<T> queue,
-                              ConcatenableQueue.Node<T> root,
-                              ConcatenableQueue.Node<T> minNode,
-                              ConcatenableQueue.Node<T> maxNode,
+                              ConcatenableQueue.CQNode<T> root,
+                              ConcatenableQueue.CQNode<T> minNode,
+                              ConcatenableQueue.CQNode<T> maxNode,
                               Comparator<T> cmp) {
 
         queue.root = root;
@@ -32,11 +32,11 @@ public class CQUtil {
         queue.cmp = cmp;
     }
 
-    static <T> void assertSameFields(ConcatenableQueue.Node<T> node,
+    static <T> void assertSameFields(ConcatenableQueue.CQNode<T> node,
                                      T nodeData,
-                                     ConcatenableQueue.Node<T> left,
-                                     ConcatenableQueue.Node<T> right,
-                                     ConcatenableQueue.Node<T> lmax,
+                                     ConcatenableQueue.CQNode<T> left,
+                                     ConcatenableQueue.CQNode<T> right,
+                                     ConcatenableQueue.CQNode<T> lmax,
                                      int height, boolean isLeaf) {
         assertNotNull(node);
         assertEquals(nodeData, node.data);
@@ -44,13 +44,13 @@ public class CQUtil {
         assertEquals(right, node.right);
         assertEquals(height, node.height);
         assertEquals(isLeaf, node.isLeaf);
-        assertEquals(lmax, node.lMax);
+        assertEquals(lmax, node.leftSubtreeMax);
     }
 
     static <T> void assertSameFields(ConcatenableQueue<T> queue,
-                                     ConcatenableQueue.Node<T> root,
-                                     ConcatenableQueue.Node<T> minNode,
-                                     ConcatenableQueue.Node<T> maxNode,
+                                     ConcatenableQueue.CQNode<T> root,
+                                     ConcatenableQueue.CQNode<T> minNode,
+                                     ConcatenableQueue.CQNode<T> maxNode,
                                      Comparator<T> comparator) {
         assertNotNull(queue);
         assertEquals(root, queue.root);

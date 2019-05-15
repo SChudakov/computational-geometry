@@ -41,7 +41,7 @@ public class ParallelDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpeci
 
         @Override
         protected OT compute() {
-            if (algorithmSpecifics.size(input) <= inputSizeThreshold) {
+            if (algorithmSpecifics.inputSize(input) <= inputSizeThreshold) {
                 return sequentialExecution.solveRecursively(input);
             } else {
                 Pair<IT, IT> p = algorithmSpecifics.divide(input);

@@ -11,6 +11,13 @@ public class Point2D implements Comparable<Point2D> {
         this.y = y;
     }
 
+    public static double getSlope(Point2D left, Point2D right) {
+        if (right.x - left.x < 0) {
+            throw new IllegalArgumentException("invalid positioning of points");
+        }
+        return (right.y - left.y) / (right.x - left.x);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

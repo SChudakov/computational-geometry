@@ -1,18 +1,28 @@
 package com.chudakov.geometry.alg.convexhull.overmars;
 
-import com.chudakov.geometry.alg.convexhull.BaseConvexHull2DTest;
 import com.chudakov.geometry.common.Point2D;
+import com.chudakov.geometry.core.DaCExecutionSpecifics;
+import com.chudakov.geometry.datastructure.ConvexHull;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ConvexHull2DTest extends BaseConvexHull2DTest {
+public class ConvexHull2DTest {
+    private static final String TEST_CASES_INPUT_DIR = "./src/test/resources/convexhull/100_d/input/";
+    private static final String TEST_CASES_OUTPUT_DIR = "./src/test/resources/convexhull/100_d/output/";
+
     @Test
     public void testSimple1() {
         List<Point2D> points = new ArrayList<>(8);
@@ -192,28 +202,6 @@ public class ConvexHull2DTest extends BaseConvexHull2DTest {
         ), points7);
     }
 
-    @Test
-    public void testPrecompute() {
-        List<Point2D> points = new ArrayList<>();
-        points.add(new Point2D(1, 7));
-        points.add(new Point2D(1, 8));
-        points.add(new Point2D(1, 9));
-        points.add(new Point2D(4, 8));
-        points.add(new Point2D(6, 2));
-        points.add(new Point2D(7, 9));
-        points.add(new Point2D(8, 5));
-        points.add(new Point2D(8, 7));
-        points.add(new Point2D(8, 8));
-        points.add(new Point2D(9, 0));
-
-
-        points.add(new Point2D(1, 7));
-        points.add(new Point2D(1, 9));
-        points.add(new Point2D(4, 8));
-        points.add(new Point2D(7, 9));
-
-
-    }
 
     @Test
     public void tesSequentialConvexHull() {
@@ -223,5 +211,46 @@ public class ConvexHull2DTest extends BaseConvexHull2DTest {
     @Test
     public void tesParallelConvexHull() {
         testConvexHull2(new ParallelConvexHull2D());
+    }
+
+    private void testConvexHull2(DaCExecutionSpecifics<List<Point2D>, ConvexHull> specifics) {
+        PointReader reader = new PointReader();
+
+        File testCasesInputsDir = new File(TEST_CASES_INPUT_DIR);
+        File[] testCasesInputs = Objects.requireNonNull(testCasesInputsDir.listFiles());
+        int numberOfTestCases = testCasesInputs.length;
+
+        try {
+            for (int i = 0; i < numberOfTestCases; ++i) {
+
+                String testCaseName = i + ".txt";
+                String inputFilePath = Paths.get(TEST_CASES_INPUT_DIR, testCaseName).toString();
+                String outputFilePath = Paths.get(TEST_CASES_OUTPUT_DIR, testCaseName).toString();
+
+
+                List<Point2D> input = reader.readPoints(inputFilePath);
+                List<Point2D> expectedOutput = reader.readPoints(outputFilePath);
+
+                ConvexHull actualOutput = specifics.solve(input);
+
+                assertEqual(expectedOutput, actualOutput);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void assertEqual(List<Point2D> expected, ConvexHull actual) {
+        Set<Point2D> expectedPoints = new HashSet<>(expected);
+        List<Point2D> actualList = new ArrayList<>();
+        for (Point2D point : actual) {
+            actualList.add(point);
+        }
+
+        expected.sort(Point2D::compareTo);
+
+        Set<Point2D> actualPoints = new HashSet<>(actualList);
+
+        assertEquals(expectedPoints, actualPoints);
     }
 }

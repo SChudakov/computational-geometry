@@ -1,4 +1,4 @@
-package com.chudakov.geometry.alg.convexhull.overmars;
+package com.chudakov.geometry.datastructure;
 
 import com.chudakov.geometry.common.Point2D;
 

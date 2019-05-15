@@ -1,11 +1,9 @@
-package com.chudakov.geometry.alg.convexhull.overmars;
+package com.chudakov.geometry.datastructure;
 
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.util.Pair;
 import org.junit.Test;
 
-import static com.chudakov.geometry.alg.convexhull.overmars.CQUtil.assertSameFields;
-import static com.chudakov.geometry.alg.convexhull.overmars.CQUtil.setFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -51,19 +49,19 @@ public class ConvexHullTest {
         ConcatenableQueue<Point2D> upper = joined.upperSubhull.subhull;
         ConcatenableQueue<Point2D> lower = joined.lowerSubhull.subhull;
 
-        ConcatenableQueue.Node<Point2D> upperRoot = upper.root;
-        ConcatenableQueue.Node<Point2D> upperRootLeft = upper.root.left;
-        ConcatenableQueue.Node<Point2D> upperRootRight = upper.root.right;
-        assertSameFields(upperRoot, null, upperRootLeft, upperRootRight, upperRootLeft, 1, false);
+        ConcatenableQueue.CQNode<Point2D> upperRoot = upper.root;
+        ConcatenableQueue.CQNode<Point2D> upperRootLeft = upper.root.left;
+        ConcatenableQueue.CQNode<Point2D> upperRootRight = upper.root.right;
+        CQUtil.assertSameFields(upperRoot, null, upperRootLeft, upperRootRight, upperRootLeft, 1, false);
         assertNotNull(upperRootLeft);
         assertNotNull(upperRootRight);
-        assertSameFields(upperRootLeft, p1, null, upperRootRight, upperRootLeft, 0, true);
-        assertSameFields(upperRootRight, p4, upperRootLeft, null, upperRootRight, 0, true);
+        CQUtil.assertSameFields(upperRootLeft, p1, null, upperRootRight, upperRootLeft, 0, true);
+        CQUtil.assertSameFields(upperRootRight, p4, upperRootLeft, null, upperRootRight, 0, true);
 
 
-        ConcatenableQueue.Node<Point2D> lowerRoot = lower.root;
+        ConcatenableQueue.CQNode<Point2D> lowerRoot = lower.root;
         assertNotNull(lowerRoot);
-        assertSameFields(lowerRoot, p2, null, null, lowerRoot, 0, true);
+        CQUtil.assertSameFields(lowerRoot, p2, null, null, lowerRoot, 0, true);
     }
 
     @Test
@@ -79,7 +77,7 @@ public class ConvexHullTest {
         right.add(point2);
         right.add(point3);
 
-        Pair<ConcatenableQueue.Node<Point2D>, ConcatenableQueue.Node<Point2D>> tangent =
+        Pair<ConcatenableQueue.CQNode<Point2D>, ConcatenableQueue.CQNode<Point2D>> tangent =
                 ConvexHull.tangent(left, right, ConvexHull::getLowerTangentCase);
 
 
@@ -110,7 +108,7 @@ public class ConvexHullTest {
 
         ConcatenableQueue<Point2D> right = ConcatenableQueue.concatenate(right1, right2);
 
-        Pair<ConcatenableQueue.Node<Point2D>, ConcatenableQueue.Node<Point2D>> tangent =
+        Pair<ConcatenableQueue.CQNode<Point2D>, ConcatenableQueue.CQNode<Point2D>> tangent =
                 ConvexHull.tangent(left, right, ConvexHull::getUpperTangentCase);
 
 
@@ -123,8 +121,8 @@ public class ConvexHullTest {
 
 //      ----------------------------------   one point case -------------------------------------------------
 
-        ConcatenableQueue.Node<Point2D> node1_1 = new ConcatenableQueue.Node<>(new Point2D(1, 1));
-        setFields(node1_1, null, null, node1_1, 0, true);
+        ConcatenableQueue.CQNode<Point2D> node1_1 = new ConcatenableQueue.CQNode<>(new Point2D(1, 1));
+        CQUtil.setFields(node1_1, null, null, node1_1, 0, true);
 
 
         assertEquals(0, ConvexHull.getUpperTangentCase(node1_1, 0, ConvexHull.Position.LEFT));
@@ -140,10 +138,10 @@ public class ConvexHullTest {
 //        ----------------------------------   two point case -------------------------------------------------
 
 
-        ConcatenableQueue.Node<Point2D> node2_1 = new ConcatenableQueue.Node<>();
-        ConcatenableQueue.Node<Point2D> node2_2 = new ConcatenableQueue.Node<>();
-        setFields(node2_1, null, node2_2, node2_1, 0, true);
-        setFields(node2_2, node2_1, null, node2_2, 0, true);
+        ConcatenableQueue.CQNode<Point2D> node2_1 = new ConcatenableQueue.CQNode<>();
+        ConcatenableQueue.CQNode<Point2D> node2_2 = new ConcatenableQueue.CQNode<>();
+        CQUtil.setFields(node2_1, null, node2_2, node2_1, 0, true);
+        CQUtil.setFields(node2_2, node2_1, null, node2_2, 0, true);
 
         node2_1.data = new Point2D(1, 1);
         node2_2.data = new Point2D(2, 2);
@@ -203,12 +201,12 @@ public class ConvexHullTest {
 //      ----------------------------------   three point case -------------------------------------------------
 
 
-        ConcatenableQueue.Node<Point2D> node3_1 = new ConcatenableQueue.Node<>();
-        ConcatenableQueue.Node<Point2D> node3_2 = new ConcatenableQueue.Node<>();
-        ConcatenableQueue.Node<Point2D> node3_3 = new ConcatenableQueue.Node<>();
-        setFields(node3_1, null, node3_2, node3_1, 0, true);
-        setFields(node3_2, node3_1, node3_3, node3_2, 0, true);
-        setFields(node3_3, node3_2, null, node3_3, 0, true);
+        ConcatenableQueue.CQNode<Point2D> node3_1 = new ConcatenableQueue.CQNode<>();
+        ConcatenableQueue.CQNode<Point2D> node3_2 = new ConcatenableQueue.CQNode<>();
+        ConcatenableQueue.CQNode<Point2D> node3_3 = new ConcatenableQueue.CQNode<>();
+        CQUtil.setFields(node3_1, null, node3_2, node3_1, 0, true);
+        CQUtil.setFields(node3_2, node3_1, node3_3, node3_2, 0, true);
+        CQUtil.setFields(node3_3, node3_2, null, node3_3, 0, true);
 
 
 //      ---------------------------------------      1st row     -----------------------------------------------------
