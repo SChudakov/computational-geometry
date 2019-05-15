@@ -40,29 +40,29 @@ public class ConcatenableQueue<E> implements Iterable<E> {
             minNode = node;
             maxNode = node;
         } else {
-            root = insertAt(root, e);
+            root = insert(root, e);
         }
     }
 
-    private Node<E> insertAt(Node<E> node, E data) {
+    private Node<E> insert(Node<E> node, E e) {
         Node<E> result = null;
-        if (compareImpl(data, node.lMax.data) <= 0) { // go to the left sub-tree
+        if (compareImpl(e, node.lMax.data) <= 0) { // go to the left sub-tree
             if (node.isLeaf) {
-                if (compareImpl(data, node.data) == 0) {  // corner case, replace old value by the new one
-                    node.data = data;
+                if (compareImpl(e, node.data) == 0) {  // corner case, replace old value by the new one
+                    node.data = e;
                 } else { // create new leaf between n.left & n, hence data < node.lMax.data
-                    Node<E> createdLeaf = createLeadBetween(data, node.left, node);
+                    Node<E> createdLeaf = createLeafBetween(e, node.left, node);
                     result = new Node<>(createdLeaf, createdLeaf, node);
                 }
             } else { // go left & update node.left pointer
-                node.left = insertAt(node.left, data);
+                node.left = insert(node.left, e);
             }
         } else {
             if (node.isLeaf) { // create new leaf between n & n.right, hence data > node.lMax.data
-                Node<E> createdLeaf = createLeadBetween(data, node, node.right);
+                Node<E> createdLeaf = createLeafBetween(e, node, node.right);
                 result = new Node<>(node, node, createdLeaf);
             } else { // go left & update node.right pointer
-                node.right = insertAt(node.right, data);
+                node.right = insert(node.right, e);
             }
         }
 
@@ -74,15 +74,15 @@ public class ConcatenableQueue<E> implements Iterable<E> {
         return result;
     }
 
-    private Node<E> createLeadBetween(E data, Node<E> left, Node<E> right) {
-        Node<E> result = new Node<>(data, left, right);
-        if (left != null) {
-            left.right = result;
+    private Node<E> createLeafBetween(E data, Node<E> leftNode, Node<E> rightNode) {
+        Node<E> result = new Node<>(data, leftNode, rightNode);
+        if (leftNode != null) {
+            leftNode.right = result;
         } else {
             minNode = result;
         }
-        if (right != null) {
-            right.left = result;
+        if (rightNode != null) {
+            rightNode.left = result;
         } else {
             maxNode = result;
         }
@@ -160,28 +160,28 @@ public class ConcatenableQueue<E> implements Iterable<E> {
     }
 
 
-    public static <E> ConcatenableQueue<E> concatenate(ConcatenableQueue<E> qLeft, ConcatenableQueue<E> qRight) {
-        Objects.requireNonNull(qLeft, "qLeft is null!");
-        Objects.requireNonNull(qRight, "qRight is null!");
+    public static <E> ConcatenableQueue<E> concatenate(ConcatenableQueue<E> leftQueue, ConcatenableQueue<E> rightQueue) {
+        Objects.requireNonNull(leftQueue, "qLeft is null!");
+        Objects.requireNonNull(rightQueue, "qRight is null!");
 
-        assertSameComparator(qLeft, qRight);
+        assertSameComparator(leftQueue, rightQueue);
 
         // corner cases
-        if (qLeft.root == null) {
-            return qRight;
+        if (leftQueue.root == null) {
+            return rightQueue;
         }
-        if (qRight.root == null) {
-            return qLeft;
+        if (rightQueue.root == null) {
+            return leftQueue;
         }
 
         // concatenate the leafs
-        qLeft.maxNode.right = qRight.minNode;
-        qRight.minNode.left = qLeft.maxNode;
+        leftQueue.maxNode.right = rightQueue.minNode;
+        rightQueue.minNode.left = leftQueue.maxNode;
 
         // concatenate the two trees
-        Node<E> newRoot = glueTree(qLeft.root, qRight.root, qLeft.maxNode);
+        Node<E> newRoot = glueTree(leftQueue.root, rightQueue.root, leftQueue.maxNode);
 
-        return new ConcatenableQueue<>(newRoot, qLeft.minNode, qRight.maxNode, null);
+        return new ConcatenableQueue<>(newRoot, leftQueue.minNode, rightQueue.maxNode, null);
     }
 
 
@@ -198,36 +198,36 @@ public class ConcatenableQueue<E> implements Iterable<E> {
         return Pair.of(left, right);
     }
 
-    void splitAt(Node<E> node, E data, ConcatenableQueue<E> qLeft, ConcatenableQueue<E> qRight) {
+    void splitAt(Node<E> node, E e, ConcatenableQueue<E> leftQueue, ConcatenableQueue<E> rightQueue) {
         if (node.isLeaf) { // data`s node found (right leaf)
             // e == node.data
             // node has already proper height
-            qLeft.root = node;
-            qLeft.maxNode = node;
+            leftQueue.root = node;
+            leftQueue.maxNode = node;
 
-            qRight.minNode = node.right;
+            rightQueue.minNode = node.right;
 
             cutAt(node); // cut the queue connections
         } else {
-            if (compareImpl(data, node.lMax.data) == 0) { // base case, also if data`s node is a left leaf
-                qLeft.root = node.left;
-                qLeft.maxNode = node.lMax;
+            if (compareImpl(e, node.lMax.data) == 0) { // base case, also if data`s node is a left leaf
+                leftQueue.root = node.left;
+                leftQueue.maxNode = node.lMax;
 
-                qRight.root = node.right;
-                qRight.minNode = node.lMax.right;
+                rightQueue.root = node.right;
+                rightQueue.minNode = node.lMax.right;
 
                 cutAt(node.lMax);
-            } else if (compareImpl(data, node.lMax.data) < 0) { // to the left subtree
+            } else if (compareImpl(e, node.lMax.data) < 0) { // to the left subtree
                 // lMax remains the same for node
 
-                splitAt(node.left, data, qLeft, qRight);
+                splitAt(node.left, e, leftQueue, rightQueue);
 
-                qRight.root = glueTree(qRight.root, node.right, node.lMax);
+                rightQueue.root = glueTree(rightQueue.root, node.right, node.lMax);
             } else { // to the right subtree
 
-                splitAt(node.right, data, qLeft, qRight);
+                splitAt(node.right, e, leftQueue, rightQueue);
 
-                qLeft.root = glueTree(node.left, qLeft.root, node.lMax);
+                leftQueue.root = glueTree(node.left, leftQueue.root, node.lMax);
             }
         }
     }

@@ -5,6 +5,8 @@ import com.chudakov.geometry.util.Pair;
 public interface DaCAlgorithm<IT, OT> {
     boolean isBaseCase(IT input);
 
+    int size(IT input);
+
     OT solveBaseCase(IT input);
 
     OT merge(OT first, OT second);

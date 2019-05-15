@@ -20,13 +20,15 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 8, time = 10)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class ConvexHull2DPerf extends BaseConvexHull2DPerf {
+    private static final int TASKS_TO_NUM_OF_THREADS_RATIO = 20;
+
     @Benchmark
-    public ConvexHull testSequential(ConvexHull2DState state) {
+    public ConvexHull benchmarkSequential(ConvexHull2DState state) {
         return new SequentialConvexHull2D().solve(state.points);
     }
 
     @Benchmark
-    public ConvexHull testParallel(ConvexHull2DState state) {
-        return new ParallelConvexHull2D().solve(state.points);
+    public ConvexHull benchmarkParallel(ConvexHull2DState state) {
+        return new ParallelConvexHull2D(state.inputSizeThreshold).solve(state.points);
     }
 }

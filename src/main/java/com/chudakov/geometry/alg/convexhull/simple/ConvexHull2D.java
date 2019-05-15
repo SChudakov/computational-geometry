@@ -17,6 +17,11 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, List<Point2D>> 
     }
 
     @Override
+    public int size(List<Point2D> input) {
+        return input.size();
+    }
+
+    @Override
     public List<Point2D> merge(List<Point2D> a, List<Point2D> b) {
         int n1 = a.size();
         int n2 = b.size();

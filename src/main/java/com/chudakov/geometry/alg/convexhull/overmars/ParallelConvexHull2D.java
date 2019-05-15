@@ -9,4 +9,8 @@ public class ParallelConvexHull2D extends ParallelDaCExecutionSpecifics<List<Poi
     public ParallelConvexHull2D() {
         super(new ConvexHull2D());
     }
+
+    public ParallelConvexHull2D(int inputSizeThreshold) {
+        super(new ConvexHull2D(), inputSizeThreshold);
+    }
 }

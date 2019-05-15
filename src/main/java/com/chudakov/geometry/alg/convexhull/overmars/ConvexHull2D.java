@@ -16,6 +16,11 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
     }
 
     @Override
+    public int size(List<Point2D> input) {
+        return input.size();
+    }
+
+    @Override
     public ConvexHull solveBaseCase(List<Point2D> points) {
         int size = points.size();
 
@@ -45,7 +50,7 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
                     upper.add(third);
                     lower.add(second);
                 }
-            } else if(leftSlope > rightSlope){
+            } else if (leftSlope > rightSlope) {
                 if (first.y < second.y) {
                     upper.add(second);
                     upper.add(third);
@@ -55,7 +60,7 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
                     upper.add(second);
                     lower.add(third);
                 }
-            } else{ // leftSlope == rightSlope
+            } else { // leftSlope == rightSlope
                 if (first.y < second.y) {
                     upper.add(third);
                     lower.add(first);

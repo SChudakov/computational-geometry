@@ -15,12 +15,20 @@ public class BaseConvexHull2DPerf {
     @State(Scope.Benchmark)
     public static class ConvexHull2DState {
 
-        @Param({/*"100000",*/"1000000"/*,"10000000", "100000000"*/})
-        int size;
+        @Param({"100000", "1000000", "10000000", "100000000"})
+        public int size;
+        @Param({"20", "30", "40", "50"})
+        public int tasksPerThread;
+
+        public int inputSizeThreshold;
         public List<Point2D> points;
 
         @Setup(Level.Trial)
         public void generateGraph() {
+            int inputSizeThreshold = Math.max(
+                    size / Runtime.getRuntime().availableProcessors() / tasksPerThread,
+                    10000
+            );
             int upperLimit = 1_000_000;
             this.points = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
