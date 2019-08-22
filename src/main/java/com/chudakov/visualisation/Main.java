@@ -11,14 +11,12 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         ConvexHullVisualisation visualisation = new ConvexHullVisualisation();
-//        visualisation.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         DrawingPanel panel = new DrawingPanel();
         visualisation.getContentPane().add(panel, BorderLayout.CENTER);
         visualisation.setVisible(true);
 
         new Thread(() -> {
             for (int i = 0; i < 500; ++i) {
-                System.out.println(i);
                 int numOfPoints = 50;
                 int width = panel.getWidth();
                 int height = panel.getHeight();

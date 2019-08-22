@@ -8,6 +8,7 @@ import com.chudakov.geometry.alg.convexhull.overmars.SequentialConvexHull2D;
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.datastructure.ConvexHull;
 
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +39,9 @@ public class JFrame extends javax.swing.JFrame {
 
         pointsPanel = new DrawingPanel();
 
-        jPanel1 = new javax.swing.JPanel();
+        buttonsPanel = new javax.swing.JPanel();
         numOfPointsTextField = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
+        buildButton = new javax.swing.JButton();
         generateButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -56,11 +57,11 @@ public class JFrame extends javax.swing.JFrame {
                         .addGap(0, 782, Short.MAX_VALUE)
         );
 
-        jButton2.setText("Build");
-        jButton2.setActionCommand("");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        buildButton.setText("Build");
+        buildButton.setActionCommand("");
+        buildButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                buildButtonActionPerformed(evt);
             }
         });
 
@@ -72,8 +73,8 @@ public class JFrame extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(buttonsPanel);
+        buttonsPanel.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
@@ -82,7 +83,7 @@ public class JFrame extends javax.swing.JFrame {
                                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                                 .addGap(0, 0, Short.MAX_VALUE)
                                                 .addComponent(numOfPointsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(buildButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(generateButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addContainerGap())
         );
@@ -91,7 +92,7 @@ public class JFrame extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(numOfPointsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(buildButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(generateButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
@@ -104,14 +105,14 @@ public class JFrame extends javax.swing.JFrame {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(pointsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(buttonsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(pointsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(buttonsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-
+//        this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -151,7 +152,6 @@ public class JFrame extends javax.swing.JFrame {
 
     private void generateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateButtonActionPerformed
         try {
-            System.out.println("generate");
             String numOfPointsText = this.numOfPointsTextField.getText();
             int numOfPoints = Integer.valueOf(numOfPointsText);
             int width = this.pointsPanel.getWidth();
@@ -159,7 +159,7 @@ public class JFrame extends javax.swing.JFrame {
 
             generated = generatePoints(numOfPoints, width, height);
 
-            pointsPanel.generated = generated;
+            pointsPanel.generated = new ArrayList<>(generated);
             pointsPanel.convexHull = null;
             new Thread(() -> {
                 pointsPanel.paintComponent(pointsPanel.getGraphics());
@@ -171,10 +171,8 @@ public class JFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_generateButtonActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void buildButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if (generated != null) {
-            System.out.println("build");
-
             List<Point2D> convexHullPoints = new ArrayList<>();
             ConvexHull hull = this.convexHull2D.solve(this.generated);
             for (Point2D point2D : hull) {
@@ -203,8 +201,8 @@ public class JFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton generateButton;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton buildButton;
+    private javax.swing.JPanel buttonsPanel;
     private javax.swing.JTextField numOfPointsTextField;
     private DrawingPanel pointsPanel;
     // End of variables declaration//GEN-END:variables
