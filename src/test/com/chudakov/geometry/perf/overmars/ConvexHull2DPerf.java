@@ -29,18 +29,18 @@ import java.util.concurrent.TimeUnit;
 public class ConvexHull2DPerf {
     @Benchmark
     public ConvexHull benchmarkSequential(ConvexHull2DState state) {
-        return new SequentialConvexHull2D().solve(state.points);
+        return new SequentialConvexHull2D().solve(new ArrayList<>(state.points));
     }
 
     @Benchmark
     public ConvexHull benchmarkParallel(ConvexHull2DState state) {
-        return new ParallelConvexHull2D(state.inputSizeThreshold).solve(state.points);
+        return new ParallelConvexHull2D(state.inputSizeThreshold).solve(new ArrayList<>(state.points));
     }
 
     @State(Scope.Benchmark)
     public static class ConvexHull2DState {
 
-        @Param({"100000", "1000000", "10000000"})
+        @Param({"100000", "500000", "1000000", "5000000", "10000000", /*"25000000", "50000000", "70000000"*/})
         public int size;
         @Param({"20", "30", "40", "50"})
         public int tasksPerThread;
@@ -49,11 +49,8 @@ public class ConvexHull2DPerf {
         public List<Point2D> points;
 
         @Setup(Level.Trial)
-        public void generateGraph() {
-            inputSizeThreshold = Math.max(
-                    size / Runtime.getRuntime().availableProcessors() / tasksPerThread,
-                    10000
-            );
+        public void generatePoints() {
+            inputSizeThreshold = size / Runtime.getRuntime().availableProcessors() / tasksPerThread;
             int upperLimit = 1_000_000;
             this.points = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
