@@ -6,7 +6,7 @@ import com.chudakov.geometry.datastructure.ConvexHull;
 
 import java.util.List;
 
-public class SequentialUAE2D extends SequentialDaCExecutionSpecifics<List<Point2D>, ConvexHull> {
+public class SequentialUAE2D extends SequentialDaCExecutionSpecifics<List<Point2D>, UAEResult> {
     public SequentialUAE2D() {
         super(new UAE2D());
     }

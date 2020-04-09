@@ -4,6 +4,7 @@ import com.chudakov.geometry.uae.ParallelUAE2D;
 import com.chudakov.geometry.uae.SequentialUAE2D;
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.datastructure.ConvexHull;
+import com.chudakov.geometry.uae.UAEResult;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -28,12 +29,12 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class ConvexHull2DPerf {
     @Benchmark
-    public ConvexHull benchmarkSequential(ConvexHull2DState state) {
+    public UAEResult benchmarkSequential(ConvexHull2DState state) {
         return new SequentialUAE2D().solve(new ArrayList<>(state.points));
     }
 
     @Benchmark
-    public ConvexHull benchmarkParallel(ConvexHull2DState state) {
+    public UAEResult benchmarkParallel(ConvexHull2DState state) {
         return new ParallelUAE2D(state.inputSizeThreshold).solve(new ArrayList<>(state.points));
     }
 

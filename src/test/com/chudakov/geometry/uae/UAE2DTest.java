@@ -34,7 +34,7 @@ public class UAE2DTest {
         points.add(new Point2D(12, 1));
         points.add(new Point2D(13, 3));
 
-        ConvexHull hull = new SequentialUAE2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
         assertEqual(points, hull);
     }
@@ -63,7 +63,7 @@ public class UAE2DTest {
         expected.add(new Point2D(8, 10));
 
 
-        ConvexHull hull = new SequentialUAE2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
         assertEqual(expected, hull);
     }
@@ -85,7 +85,7 @@ public class UAE2DTest {
         expected.add(new Point2D(1, 1));
         expected.add(new Point2D(8, 1));
 
-        ConvexHull hull = new SequentialUAE2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
         assertEqual(expected, hull);
     }
@@ -107,7 +107,7 @@ public class UAE2DTest {
         expected.add(new Point2D(1, 1));
         expected.add(new Point2D(1, 8));
 
-        ConvexHull hull = new SequentialUAE2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
         assertEqual(expected, hull);
     }
@@ -213,7 +213,7 @@ public class UAE2DTest {
         testConvexHull2(new ParallelUAE2D());
     }
 
-    private void testConvexHull2(DaCExecutionSpecifics<List<Point2D>, ConvexHull> specifics) {
+    private void testConvexHull2(DaCExecutionSpecifics<List<Point2D>, UAEResult> specifics) {
         PointReader reader = new PointReader();
 
         File testCasesInputsDir = new File(TEST_CASES_INPUT_DIR);
@@ -231,7 +231,7 @@ public class UAE2DTest {
                 List<Point2D> input = reader.readPoints(inputFilePath);
                 List<Point2D> expectedOutput = reader.readPoints(outputFilePath);
 
-                ConvexHull actualOutput = specifics.solve(input);
+                ConvexHull actualOutput = specifics.solve(input).convexHull;
 
                 assertEqual(expectedOutput, actualOutput);
             }

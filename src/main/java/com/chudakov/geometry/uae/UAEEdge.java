@@ -11,4 +11,8 @@ public class UAEEdge {
 
     UAEEdge sym;
 
+    public UAEEdge(Point2D org, Point2D dest) {
+        this.org = org;
+        this.dest = dest;
+    }
 }

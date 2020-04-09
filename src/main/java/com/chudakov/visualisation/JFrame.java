@@ -173,7 +173,7 @@ public class JFrame extends javax.swing.JFrame {
     private void buildButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if (generated != null) {
             List<Point2D> convexHullPoints = new ArrayList<>();
-            ConvexHull hull = this.convexHull2D.solve(this.generated);
+            ConvexHull hull = this.convexHull2D.solve(this.generated).getConvexHull();
             for (Point2D point2D : hull) {
                 convexHullPoints.add(point2D);
             }

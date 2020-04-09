@@ -33,7 +33,7 @@ public class Main {
                 }
 
                 SequentialUAE2D convexHull = new SequentialUAE2D();
-                ConvexHull hull = convexHull.solve(generated);
+                ConvexHull hull = convexHull.solve(generated).getConvexHull();
                 List<Point2D> convex = new ArrayList<>();
                 for (Point2D point2D : hull) {
                     convex.add(point2D);

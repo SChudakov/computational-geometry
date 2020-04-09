@@ -7,11 +7,12 @@ import com.chudakov.geometry.datastructure.ConvexHull;
 import com.chudakov.geometry.datastructure.ConvexSubhull;
 import com.chudakov.geometry.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class UAE2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
+public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     @Override
     public boolean isBaseCase(List<Point2D> points) {
         int size = points.size();
@@ -24,7 +25,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
     }
 
     @Override
-    public ConvexHull solveBaseCase(List<Point2D> points) {
+    public UAEResult solveBaseCase(List<Point2D> points) {
         int size = points.size();
 
         ConcatenableQueue<Point2D> upper = new ConcatenableQueue<>();
@@ -69,13 +70,24 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
         ConvexSubhull upperSubhull = new ConvexSubhull(upper, ConvexSubhull.Type.UPPER);
         ConvexSubhull lowerSubhull = new ConvexSubhull(lower, ConvexSubhull.Type.LOWER);
 
-        return new ConvexHull(upperSubhull, lowerSubhull);
+        ConvexHull convexHull = new ConvexHull(upperSubhull, lowerSubhull);
+        return new UAEResult(convexHull, null, null, null);
     }
 
     @Override
-    public ConvexHull merge(ConvexHull left, ConvexHull right) {
-        return ConvexHull.join(left, right);
+    public UAEResult merge(UAEResult left, UAEResult right) {
+        Pair<UAEEdge, UAEEdge> p = getTriangulationEdges(left, right);
+        ConvexHull convexHull = ConvexHull.join(left.convexHull, right.convexHull);
+        List<UAEEdge> edges = new ArrayList<>(left.edges.size() + right.edges.size());
+        edges.addAll(left.edges);
+        edges.addAll(right.edges);
+        return new UAEResult(convexHull,  p.getFirst(), p.getSecond(),edges);
     }
+
+    private Pair<UAEEdge, UAEEdge> getTriangulationEdges(UAEResult left, UAEResult right) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
 
     @Override
     public Pair<List<Point2D>, List<Point2D>> divide(List<Point2D> input) {
