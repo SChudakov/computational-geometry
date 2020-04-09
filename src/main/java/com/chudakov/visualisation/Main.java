@@ -1,6 +1,6 @@
 package com.chudakov.visualisation;
 
-import com.chudakov.geometry.alg.convexhull.overmars.SequentialConvexHull2D;
+import com.chudakov.geometry.uae.SequentialUAE2D;
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.datastructure.ConvexHull;
 
@@ -32,7 +32,7 @@ public class Main {
                     e.printStackTrace();
                 }
 
-                SequentialConvexHull2D convexHull = new SequentialConvexHull2D();
+                SequentialUAE2D convexHull = new SequentialUAE2D();
                 ConvexHull hull = convexHull.solve(generated);
                 List<Point2D> convex = new ArrayList<>();
                 for (Point2D point2D : hull) {

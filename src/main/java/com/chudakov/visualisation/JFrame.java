@@ -4,11 +4,10 @@ package com.chudakov.visualisation;/*
  * and open the template in the editor.
  */
 
-import com.chudakov.geometry.alg.convexhull.overmars.SequentialConvexHull2D;
+import com.chudakov.geometry.uae.SequentialUAE2D;
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.datastructure.ConvexHull;
 
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * @author Semen
  */
 public class JFrame extends javax.swing.JFrame {
-    private SequentialConvexHull2D convexHull2D;
+    private SequentialUAE2D convexHull2D;
     private List<Point2D> generated;
     private List<Point2D> convexHull;
 
@@ -35,7 +34,7 @@ public class JFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        this.convexHull2D = new SequentialConvexHull2D();
+        this.convexHull2D = new SequentialUAE2D();
 
         pointsPanel = new DrawingPanel();
 

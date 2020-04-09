@@ -1,7 +1,7 @@
 package com.chudakov.geometry.perf.overmars;
 
-import com.chudakov.geometry.alg.convexhull.overmars.ParallelConvexHull2D;
-import com.chudakov.geometry.alg.convexhull.overmars.SequentialConvexHull2D;
+import com.chudakov.geometry.uae.ParallelUAE2D;
+import com.chudakov.geometry.uae.SequentialUAE2D;
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.datastructure.ConvexHull;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -29,12 +29,12 @@ import java.util.concurrent.TimeUnit;
 public class ConvexHull2DPerf {
     @Benchmark
     public ConvexHull benchmarkSequential(ConvexHull2DState state) {
-        return new SequentialConvexHull2D().solve(new ArrayList<>(state.points));
+        return new SequentialUAE2D().solve(new ArrayList<>(state.points));
     }
 
     @Benchmark
     public ConvexHull benchmarkParallel(ConvexHull2DState state) {
-        return new ParallelConvexHull2D(state.inputSizeThreshold).solve(new ArrayList<>(state.points));
+        return new ParallelUAE2D(state.inputSizeThreshold).solve(new ArrayList<>(state.points));
     }
 
     @State(Scope.Benchmark)

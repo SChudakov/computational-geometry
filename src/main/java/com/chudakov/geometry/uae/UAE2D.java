@@ -1,4 +1,4 @@
-package com.chudakov.geometry.alg.convexhull.overmars;
+package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.core.DaCAlgorithm;
@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
+public class UAE2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
     @Override
     public boolean isBaseCase(List<Point2D> points) {
         int size = points.size();
@@ -89,7 +89,11 @@ public class ConvexHull2D implements DaCAlgorithm<List<Point2D>, ConvexHull> {
         removeDuplicated(points, Comparator.comparingDouble(p -> p.y));
         points.sort(Point2D::compareTo);
         removeDuplicated(points, Comparator.comparingDouble(p -> p.x));
-        return points;
+        return deleteCocircularPoints(points);
+    }
+
+    private List<Point2D> deleteCocircularPoints(List<Point2D> points) {
+        throw new UnsupportedOperationException("not implemented");
     }
 
     void removeDuplicated(List<Point2D> points, Comparator<Point2D> comparator) {

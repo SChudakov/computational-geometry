@@ -1,4 +1,4 @@
-package com.chudakov.geometry.alg.convexhull.overmars;
+package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.core.DaCExecutionSpecifics;
@@ -19,7 +19,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ConvexHull2DTest {
+public class UAE2DTest {
     private static final String TEST_CASES_INPUT_DIR = "./src/test/resources/convexhull/100_d/input/";
     private static final String TEST_CASES_OUTPUT_DIR = "./src/test/resources/convexhull/100_d/output/";
 
@@ -34,7 +34,7 @@ public class ConvexHull2DTest {
         points.add(new Point2D(12, 1));
         points.add(new Point2D(13, 3));
 
-        ConvexHull hull = new SequentialConvexHull2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points);
 
         assertEqual(points, hull);
     }
@@ -63,7 +63,7 @@ public class ConvexHull2DTest {
         expected.add(new Point2D(8, 10));
 
 
-        ConvexHull hull = new SequentialConvexHull2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points);
 
         assertEqual(expected, hull);
     }
@@ -85,7 +85,7 @@ public class ConvexHull2DTest {
         expected.add(new Point2D(1, 1));
         expected.add(new Point2D(8, 1));
 
-        ConvexHull hull = new SequentialConvexHull2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points);
 
         assertEqual(expected, hull);
     }
@@ -107,7 +107,7 @@ public class ConvexHull2DTest {
         expected.add(new Point2D(1, 1));
         expected.add(new Point2D(1, 8));
 
-        ConvexHull hull = new SequentialConvexHull2D().solve(points);
+        ConvexHull hull = new SequentialUAE2D().solve(points);
 
         assertEqual(expected, hull);
     }
@@ -115,7 +115,7 @@ public class ConvexHull2DTest {
 
     @Test
     public void testRemoveDuplicated() {
-        ConvexHull2D convexHull = new ConvexHull2D();
+        UAE2D convexHull = new UAE2D();
 
         List<Point2D> points1 = new ArrayList<>();
         convexHull.removeDuplicated(points1, Point2D::compareTo);
@@ -205,12 +205,12 @@ public class ConvexHull2DTest {
 
     @Test
     public void tesSequentialConvexHull() {
-        testConvexHull2(new SequentialConvexHull2D());
+        testConvexHull2(new SequentialUAE2D());
     }
 
     @Test
     public void tesParallelConvexHull() {
-        testConvexHull2(new ParallelConvexHull2D());
+        testConvexHull2(new ParallelUAE2D());
     }
 
     private void testConvexHull2(DaCExecutionSpecifics<List<Point2D>, ConvexHull> specifics) {
