@@ -10,14 +10,8 @@ public class UAEResult {
     DTEdge e1;
     DTEdge e2;
 
-    List<DTEdge> edges;
-
     public ConvexHull getConvexHull() {
         return convexHull;
-    }
-
-    public List<DTEdge> getEdges() {
-        return edges;
     }
 
     public DTEdge getE1() {
@@ -28,10 +22,9 @@ public class UAEResult {
         return e2;
     }
 
-    public UAEResult(ConvexHull convexHull, DTEdge e1, DTEdge e2, List<DTEdge> edges) {
+    public UAEResult(ConvexHull convexHull, DTEdge e1, DTEdge e2) {
         this.convexHull = convexHull;
         this.e1 = e1;
         this.e2 = e2;
-        this.edges = edges;
     }
 }

@@ -10,7 +10,6 @@ import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -30,8 +29,8 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     @Override
     public UAEResult solveBaseCase(List<Point2D> points) {
         ConvexHull convexHull = convexHullBaseCase(points);
-        Triple<DTEdge, DTEdge, List<DTEdge>> t = delaunayTriangulationBaseCase(points);
-        return new UAEResult(convexHull, t.getLeft(), t.getMiddle(), t.getRight());
+        Pair<DTEdge, DTEdge> p = delaunayTriangulationBaseCase(points);
+        return new UAEResult(convexHull, p.getLeft(), p.getRight());
     }
 
     private ConvexHull convexHullBaseCase(List<Point2D> points) {
@@ -82,10 +81,10 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         return new ConvexHull(upperSubhull, lowerSubhull);
     }
 
-    private Triple<DTEdge, DTEdge, List<DTEdge>> delaunayTriangulationBaseCase(List<Point2D> points) {
+    private Pair<DTEdge, DTEdge> delaunayTriangulationBaseCase(List<Point2D> points) {
         if (points.size() == 2) {
             DTEdge e = makeEdge(points.get(0), points.get(1));
-            return Triple.of(e, e.sym, Collections.singletonList(e));
+            return Pair.of(e, e.sym);
         }
 
         // points size = 3
@@ -100,26 +99,20 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         // Close the triangle.
         if (leftOf(p3, a)) {
             connect(b, a);
-            return Triple.of(a, b.sym, Arrays.asList(a, b));
+            return Pair.of(a, b.sym);
         } else if (leftOf(p3, a)) {
             DTEdge c = connect(b, a);
-            return Triple.of(c.sym, c, Arrays.asList(a, b, c));
+            return Pair.of(c.sym, c);
         } else { // the three points are collinear
-            return Triple.of(a, b.sym, Arrays.asList(a, b));
+            return Pair.of(a, b.sym);
         }
     }
 
     @Override
     public UAEResult merge(UAEResult left, UAEResult right) {
         Pair<DTEdge, DTEdge> p = getTriangulationEdges(left, right);
-
         ConvexHull convexHull = ConvexHull.join(left.convexHull, right.convexHull);
-
-        List<DTEdge> edges = new ArrayList<>(left.edges.size() + right.edges.size());
-        edges.addAll(left.edges);
-        edges.addAll(right.edges);
-
-        return new UAEResult(convexHull, p.getLeft(), p.getRight(), edges);
+        return new UAEResult(convexHull, p.getLeft(), p.getRight());
     }
 
     private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left, UAEResult right) {
