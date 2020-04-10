@@ -1,7 +1,5 @@
 package com.chudakov.geometry.uae;
 
-import com.chudakov.geometry.uae.ConcatenableQueue;
-
 import java.util.Comparator;
 
 import static org.junit.Assert.assertEquals;

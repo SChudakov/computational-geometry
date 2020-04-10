@@ -24,7 +24,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     public UAEResult solveBaseCase(List<Point2D> points) {
         ConvexHull convexHull = convexHullBaseCase(points);
         Pair<DTEdge, DTEdge> p = delaunayTriangulationBaseCase(points);
-        return new UAEResult(convexHull, p.getLeft(), p.getRight());
+        return new UAEResult(convexHull, p.getLeft(), p.getRight()/*null,null*/);
     }
 
     private ConvexHull convexHullBaseCase(List<Point2D> points) {
@@ -143,7 +143,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         ConvexHull convexHull = new ConvexHull(upperSubhull, lowerSubhull);
 
         Pair<DTEdge, DTEdge> p = getTriangulationEdges(left, right);
-        return new UAEResult(convexHull, p.getLeft(), p.getRight());
+        return new UAEResult(convexHull, p.getLeft(), p.getRight()/*null, null*/);
     }
 
     private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left, UAEResult right) {
@@ -164,8 +164,8 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         points.sort(Point2D::compareTo);
         removeDuplicated(points, Comparator.comparingDouble(p -> p.x));
         return deleteCocircularPoints(points);
+//        return points;
     }
-
 
 
     static void removeDuplicated(List<Point2D> points, Comparator<Point2D> comparator) {

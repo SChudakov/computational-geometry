@@ -114,15 +114,13 @@ public class UAE2DTest {
 
     @Test
     public void testRemoveDuplicated() {
-        UAE2D convexHull = new UAE2D();
-
         List<Point2D> points1 = new ArrayList<>();
-        convexHull.removeDuplicated(points1, Point2D::compareTo);
+        UAE2D.removeDuplicated(points1, Point2D::compareTo);
         assertTrue(points1.isEmpty());
 
         List<Point2D> points2 = new ArrayList<>();
         points2.add(new Point2D(1, 1));
-        convexHull.removeDuplicated(points2, Point2D::compareTo);
+        UAE2D.removeDuplicated(points2, Point2D::compareTo);
         assertEquals(Collections.singletonList(
                 new Point2D(1, 1)
         ), points2);
@@ -130,7 +128,7 @@ public class UAE2DTest {
         List<Point2D> points3 = new ArrayList<>();
         points3.add(new Point2D(1, 1));
         points3.add(new Point2D(1, 1));
-        convexHull.removeDuplicated(points3, Point2D::compareTo);
+        UAE2D.removeDuplicated(points3, Point2D::compareTo);
         assertEquals(Arrays.asList(
                 new Point2D(1, 1),
                 new Point2D(1, 1)
@@ -139,7 +137,7 @@ public class UAE2DTest {
         List<Point2D> points4 = new ArrayList<>();
         points4.add(new Point2D(1, 1));
         points4.add(new Point2D(1, 2));
-        convexHull.removeDuplicated(points4, Point2D::compareTo);
+        UAE2D.removeDuplicated(points4, Point2D::compareTo);
         assertEquals(Arrays.asList(
                 new Point2D(1, 1),
                 new Point2D(1, 2)
@@ -150,7 +148,7 @@ public class UAE2DTest {
         points5.add(new Point2D(1, 1));
         points5.add(new Point2D(1, 1));
         points5.add(new Point2D(1, 1));
-        convexHull.removeDuplicated(points5, Point2D::compareTo);
+        UAE2D.removeDuplicated(points5, Point2D::compareTo);
         assertEquals(Arrays.asList(
                 new Point2D(1, 1),
                 new Point2D(1, 1)
@@ -167,7 +165,7 @@ public class UAE2DTest {
         points6.add(new Point2D(3, 3));
         points6.add(new Point2D(3, 3));
         points6.add(new Point2D(4, 4));
-        convexHull.removeDuplicated(points6, Point2D::compareTo);
+        UAE2D.removeDuplicated(points6, Point2D::compareTo);
         assertEquals(Arrays.asList(
                 new Point2D(1, 1),
                 new Point2D(1, 1),
@@ -189,7 +187,7 @@ public class UAE2DTest {
         points7.add(new Point2D(5, 5));
         points7.add(new Point2D(5, 5));
         points7.add(new Point2D(5, 5));
-        convexHull.removeDuplicated(points7, Point2D::compareTo);
+        UAE2D.removeDuplicated(points7, Point2D::compareTo);
         assertEquals(Arrays.asList(
                 new Point2D(1, 1),
                 new Point2D(2, 2),

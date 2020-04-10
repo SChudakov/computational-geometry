@@ -23,7 +23,7 @@ public class PointReader {
                 throw new RuntimeException("illegal line format: " + line);
             }
             result.add(new Point2D(
-                    Double.valueOf(coordinates[0]), Double.valueOf(coordinates[1]))
+                    Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]))
             );
         }
         return result;

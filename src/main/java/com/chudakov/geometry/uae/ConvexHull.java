@@ -1,7 +1,6 @@
 package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Iterator;
 
