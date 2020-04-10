@@ -1,6 +1,6 @@
 package com.chudakov.geometry.core;
 
-import com.chudakov.geometry.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 public interface DaCAlgorithm<IT, OT> {
     boolean isBaseCase(IT input);

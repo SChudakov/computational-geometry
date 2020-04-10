@@ -5,7 +5,7 @@ import com.chudakov.geometry.core.DaCAlgorithm;
 import com.chudakov.geometry.datastructure.ConcatenableQueue;
 import com.chudakov.geometry.datastructure.ConvexHull;
 import com.chudakov.geometry.datastructure.ConvexSubhull;
-import com.chudakov.geometry.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -81,7 +81,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         List<UAEEdge> edges = new ArrayList<>(left.edges.size() + right.edges.size());
         edges.addAll(left.edges);
         edges.addAll(right.edges);
-        return new UAEResult(convexHull,  p.getFirst(), p.getSecond(),edges);
+        return new UAEResult(convexHull, p.getLeft(), p.getRight(), edges);
     }
 
     private Pair<UAEEdge, UAEEdge> getTriangulationEdges(UAEResult left, UAEResult right) {

@@ -1,6 +1,6 @@
 package com.chudakov.geometry.datastructure;
 
-import com.chudakov.geometry.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -103,8 +103,8 @@ public class ConcatenableQueue<E> implements Iterable<E> {
 
         Pair<ConcatenableQueue<E>, ConcatenableQueue<E>> cuts = split(splitterNode.data);
 
-        ConcatenableQueue<E> left = cuts.getFirst();
-        ConcatenableQueue<E> right = cuts.getSecond();
+        ConcatenableQueue<E> left = cuts.getLeft();
+        ConcatenableQueue<E> right = cuts.getRight();
 
         copy(right, this);
 
@@ -122,8 +122,8 @@ public class ConcatenableQueue<E> implements Iterable<E> {
 
         Pair<ConcatenableQueue<E>, ConcatenableQueue<E>> cuts = split(e);
 
-        ConcatenableQueue<E> left = cuts.getFirst();
-        ConcatenableQueue<E> right = cuts.getSecond();
+        ConcatenableQueue<E> left = cuts.getLeft();
+        ConcatenableQueue<E> right = cuts.getRight();
 
         copy(left, this);
 

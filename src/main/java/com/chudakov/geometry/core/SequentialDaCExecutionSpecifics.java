@@ -1,6 +1,7 @@
 package com.chudakov.geometry.core;
 
-import com.chudakov.geometry.util.Pair;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 public class SequentialDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpecifics<IT, OT> {
     protected SequentialDaCExecutionSpecifics(DaCAlgorithm<IT, OT> algorithmSpecifics) {
@@ -14,8 +15,8 @@ public class SequentialDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpe
         }
 
         Pair<IT, IT> p = algorithmSpecifics.divide(input);
-        IT left = p.getFirst();
-        IT right = p.getSecond();
+        IT left = p.getLeft();
+        IT right = p.getRight();
 
         OT leftHull = solveRecursively(left);
         OT rightHull = solveRecursively(right);

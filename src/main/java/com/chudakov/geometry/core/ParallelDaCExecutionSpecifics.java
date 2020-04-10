@@ -1,6 +1,6 @@
 package com.chudakov.geometry.core;
 
-import com.chudakov.geometry.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -45,8 +45,8 @@ public class ParallelDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpeci
                 return sequentialExecution.solveRecursively(input);
             } else {
                 Pair<IT, IT> p = algorithmSpecifics.divide(input);
-                IT left = p.getFirst();
-                IT right = p.getSecond();
+                IT left = p.getLeft();
+                IT right = p.getRight();
 
                 ExecutionTask t1 = new ExecutionTask(left);
                 t1.fork();

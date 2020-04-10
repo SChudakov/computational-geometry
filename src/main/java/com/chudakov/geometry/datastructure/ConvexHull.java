@@ -1,7 +1,7 @@
 package com.chudakov.geometry.datastructure;
 
 import com.chudakov.geometry.common.Point2D;
-import com.chudakov.geometry.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Iterator;
 
@@ -36,17 +36,17 @@ public class ConvexHull implements Iterable<Point2D> {
 
         // first: prepare upper queues
         Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1 = moveCornerPointsUp(leftUpper, leftLower);
-        leftUpper = p1.getFirst();
-        leftLower = p1.getSecond();
+        leftUpper = p1.getLeft();
+        leftLower = p1.getRight();
 
         Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p2 = moveCornerPointsUp(rightUpper, rightLower);
-        rightUpper = p2.getFirst();
-        rightLower = p2.getSecond();
+        rightUpper = p2.getLeft();
+        rightLower = p2.getRight();
 
         Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> rests =
                 cutRest(leftUpper, rightUpper, ConvexHull::getUpperTangentCase);
-        ConcatenableQueue<Point2D> leftUpperRest = rests.getFirst();
-        ConcatenableQueue<Point2D> rightUpperRest = rests.getSecond();
+        ConcatenableQueue<Point2D> leftUpperRest = rests.getLeft();
+        ConcatenableQueue<Point2D> rightUpperRest = rests.getRight();
 
         // second: prepare lower queues
         leftLower = moveRightCornerPointDown(leftUpperRest, leftLower);
@@ -113,13 +113,13 @@ public class ConvexHull implements Iterable<Point2D> {
             ConcatenableQueue<Point2D> left, ConcatenableQueue<Point2D> right,
             TriFunction<ConcatenableQueue.CQNode<Point2D>, Double, Position, Integer> casesFunction) {
         if (left.root == null || right.root == null) {
-            return new Pair<>(new ConcatenableQueue<>(left.cmp), new ConcatenableQueue<>(right.cmp));
+            return Pair.of(new ConcatenableQueue<>(left.cmp), new ConcatenableQueue<>(right.cmp));
         }
         Pair<ConcatenableQueue.CQNode<Point2D>, ConcatenableQueue.CQNode<Point2D>> p =
                 tangent(left, right, casesFunction);
 
-        ConcatenableQueue.CQNode<Point2D> leftBase = p.getFirst();
-        ConcatenableQueue.CQNode<Point2D> rightBase = p.getSecond();
+        ConcatenableQueue.CQNode<Point2D> leftBase = p.getLeft();
+        ConcatenableQueue.CQNode<Point2D> rightBase = p.getRight();
 
         ConcatenableQueue<Point2D> leftRest = left.cutRight(leftBase.data);
         ConcatenableQueue<Point2D> rightRest = right.cutLeft(rightBase.data);

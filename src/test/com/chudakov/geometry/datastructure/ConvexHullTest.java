@@ -1,7 +1,7 @@
 package com.chudakov.geometry.datastructure;
 
 import com.chudakov.geometry.common.Point2D;
-import com.chudakov.geometry.util.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -81,8 +81,8 @@ public class ConvexHullTest {
                 ConvexHull.tangent(left, right, ConvexHull::getLowerTangentCase);
 
 
-        assertEquals(point1, tangent.getFirst().data);
-        assertEquals(point3, tangent.getSecond().data);
+        assertEquals(point1, tangent.getLeft().data);
+        assertEquals(point3, tangent.getRight().data);
     }
 
     @Test
@@ -112,8 +112,8 @@ public class ConvexHullTest {
                 ConvexHull.tangent(left, right, ConvexHull::getUpperTangentCase);
 
 
-        assertEquals(point1, tangent.getFirst().data);
-        assertEquals(point4, tangent.getSecond().data);
+        assertEquals(point1, tangent.getLeft().data);
+        assertEquals(point4, tangent.getRight().data);
     }
 
     @Test
