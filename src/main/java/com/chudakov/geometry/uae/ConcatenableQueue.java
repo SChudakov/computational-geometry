@@ -1,4 +1,4 @@
-package com.chudakov.geometry.datastructure;
+package com.chudakov.geometry.uae;
 
 import org.apache.commons.lang3.tuple.Pair;
 

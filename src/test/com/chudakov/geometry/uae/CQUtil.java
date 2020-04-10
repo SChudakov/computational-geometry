@@ -1,4 +1,6 @@
-package com.chudakov.geometry.datastructure;
+package com.chudakov.geometry.uae;
+
+import com.chudakov.geometry.uae.ConcatenableQueue;
 
 import java.util.Comparator;
 

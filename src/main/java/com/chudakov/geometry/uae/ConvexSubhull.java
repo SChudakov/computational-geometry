@@ -1,4 +1,4 @@
-package com.chudakov.geometry.datastructure;
+package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 

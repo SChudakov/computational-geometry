@@ -3,7 +3,6 @@ package com.chudakov.geometry.perf.overmars;
 import com.chudakov.geometry.uae.ParallelUAE2D;
 import com.chudakov.geometry.uae.SequentialUAE2D;
 import com.chudakov.geometry.common.Point2D;
-import com.chudakov.geometry.datastructure.ConvexHull;
 import com.chudakov.geometry.uae.UAEResult;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;

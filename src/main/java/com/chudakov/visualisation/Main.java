@@ -2,7 +2,7 @@ package com.chudakov.visualisation;
 
 import com.chudakov.geometry.uae.SequentialUAE2D;
 import com.chudakov.geometry.common.Point2D;
-import com.chudakov.geometry.datastructure.ConvexHull;
+import com.chudakov.geometry.uae.ConvexHull;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;

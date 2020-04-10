@@ -1,71 +1,9 @@
-package com.chudakov.geometry.datastructure;
+package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Iterator;
-
-public class ConvexHull implements Iterable<Point2D> {
-    @FunctionalInterface
-    interface TriFunction<A, B, C, R> {
-        R apply(A a, B b, C c);
-    }
-
-    enum Position {LEFT, RIGHT}
-
-    final ConvexSubhull upperSubhull;
-    final ConvexSubhull lowerSubhull;
-
-    public ConvexHull(ConvexSubhull upperSubhull, ConvexSubhull lowerSubhull) {
-        if (!upperSubhull.type.equals(ConvexSubhull.Type.UPPER)) {
-            throw new IllegalArgumentException("upper sub-hull improper type");
-        }
-        if (!lowerSubhull.type.equals(ConvexSubhull.Type.LOWER)) {
-            throw new IllegalArgumentException("lower sub-hull improper type");
-        }
-        this.upperSubhull = upperSubhull;
-        this.lowerSubhull = lowerSubhull;
-    }
-
-    public static ConvexHull join(ConvexHull left, ConvexHull right) {
-
-        ConcatenableQueue<Point2D> leftUpper = left.upperSubhull.subhull;
-        ConcatenableQueue<Point2D> leftLower = left.lowerSubhull.subhull;
-        ConcatenableQueue<Point2D> rightUpper = right.upperSubhull.subhull;
-        ConcatenableQueue<Point2D> rightLower = right.lowerSubhull.subhull;
-
-        // first: prepare upper queues
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1 = moveCornerPointsUp(leftUpper, leftLower);
-        leftUpper = p1.getLeft();
-        leftLower = p1.getRight();
-
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p2 = moveCornerPointsUp(rightUpper, rightLower);
-        rightUpper = p2.getLeft();
-        rightLower = p2.getRight();
-
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> rests =
-                cutRest(leftUpper, rightUpper, ConvexHull::getUpperTangentCase);
-        ConcatenableQueue<Point2D> leftUpperRest = rests.getLeft();
-        ConcatenableQueue<Point2D> rightUpperRest = rests.getRight();
-
-        // second: prepare lower queues
-        leftLower = moveRightCornerPointDown(leftUpperRest, leftLower);
-        rightLower = moveLeftCornerPointDown(rightUpperRest, rightLower);
-
-        cutRest(leftLower, rightLower, ConvexHull::getLowerTangentCase);
-
-        // finally: create sub-hulls
-        ConcatenableQueue<Point2D> upperResult = ConcatenableQueue.concatenate(leftUpper, rightUpper);
-        ConcatenableQueue<Point2D> lowerResult = ConcatenableQueue.concatenate(leftLower, rightLower);
-
-        lowerResult = adjustLowerHull(upperResult, lowerResult);
-
-        ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
-        ConvexSubhull lowerSubhull = new ConvexSubhull(lowerResult, ConvexSubhull.Type.LOWER);
-
-        return new ConvexHull(upperSubhull, lowerSubhull);
-    }
-
+public class CH {
     static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> moveCornerPointsUp(
             ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
         ConcatenableQueue<Point2D> lowerRest = lower;
@@ -111,7 +49,7 @@ public class ConvexHull implements Iterable<Point2D> {
 
     static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> cutRest(
             ConcatenableQueue<Point2D> left, ConcatenableQueue<Point2D> right,
-            TriFunction<ConcatenableQueue.CQNode<Point2D>, Double, Position, Integer> casesFunction) {
+            ConvexHull.TriFunction<ConcatenableQueue.CQNode<Point2D>, Double, ConvexHull.Position, Integer> casesFunction) {
         if (left.root == null || right.root == null) {
             return Pair.of(new ConcatenableQueue<>(left.cmp), new ConcatenableQueue<>(right.cmp));
         }
@@ -130,7 +68,7 @@ public class ConvexHull implements Iterable<Point2D> {
     static Pair<ConcatenableQueue.CQNode<Point2D>, ConcatenableQueue.CQNode<Point2D>> tangent(
             ConcatenableQueue<Point2D> leftHull,
             ConcatenableQueue<Point2D> rightHull,
-            TriFunction<ConcatenableQueue.CQNode<Point2D>, Double, Position, Integer> casesFunction) {
+            ConvexHull.TriFunction<ConcatenableQueue.CQNode<Point2D>, Double, ConvexHull.Position, Integer> casesFunction) {
 
         //locate the appropriate pointers on both hulls
         ConcatenableQueue.CQNode<Point2D> leftIterator = leftHull.root;
@@ -141,8 +79,8 @@ public class ConvexHull implements Iterable<Point2D> {
 
         while (!done) {
             double tangentSlope = getSlope(leftIterator.leftSubtreeMax, rightIterator.leftSubtreeMax);
-            int leftCase = casesFunction.apply(leftIterator.leftSubtreeMax, tangentSlope, Position.LEFT);
-            int rightCase = casesFunction.apply(rightIterator.leftSubtreeMax, tangentSlope, Position.RIGHT);
+            int leftCase = casesFunction.apply(leftIterator.leftSubtreeMax, tangentSlope, ConvexHull.Position.LEFT);
+            int rightCase = casesFunction.apply(rightIterator.leftSubtreeMax, tangentSlope, ConvexHull.Position.RIGHT);
 
             if (leftCase == -1) {
                 if (rightCase == -1) {
@@ -202,22 +140,22 @@ public class ConvexHull implements Iterable<Point2D> {
     }
 
 
-    static int getUpperTangentCase(ConcatenableQueue.CQNode<Point2D> node, double tangentSlope, Position subHullPosition) {
+    static int getUpperTangentCase(ConcatenableQueue.CQNode<Point2D> node, double tangentSlope, ConvexHull.Position subHullPosition) {
         boolean leftSlopeGreater = true;
         boolean rightSlopeGreater = false;
 
         if (node.left != null) {
             double leftSlope = getSlope(node.left, node);
-            if ((subHullPosition.equals(Position.LEFT) && leftSlope <= tangentSlope) ||
-                    (subHullPosition.equals(Position.RIGHT) && leftSlope < tangentSlope)) {
+            if ((subHullPosition.equals(ConvexHull.Position.LEFT) && leftSlope <= tangentSlope) ||
+                    (subHullPosition.equals(ConvexHull.Position.RIGHT) && leftSlope < tangentSlope)) {
                 leftSlopeGreater = false;
             }
         }
 
         if (node.right != null) {
             double rightSlope = getSlope(node, node.right);
-            if ((subHullPosition.equals(Position.LEFT) && rightSlope > tangentSlope) ||
-                    (subHullPosition.equals(Position.RIGHT) && rightSlope >= tangentSlope)) {
+            if ((subHullPosition.equals(ConvexHull.Position.LEFT) && rightSlope > tangentSlope) ||
+                    (subHullPosition.equals(ConvexHull.Position.RIGHT) && rightSlope >= tangentSlope)) {
                 rightSlopeGreater = true;
             }
         }
@@ -234,22 +172,22 @@ public class ConvexHull implements Iterable<Point2D> {
         }
     }
 
-    static int getLowerTangentCase(ConcatenableQueue.CQNode<Point2D> node, double tangentSlope, Position subHullPosition) {
+    static int getLowerTangentCase(ConcatenableQueue.CQNode<Point2D> node, double tangentSlope, ConvexHull.Position subHullPosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
 
         if (node.left != null) {
             double leftSlope = getSlope(node.left, node);
-            if ((subHullPosition.equals(Position.LEFT) && leftSlope >= tangentSlope) ||
-                    (subHullPosition.equals(Position.RIGHT) && leftSlope > tangentSlope)) {
+            if ((subHullPosition.equals(ConvexHull.Position.LEFT) && leftSlope >= tangentSlope) ||
+                    (subHullPosition.equals(ConvexHull.Position.RIGHT) && leftSlope > tangentSlope)) {
                 leftSlopeGreater = true;
             }
         }
 
         if (node.right != null) {
             double rightSlope = getSlope(node, node.right);
-            if ((subHullPosition.equals(Position.LEFT) && rightSlope < tangentSlope) ||
-                    (subHullPosition.equals(Position.RIGHT) && rightSlope <= tangentSlope)) {
+            if ((subHullPosition.equals(ConvexHull.Position.LEFT) && rightSlope < tangentSlope) ||
+                    (subHullPosition.equals(ConvexHull.Position.RIGHT) && rightSlope <= tangentSlope)) {
                 rightSlopeGreater = false;
             }
         }
@@ -271,8 +209,8 @@ public class ConvexHull implements Iterable<Point2D> {
         if (lowerHull.root == null) {
             return lowerHull;
         }
-        ConcatenableQueue.CQNode<Point2D> leftBaseNode = getBaseNode(lowerHull, upperHull.minNode, Position.LEFT);
-        ConcatenableQueue.CQNode<Point2D> rightBaseNode = getBaseNode(lowerHull, upperHull.maxNode, Position.RIGHT);
+        ConcatenableQueue.CQNode<Point2D> leftBaseNode = getBaseNode(lowerHull, upperHull.minNode, ConvexHull.Position.LEFT);
+        ConcatenableQueue.CQNode<Point2D> rightBaseNode = getBaseNode(lowerHull, upperHull.maxNode, ConvexHull.Position.RIGHT);
 
         // corner case
         if (leftBaseNode.data.compareTo(rightBaseNode.data) > 0) {
@@ -295,13 +233,13 @@ public class ConvexHull implements Iterable<Point2D> {
 
     static ConcatenableQueue.CQNode<Point2D> getBaseNode(ConcatenableQueue<Point2D> lowerHull,
                                                          ConcatenableQueue.CQNode<Point2D> compareNode,
-                                                         Position compareNodePosition) {
+                                                         ConvexHull.Position compareNodePosition) {
         ConcatenableQueue.CQNode<Point2D> hullIterator = lowerHull.root;
 
         boolean done = false;
         while (!done) {
             double tangentSlope;
-            if (compareNodePosition.equals(Position.LEFT)) {
+            if (compareNodePosition.equals(ConvexHull.Position.LEFT)) {
                 tangentSlope = getSlope(compareNode, hullIterator.leftSubtreeMax);
             } else {
                 tangentSlope = getSlope(hullIterator.leftSubtreeMax, compareNode);
@@ -323,22 +261,22 @@ public class ConvexHull implements Iterable<Point2D> {
 
     static int getLowerBaseCase(ConcatenableQueue.CQNode<Point2D> node,
                                 double tangentSlope,
-                                Position nodePosition) {
+                                ConvexHull.Position nodePosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
 
         if (node.left != null) {
             double leftSlope = getSlope(node.left, node);
-            if ((nodePosition.equals(Position.LEFT) && leftSlope > tangentSlope) ||
-                    (nodePosition.equals(Position.RIGHT) && leftSlope >= tangentSlope)) {
+            if ((nodePosition.equals(ConvexHull.Position.LEFT) && leftSlope > tangentSlope) ||
+                    (nodePosition.equals(ConvexHull.Position.RIGHT) && leftSlope >= tangentSlope)) {
                 leftSlopeGreater = true;
             }
         }
 
         if (node.right != null) {
             double rightSlope = getSlope(node, node.right);
-            if ((nodePosition.equals(Position.LEFT) && rightSlope <= tangentSlope) ||
-                    (nodePosition.equals(Position.RIGHT) && rightSlope < tangentSlope)) {
+            if ((nodePosition.equals(ConvexHull.Position.LEFT) && rightSlope <= tangentSlope) ||
+                    (nodePosition.equals(ConvexHull.Position.RIGHT) && rightSlope < tangentSlope)) {
                 rightSlopeGreater = false;
             }
         }
@@ -352,63 +290,6 @@ public class ConvexHull implements Iterable<Point2D> {
                 throw new IllegalArgumentException("concave hull segment");
             }
             return 0;
-        }
-    }
-
-
-    @Override
-    public String toString() {
-        Iterator<Point2D> iterator = this.iterator();
-        if (!iterator.hasNext()) {
-            return "[]";
-        } else {
-            StringBuilder result = new StringBuilder();
-            result.append('[');
-
-            while (true) {
-                Point2D element = iterator.next();
-                result.append(element);
-                if (!iterator.hasNext()) {
-                    return result.append(']').toString();
-                }
-
-                result.append(',').append(' ');
-            }
-        }
-    }
-
-    @Override
-    public Iterator<Point2D> iterator() {
-        return new CHIterator();
-    }
-
-    private class CHIterator implements Iterator<Point2D> {
-        Iterator<Point2D> iterator;
-        ConvexSubhull.Type hullType;
-
-        CHIterator() {
-            iterator = upperSubhull.subhull.iterator();
-            hullType = ConvexSubhull.Type.UPPER;
-            changeIteratorIfNeeded();
-        }
-
-        @Override
-        public boolean hasNext() {
-            changeIteratorIfNeeded();
-            return iterator.hasNext();
-        }
-
-        @Override
-        public Point2D next() {
-            changeIteratorIfNeeded();
-            return iterator.next();
-        }
-
-        private void changeIteratorIfNeeded() {
-            if (!iterator.hasNext() && hullType.equals(ConvexSubhull.Type.UPPER)) {
-                iterator = lowerSubhull.subhull.reverseIterator();
-                hullType = ConvexSubhull.Type.LOWER;
-            }
         }
     }
 }

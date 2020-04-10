@@ -2,7 +2,6 @@ package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.core.SequentialDaCExecutionSpecifics;
-import com.chudakov.geometry.datastructure.ConvexHull;
 
 import java.util.List;
 
