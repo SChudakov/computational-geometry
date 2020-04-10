@@ -8,6 +8,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
+import static com.chudakov.geometry.uae.ConcatenableQueue.CQNode;
+
 public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     @Override
     public boolean isBaseCase(List<Point2D> points) {
@@ -109,6 +111,80 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         ConcatenableQueue<Point2D> rightUpper = right.convexHull.upperSubhull.subhull;
         ConcatenableQueue<Point2D> rightLower = right.convexHull.lowerSubhull.subhull;
 
+        // 1. compute tangents
+        TangentData upperTangent = upperTangent(leftUpper, leftLower, rightUpper, rightLower);
+        TangentData lowerTangent = lowerTangent(leftUpper, leftLower, rightUpper, rightLower);
+
+        // 2. use tangents in triangulation
+        Pair<DTEdge, DTEdge> p = getTriangulationEdges(left, right, upperTangent, lowerTangent);
+
+        // 3. cut convex hull w.r.t the tangents
+        cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
+
+        // 4. concatenate upper and lower queue
+        ConcatenableQueue<Point2D> upperResult = ConcatenableQueue.concatenate(leftUpper, rightUpper);
+        ConcatenableQueue<Point2D> lowerResult = ConcatenableQueue.concatenate(leftLower, rightLower);
+
+        // 5. create sub-hulls and convex hull
+        ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
+        ConvexSubhull lowerSubhull = new ConvexSubhull(lowerResult, ConvexSubhull.Type.LOWER);
+        ConvexHull convexHull = new ConvexHull(upperSubhull, lowerSubhull);
+
+        return new UAEResult(convexHull, p.getLeft(), p.getRight());
+    }
+
+    private TangentData upperTangent(ConcatenableQueue<Point2D> leftUpper,
+                                     ConcatenableQueue<Point2D> leftLower,
+                                     ConcatenableQueue<Point2D> rightUpper,
+                                     ConcatenableQueue<Point2D> rightLower) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    private TangentData lowerTangent(ConcatenableQueue<Point2D> leftUpper,
+                                     ConcatenableQueue<Point2D> leftLower,
+                                     ConcatenableQueue<Point2D> rightUpper,
+                                     ConcatenableQueue<Point2D> rightLower) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    private void cutSubhulls(ConcatenableQueue<Point2D> leftUpper,
+                             ConcatenableQueue<Point2D> leftLower,
+                             ConcatenableQueue<Point2D> rightUpper,
+                             ConcatenableQueue<Point2D> rightLower,
+                             TangentData upperTangent,
+                             TangentData lowerTangent) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left,
+                                                       UAEResult right,
+                                                       TangentData upperTangent,
+                                                       TangentData lowerTangent) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    private static class TangentData {
+        CQNode<Point2D> leftNode;
+        boolean leftNodeOut;
+        CQNode<Point2D> rightNode;
+        boolean rightNodeOut;
+
+        public TangentData(CQNode<Point2D> leftNode, boolean leftNodeOut,
+                           CQNode<Point2D> rightNode, boolean rightNodeOut) {
+            this.leftNode = leftNode;
+            this.leftNodeOut = leftNodeOut;
+            this.rightNode = rightNode;
+            this.rightNodeOut = rightNodeOut;
+        }
+    }
+
+
+    private ConvexHull oldJoin(ConvexHull left, ConvexHull right) {
+        ConcatenableQueue<Point2D> leftUpper = left.upperSubhull.subhull;
+        ConcatenableQueue<Point2D> leftLower = left.lowerSubhull.subhull;
+        ConcatenableQueue<Point2D> rightUpper = right.upperSubhull.subhull;
+        ConcatenableQueue<Point2D> rightLower = right.lowerSubhull.subhull;
+
         // 1. prepare upper queues
         Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1 = CH.moveCornerPointsUp(leftUpper, leftLower);
         leftUpper = p1.getLeft();
@@ -140,14 +216,8 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         // 7. create sub-hulls and convex hull
         ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
         ConvexSubhull lowerSubhull = new ConvexSubhull(lowerResult, ConvexSubhull.Type.LOWER);
-        ConvexHull convexHull = new ConvexHull(upperSubhull, lowerSubhull);
 
-        Pair<DTEdge, DTEdge> p = getTriangulationEdges(left, right);
-        return new UAEResult(convexHull, p.getLeft(), p.getRight()/*null, null*/);
-    }
-
-    private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left, UAEResult right) {
-        throw new UnsupportedOperationException("not implemented");
+        return new ConvexHull(upperSubhull, lowerSubhull);
     }
 
 
