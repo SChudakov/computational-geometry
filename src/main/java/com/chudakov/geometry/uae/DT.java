@@ -2,8 +2,6 @@ package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 
-import java.util.List;
-
 public class DT {
 
     static DTEdge makeEdge(Point2D org, Point2D dest) {
@@ -74,11 +72,17 @@ public class DT {
         return det < 0;
     }
 
-    static boolean leftOf(Point2D p, DTEdge e) {
-        throw new UnsupportedOperationException("not implemented");
+    static boolean rightOf(Point2D p, DTEdge e) {
+        Point2D a = e.org;
+        Point2D b = e.dest;
+        double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
+        return det > 0;
     }
 
-    static boolean rightOf(Point2D p, DTEdge e) {
-        throw new UnsupportedOperationException("not implemented");
+    static boolean leftOf(Point2D p, DTEdge e) {
+        Point2D a = e.org;
+        Point2D b = e.dest;
+        double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
+        return det < 0;
     }
 }
