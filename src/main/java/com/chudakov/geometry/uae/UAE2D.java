@@ -253,12 +253,80 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     }
 
 
-
-    private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left,
-                                                       UAEResult right,
+    private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left, UAEResult right,
                                                        Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
                                                        Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
-        throw new UnsupportedOperationException("not implemented");
+        DTEdge ldo = left.e1;
+        DTEdge ldi = left.e2;
+
+        DTEdge rdi = right.e1;
+        DTEdge rdo = right.e2;
+
+        // Compute the upper common tangent of L and R.
+        while (true) {
+            if (DT.rightOf(rdi.org, ldi)) {
+                ldi = ldi.sym.onext;
+            } else if (DT.leftOf(ldi.org, rdi)) {
+                rdi = rdi.sym.oprev;
+            } else {
+                break;
+            }
+        }
+
+        // Create a first cross edge base from rdi.org to ldi.org.
+        DTEdge base = DT.connect(ldi.sym, rdi);
+
+        // Adjust ldo and rdo
+        if (ldi.org.x == ldo.org.x && ldi.org.y == ldo.org.y) {
+            ldo = base;
+        }
+        if (rdi.org.x == rdo.org.x && rdi.org.y == rdo.org.y) {
+            rdo = base.sym;
+        }
+
+        // Merge
+        while (true) {
+            // Locate the first R and L points to be encountered by the diving bubble.
+            DTEdge rcand = base.sym.onext;
+            DTEdge lcand = base.oprev;
+
+            // If both lcand and rcand are invalid, then base is the lower common tangent.
+            boolean v_rcand = DT.rightOf(rcand.dest, base);
+            boolean v_lcand = DT.rightOf(lcand.dest, base);
+            if (!(v_rcand || v_lcand)) {
+                break;
+            }
+
+            // Delete R edges out of base.dest that fail the circle test.
+            if (v_rcand) {
+                while (DT.rightOf(rcand.onext.dest, base) ||
+                        DT.inCircle(base.dest, base.org, rcand.dest, rcand.onext.dest)) {
+                    DTEdge t = rcand.onext;
+                    DT.deleteEdge(rcand);
+                    rcand = t;
+                }
+            }
+            // Symmetrically, delete L edges.
+            if (v_lcand) {
+                while (DT.rightOf(lcand.oprev.dest, base) &&
+                        DT.inCircle(base.dest, base.org, lcand.dest, lcand.oprev.dest)) {
+                    DTEdge t = lcand.oprev;
+                    DT.deleteEdge(lcand);
+                    lcand = t;
+                }
+            }
+            // The next cross edge is to be connected to either lcand.dest or rcand.dest.
+            // If both are valid, then choose the appropriate one using the in_circle test.
+            if (!v_rcand ||
+                    (v_lcand && DT.inCircle(rcand.dest, rcand.org, lcand.org, lcand.dest))) {
+                // Add cross edge base from rcand.dest to base.dest.
+                base = DT.connect(lcand, base.sym);
+            } else {
+                // Add cross edge base from base.org to lcand.dest
+                base = DT.connect(base.sym, rcand.sym);
+            }
+        }
+        return Pair.of(ldo, rdo);
     }
 
     private static class CutData {
@@ -333,8 +401,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         removeDuplicated(points, Comparator.comparingDouble(p -> p.y));
         points.sort(Point2D::compareTo);
         removeDuplicated(points, Comparator.comparingDouble(p -> p.x));
-        return deleteCocircularPoints(points);
-//        return points;
+        return points;
     }
 
 
@@ -378,10 +445,6 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
                 points.remove(points.size() - 1);
             }
         }
-    }
-
-    static List<Point2D> deleteCocircularPoints(List<Point2D> points) {
-        throw new UnsupportedOperationException("not implemented");
     }
 
     static class AntiLOPointComparator implements Comparator<Point2D> {
