@@ -290,6 +290,12 @@ public class ConcatenableQueue<E> implements Iterable<E> {
     }
 
 
+    public void clear() {
+        root = null;
+        minNode = null;
+        maxNode = null;
+    }
+
     @Override
     public Iterator<E> iterator() {
         return new CQIterator();
@@ -395,6 +401,21 @@ public class ConcatenableQueue<E> implements Iterable<E> {
                     ", height=" + height +
                     ", isLeaf=" + isLeaf +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            CQNode<?> cqNode = (CQNode<?>) o;
+
+            return data != null ? data.equals(cqNode.data) : cqNode.data == null;
+        }
+
+        @Override
+        public int hashCode() {
+            return data != null ? data.hashCode() : 0;
         }
     }
 }

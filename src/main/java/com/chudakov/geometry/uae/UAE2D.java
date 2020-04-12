@@ -111,70 +111,170 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         ConcatenableQueue<Point2D> rightUpper = right.convexHull.upperSubhull.subhull;
         ConcatenableQueue<Point2D> rightLower = right.convexHull.lowerSubhull.subhull;
 
-        // 1. compute tangents
-        TangentData upperTangent = upperTangent(leftUpper, leftLower, rightUpper, rightLower);
-        TangentData lowerTangent = lowerTangent(leftUpper, leftLower, rightUpper, rightLower);
+        // 1. move utmost points up and compute upper tangent
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1 = moveUtmostPointsUp(leftUpper, leftLower);
+        leftUpper = p1.getLeft();
+        leftLower = p1.getRight();
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p2 = moveUtmostPointsUp(rightUpper, rightLower);
+        rightUpper = p2.getLeft();
+        rightLower = p2.getRight();
+        Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent = CH.tangent(leftUpper, rightUpper, CH::getUpperTangentCase);
 
-        // 2. use tangents in triangulation
-        Pair<DTEdge, DTEdge> p = getTriangulationEdges(left, right, upperTangent, lowerTangent);
+        // 2. move utmost points down and compute lower tangent
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p3 = moveUtmostPointsDown(leftUpper, leftLower);
+        leftUpper = p3.getLeft();
+        leftLower = p3.getRight();
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p4 = moveUtmostPointsDown(rightUpper, rightLower);
+        rightUpper = p4.getLeft();
+        rightLower = p4.getRight();
+        Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent = CH.tangent(leftUpper, rightUpper, CH::getLowerTangentCase);
 
-        // 3. cut convex hull w.r.t the tangents
-        cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
+        // 3. use tangents in triangulation
+        Pair<DTEdge, DTEdge> triangulationEdges = getTriangulationEdges(left, right, upperTangent, lowerTangent);
 
-        // 4. concatenate upper and lower queue
+        // 4. cut convex hull w.r.t the tangents
+        CutData data = cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
+        leftUpper = data.leftUpper;
+        leftLower = data.leftLower;
+        rightUpper = data.rightUpper;
+        rightLower = data.rightLower;
+
+        // 5. concatenate upper and lower queue
         ConcatenableQueue<Point2D> upperResult = ConcatenableQueue.concatenate(leftUpper, rightUpper);
         ConcatenableQueue<Point2D> lowerResult = ConcatenableQueue.concatenate(leftLower, rightLower);
 
-        // 5. create sub-hulls and convex hull
+        // 6. create sub-hulls and convex hull
         ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
         ConvexSubhull lowerSubhull = new ConvexSubhull(lowerResult, ConvexSubhull.Type.LOWER);
         ConvexHull convexHull = new ConvexHull(upperSubhull, lowerSubhull);
 
-        return new UAEResult(convexHull, p.getLeft(), p.getRight());
+        return new UAEResult(convexHull, triangulationEdges.getLeft(), triangulationEdges.getRight());
     }
 
-    private TangentData upperTangent(ConcatenableQueue<Point2D> leftUpper,
-                                     ConcatenableQueue<Point2D> leftLower,
-                                     ConcatenableQueue<Point2D> rightUpper,
-                                     ConcatenableQueue<Point2D> rightLower) {
-        throw new UnsupportedOperationException("not implemented");
+    private CutData cutSubhulls(ConcatenableQueue<Point2D> leftUpper,
+                                ConcatenableQueue<Point2D> leftLower,
+                                ConcatenableQueue<Point2D> rightUpper,
+                                ConcatenableQueue<Point2D> rightLower,
+                                Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
+                                Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
+        CQNode<Point2D> ul = upperTangent.getLeft();
+        CQNode<Point2D> ur = upperTangent.getRight();
+        CQNode<Point2D> ll = lowerTangent.getLeft();
+        CQNode<Point2D> lr = lowerTangent.getRight();
+
+        // 1. cut left subhulls
+        if (ul.equals(leftLower.minNode)) {
+            leftUpper.clear();
+            leftLower.cutRight(ll.data);
+        } else if (ul.equals(leftLower.maxNode)) {
+            leftUpper.clear();
+            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveRightmostPointUp(leftUpper, leftLower);
+            leftUpper = p.getLeft();
+            leftLower = p.getRight();
+            leftLower.cutRight(ll.data);
+        } else {
+            leftUpper.cutRight(ul.data);
+            leftLower.cutRight(ll.data);
+        }
+
+        // 2. cut right subhulls
+        if (ur.equals(rightLower.minNode)) {
+            rightUpper.clear();
+            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveLeftmostPointUp(rightUpper, rightLower);
+            rightUpper = p.getLeft();
+            rightLower = p.getRight();
+            rightLower.cutLeft(lr.data);
+        } else if (ur.equals(rightLower.maxNode)) {
+            rightUpper.clear();
+            rightLower.cutLeft(lr.data);
+        } else {
+            rightUpper.cutLeft(ur.data);
+            rightLower.cutLeft(lr.data);
+        }
+
+        return new CutData(leftUpper, leftLower, rightUpper, rightLower);
     }
 
-    private TangentData lowerTangent(ConcatenableQueue<Point2D> leftUpper,
-                                     ConcatenableQueue<Point2D> leftLower,
-                                     ConcatenableQueue<Point2D> rightUpper,
-                                     ConcatenableQueue<Point2D> rightLower) {
-        throw new UnsupportedOperationException("not implemented");
+    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveUtmostPointsUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1
+                = moveLeftmostPointUp(upper, lower);
+        upper = p1.getLeft();
+        lower = p1.getValue();
+        return moveRightmostPointUp(upper, lower);
     }
 
-    private void cutSubhulls(ConcatenableQueue<Point2D> leftUpper,
-                             ConcatenableQueue<Point2D> leftLower,
-                             ConcatenableQueue<Point2D> rightUpper,
-                             ConcatenableQueue<Point2D> rightLower,
-                             TangentData upperTangent,
-                             TangentData lowerTangent) {
-        throw new UnsupportedOperationException("not implemented");
+    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveUtmostPointsDown(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+        ConcatenableQueue<Point2D> upperRest1 = upper;
+        boolean moveLeftmostPoint = upper.minNode != null && lower.minNode == null;
+        moveLeftmostPoint |= upper.minNode != null && lower.minNode != null
+                && upper.minNode.data.x < lower.minNode.data.x;
+        if (moveLeftmostPoint) {
+            upperRest1 = upper.cutRight(upper.minNode.data);
+            lower = ConcatenableQueue.concatenate(upper, lower);
+        }
+
+        ConcatenableQueue<Point2D> upperRest2 = upperRest1;
+        boolean moveRightmostPoint = upperRest1.maxNode != null && lower.maxNode == null;
+        moveRightmostPoint |= upperRest1.maxNode != null && lower.maxNode != null
+                && upperRest1.maxNode.data.x > lower.maxNode.data.x;
+        if (moveRightmostPoint) {
+            upperRest2 = upperRest1.cutLeft(upperRest1.maxNode.data);
+            lower = ConcatenableQueue.concatenate(lower, upperRest1);
+        }
+        return Pair.of(upperRest2, lower);
     }
+
+    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveLeftmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+        ConcatenableQueue<Point2D> lowerRest = lower;
+        boolean moveLeftmostPoint = lower.minNode != null && upper.minNode == null;
+        moveLeftmostPoint |= lower.minNode != null && upper.minNode != null
+                && lower.minNode.data.x < upper.minNode.data.x;
+        if (moveLeftmostPoint) {
+            lowerRest = lower.cutRight(lower.minNode.data);
+            upper = ConcatenableQueue.concatenate(lower, upper);
+        }
+        return Pair.of(upper, lowerRest);
+    }
+
+    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveRightmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+        ConcatenableQueue<Point2D> lowerRest = lower;
+        boolean moveRightmostPoint = lower.maxNode != null && upper.maxNode == null;
+        moveRightmostPoint |= lower.maxNode != null && upper.minNode != null
+                && lower.maxNode.data.x > upper.maxNode.data.x;
+        if (moveRightmostPoint) {
+            lowerRest = lower.cutLeft(lower.maxNode.data);
+            upper = ConcatenableQueue.concatenate(upper, lower);
+        }
+        return Pair.of(lowerRest, upper);
+    }
+
+
 
     private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left,
                                                        UAEResult right,
-                                                       TangentData upperTangent,
-                                                       TangentData lowerTangent) {
+                                                       Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
+                                                       Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
         throw new UnsupportedOperationException("not implemented");
     }
 
-    private static class TangentData {
-        CQNode<Point2D> leftNode;
-        boolean leftNodeOut;
-        CQNode<Point2D> rightNode;
-        boolean rightNodeOut;
+    private static class CutData {
+        ConcatenableQueue<Point2D> leftUpper;
+        ConcatenableQueue<Point2D> leftLower;
+        ConcatenableQueue<Point2D> rightUpper;
+        ConcatenableQueue<Point2D> rightLower;
 
-        public TangentData(CQNode<Point2D> leftNode, boolean leftNodeOut,
-                           CQNode<Point2D> rightNode, boolean rightNodeOut) {
-            this.leftNode = leftNode;
-            this.leftNodeOut = leftNodeOut;
-            this.rightNode = rightNode;
-            this.rightNodeOut = rightNodeOut;
+        public CutData(ConcatenableQueue<Point2D> leftUpper,
+                       ConcatenableQueue<Point2D> leftLower,
+                       ConcatenableQueue<Point2D> rightUpper,
+                       ConcatenableQueue<Point2D> rightLower) {
+            this.leftUpper = leftUpper;
+            this.leftLower = leftLower;
+            this.rightUpper = rightUpper;
+            this.rightLower = rightLower;
         }
     }
 
