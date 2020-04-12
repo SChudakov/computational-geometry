@@ -1,26 +1,25 @@
 package com.chudakov.geometry.uae;
 
+import com.chudakov.geometry.TestUtils;
 import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.core.DaCExecutionSpecifics;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UAE2DTest {
-    private static final String TEST_CASES_INPUT_DIR = "./src/test/resources/convexhull/100_d/input/";
-    private static final String TEST_CASES_OUTPUT_DIR = "./src/test/resources/convexhull/100_d/output/";
+
+    private static final String BASE = "./src/test/resources/convexhull/10/";
+    private static final String TEST_CASES_INPUT_DIR = BASE + "input/";
+    private static final String TEST_CASES_OUTPUT_DIR = BASE + "output/";
 
     @Test
     public void testSimple1() {
@@ -211,29 +210,15 @@ public class UAE2DTest {
     }
 
     private void testConvexHull2(DaCExecutionSpecifics<List<Point2D>, UAEResult> specifics) {
-        PointReader reader = new PointReader();
+        List<List<Point2D>> inputs = TestUtils.readPointsDir(TEST_CASES_INPUT_DIR);
+        List<List<Point2D>> expectedOutputs = TestUtils.readPointsDir(TEST_CASES_OUTPUT_DIR);
 
-        File testCasesInputsDir = new File(TEST_CASES_INPUT_DIR);
-        File[] testCasesInputs = Objects.requireNonNull(testCasesInputsDir.listFiles());
-        int numberOfTestCases = testCasesInputs.length;
+        for (int i = 0; i < inputs.size(); ++i) {
+            List<Point2D> input = inputs.get(i);
+            List<Point2D> expectedOutput = expectedOutputs.get(i);
 
-        try {
-            for (int i = 0; i < numberOfTestCases; ++i) {
-
-                String testCaseName = i + ".txt";
-                String inputFilePath = Paths.get(TEST_CASES_INPUT_DIR, testCaseName).toString();
-                String outputFilePath = Paths.get(TEST_CASES_OUTPUT_DIR, testCaseName).toString();
-
-
-                List<Point2D> input = reader.readPoints(inputFilePath);
-                List<Point2D> expectedOutput = reader.readPoints(outputFilePath);
-
-                ConvexHull actualOutput = specifics.solve(input).convexHull;
-
-                assertEqual(expectedOutput, actualOutput);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            ConvexHull actualOutput = specifics.solve(input).convexHull;
+            assertEqual(expectedOutput, actualOutput);
         }
     }
 
