@@ -4,6 +4,7 @@ import com.chudakov.geometry.common.Point2D;
 import com.chudakov.geometry.core.DaCAlgorithm;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -25,8 +26,8 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     @Override
     public UAEResult solveBaseCase(List<Point2D> points) {
         ConvexHull convexHull = convexHullBaseCase(points);
-        Pair<DTEdge, DTEdge> p = delaunayTriangulationBaseCase(points);
-        return new UAEResult(convexHull, p.getLeft(), p.getRight()/*null,null*/);
+//        Pair<DTEdge, DTEdge> p = delaunayTriangulationBaseCase(points);
+        return new UAEResult(convexHull, /*p.getLeft(), p.getRight()*/null, null);
     }
 
     private ConvexHull convexHullBaseCase(List<Point2D> points) {
@@ -34,41 +35,14 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
         ConcatenableQueue<Point2D> upper = new ConcatenableQueue<>();
         ConcatenableQueue<Point2D> lower = new ConcatenableQueue<>();
-        if (size == 2) {
-            if (points.get(0).y <= points.get(1).y) {
-                lower.add(points.get(0));
-                upper.add(points.get(1));
-            } else {
-                lower.add(points.get(1));
-                upper.add(points.get(0));
-            }
-        } else {
-            Point2D first = points.get(0);
-            Point2D second = points.get(1);
-            Point2D third = points.get(2);
-            double leftSlope = Point2D.getSlope(first, second);
-            double rightSlope = Point2D.getSlope(second, third);
-            if (leftSlope < rightSlope) {
-                if (first.y < second.y) {
-                    upper.add(first);
-                    upper.add(third);
-                    lower.add(second);
-                } else {
-                    upper.add(first);
-                    upper.add(third);
-                    lower.add(second);
-                }
-            } else {//leftSlope > rightSlope
-                if (first.y < second.y) {
-                    upper.add(second);
-                    upper.add(third);
-                    lower.add(first);
-                } else {
-                    upper.add(first);
-                    upper.add(second);
-                    lower.add(third);
-                }
-            }
+
+        List<Point2D> ySorted = new ArrayList<>(points);
+        ySorted.sort(new AntiLOPointComparator());
+
+        lower.add(ySorted.get(0));
+        upper.add(ySorted.get(1));
+        if (size == 3) {
+            upper.add(ySorted.get(2));
         }
 
         ConvexSubhull upperSubhull = new ConvexSubhull(upper, ConvexSubhull.Type.UPPER);
@@ -127,10 +101,11 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p4 = moveUtmostPointsDown(rightUpper, rightLower);
         rightUpper = p4.getLeft();
         rightLower = p4.getRight();
-        Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent = CH.tangent(leftUpper, rightUpper, CH::getLowerTangentCase);
+        Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent = CH.tangent(leftLower, rightLower, CH::getLowerTangentCase);
 
         // 3. use tangents in triangulation
-        Pair<DTEdge, DTEdge> triangulationEdges = getTriangulationEdges(left, right, upperTangent, lowerTangent);
+//        Pair<DTEdge, DTEdge> triangulationEdges = getTriangulationEdges(left, right, upperTangent, lowerTangent);
+        Pair<DTEdge, DTEdge> triangulationEdges = Pair.of(null, null);
 
         // 4. cut convex hull w.r.t the tangents
         CutData data = cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
@@ -167,7 +142,6 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
             leftUpper.clear();
             leftLower.cutRight(ll.data);
         } else if (ul.equals(leftLower.maxNode)) {
-            leftUpper.clear();
             Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveRightmostPointUp(leftUpper, leftLower);
             leftUpper = p.getLeft();
             leftLower = p.getRight();
@@ -179,7 +153,6 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
         // 2. cut right subhulls
         if (ur.equals(rightLower.minNode)) {
-            rightUpper.clear();
             Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveLeftmostPointUp(rightUpper, rightLower);
             rightUpper = p.getLeft();
             rightLower = p.getRight();
@@ -249,7 +222,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
             lowerRest = lower.cutLeft(lower.maxNode.data);
             upper = ConcatenableQueue.concatenate(upper, lower);
         }
-        return Pair.of(lowerRest, upper);
+        return Pair.of(upper, lowerRest);
     }
 
 
