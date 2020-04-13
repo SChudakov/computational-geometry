@@ -7,70 +7,132 @@ import static com.chudakov.geometry.uae.ConcatenableQueue.CQNode;
 import static com.chudakov.geometry.uae.ConvexHull.Position;
 
 public class CH {
-    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> moveCornerPointsUp(
-            ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+    @FunctionalInterface
+    interface TriFunction<A, B, C, R> {
+        R apply(A a, B b, C c);
+    }
+
+    static CutData cutSubhulls(ConcatenableQueue<Point2D> leftUpper,
+                               ConcatenableQueue<Point2D> leftLower,
+                               ConcatenableQueue<Point2D> rightUpper,
+                               ConcatenableQueue<Point2D> rightLower,
+                               Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
+                               Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
+        CQNode<Point2D> ul = upperTangent.getLeft();
+        CQNode<Point2D> ur = upperTangent.getRight();
+        CQNode<Point2D> ll = lowerTangent.getLeft();
+        CQNode<Point2D> lr = lowerTangent.getRight();
+
+        // 1. cut left subhulls
+        if (ul.equals(leftLower.minNode)) {
+            leftUpper.clear();
+            leftLower.cutRight(ll.data);
+        } else if (ul.equals(leftLower.maxNode)) {
+            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveRightmostPointUp(leftUpper, leftLower);
+            leftUpper = p.getLeft();
+            leftLower = p.getRight();
+            leftLower.cutRight(ll.data);
+        } else {
+            leftUpper.cutRight(ul.data);
+            leftLower.cutRight(ll.data);
+        }
+
+        // 2. cut right subhulls
+        if (ur.equals(rightLower.minNode)) {
+            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveLeftmostPointUp(rightUpper, rightLower);
+            rightUpper = p.getLeft();
+            rightLower = p.getRight();
+            rightLower.cutLeft(lr.data);
+        } else if (ur.equals(rightLower.maxNode)) {
+            rightUpper.clear();
+            rightLower.cutLeft(lr.data);
+        } else {
+            rightUpper.cutLeft(ur.data);
+            rightLower.cutLeft(lr.data);
+        }
+
+        return new CutData(leftUpper, leftLower, rightUpper, rightLower);
+    }
+
+    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveUtmostPointsUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1
+                = moveLeftmostPointUp(upper, lower);
+        upper = p1.getLeft();
+        lower = p1.getValue();
+        return moveRightmostPointUp(upper, lower);
+    }
+
+    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveUtmostPointsDown(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+        ConcatenableQueue<Point2D> upperRest1 = upper;
+        boolean moveLeftmostPoint = upper.minNode != null && lower.minNode == null;
+        moveLeftmostPoint |= upper.minNode != null && lower.minNode != null
+                && upper.minNode.data.x < lower.minNode.data.x;
+        if (moveLeftmostPoint) {
+            upperRest1 = upper.cutRight(upper.minNode.data);
+            lower = ConcatenableQueue.concatenate(upper, lower);
+        }
+
+        ConcatenableQueue<Point2D> upperRest2 = upperRest1;
+        boolean moveRightmostPoint = upperRest1.maxNode != null && lower.maxNode == null;
+        moveRightmostPoint |= upperRest1.maxNode != null && lower.maxNode != null
+                && upperRest1.maxNode.data.x > lower.maxNode.data.x;
+        if (moveRightmostPoint) {
+            upperRest2 = upperRest1.cutLeft(upperRest1.maxNode.data);
+            lower = ConcatenableQueue.concatenate(lower, upperRest1);
+        }
+        return Pair.of(upperRest2, lower);
+    }
+
+    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveLeftmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
         ConcatenableQueue<Point2D> lowerRest = lower;
-        if ((lower.minNode != null && upper.minNode == null) ||
-                (lower.minNode != null && upper.minNode != null &&
-                        lower.minNode.data.x < upper.minNode.data.x)) {
+        boolean moveLeftmostPoint = lower.minNode != null && upper.minNode == null;
+        moveLeftmostPoint |= lower.minNode != null && upper.minNode != null
+                && lower.minNode.data.x < upper.minNode.data.x;
+        if (moveLeftmostPoint) {
             lowerRest = lower.cutRight(lower.minNode.data);
             upper = ConcatenableQueue.concatenate(lower, upper);
         }
-
-        lower = lowerRest;
-        if ((lowerRest.maxNode != null && upper.maxNode == null) ||
-                (lowerRest.maxNode != null && upper.minNode != null &&
-                        lowerRest.maxNode.data.x > upper.maxNode.data.x)) {
-            lower = lowerRest.cutLeft(lowerRest.maxNode.data);
-            upper = ConcatenableQueue.concatenate(upper, lowerRest);
-        }
-        return Pair.of(upper, lower);
+        return Pair.of(upper, lowerRest);
     }
 
-    static ConcatenableQueue<Point2D> moveLeftCornerPointDown(
-            ConcatenableQueue<Point2D> upperRest, ConcatenableQueue<Point2D> lower) {
-        if ((upperRest.minNode != null && lower.minNode == null) ||
-                (upperRest.minNode != null && lower.minNode != null &&
-                        upperRest.minNode.data.x < lower.minNode.data.x)) {
-            upperRest.cutRight(upperRest.minNode.data);
-            lower = ConcatenableQueue.concatenate(upperRest, lower);
+    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
+    moveRightmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
+        ConcatenableQueue<Point2D> lowerRest = lower;
+        boolean moveRightmostPoint = lower.maxNode != null && upper.maxNode == null;
+        moveRightmostPoint |= lower.maxNode != null && upper.minNode != null
+                && lower.maxNode.data.x > upper.maxNode.data.x;
+        if (moveRightmostPoint) {
+            lowerRest = lower.cutLeft(lower.maxNode.data);
+            upper = ConcatenableQueue.concatenate(upper, lower);
         }
-        return lower;
+        return Pair.of(upper, lowerRest);
     }
 
-    static ConcatenableQueue<Point2D> moveRightCornerPointDown(
-            ConcatenableQueue<Point2D> upperRest, ConcatenableQueue<Point2D> lower) {
-        if ((upperRest.maxNode != null && lower.maxNode == null) ||
-                (upperRest.maxNode != null && lower.maxNode != null &&
-                        upperRest.maxNode.data.x > lower.maxNode.data.x)) {
-            upperRest.cutLeft(upperRest.maxNode.data);
-            lower = ConcatenableQueue.concatenate(lower, upperRest);
+    static class CutData {
+        ConcatenableQueue<Point2D> leftUpper;
+        ConcatenableQueue<Point2D> leftLower;
+        ConcatenableQueue<Point2D> rightUpper;
+        ConcatenableQueue<Point2D> rightLower;
+
+        public CutData(ConcatenableQueue<Point2D> leftUpper,
+                       ConcatenableQueue<Point2D> leftLower,
+                       ConcatenableQueue<Point2D> rightUpper,
+                       ConcatenableQueue<Point2D> rightLower) {
+            this.leftUpper = leftUpper;
+            this.leftLower = leftLower;
+            this.rightUpper = rightUpper;
+            this.rightLower = rightLower;
         }
-        return lower;
     }
 
-
-    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> cutRest(
-            ConcatenableQueue<Point2D> left, ConcatenableQueue<Point2D> right,
-            ConvexHull.TriFunction<CQNode<Point2D>, Double, Position, Integer> casesFunction) {
-        if (left.root == null || right.root == null) {
-            return Pair.of(new ConcatenableQueue<>(left.cmp), new ConcatenableQueue<>(right.cmp));
-        }
-        Pair<CQNode<Point2D>, CQNode<Point2D>> p = tangent(left, right, casesFunction);
-
-        CQNode<Point2D> leftBase = p.getLeft();
-        CQNode<Point2D> rightBase = p.getRight();
-
-        ConcatenableQueue<Point2D> leftRest = left.cutRight(leftBase.data);
-        ConcatenableQueue<Point2D> rightRest = right.cutLeft(rightBase.data);
-
-        return Pair.of(leftRest, rightRest);
-    }
 
     static Pair<CQNode<Point2D>, CQNode<Point2D>> tangent(
             ConcatenableQueue<Point2D> leftHull,
             ConcatenableQueue<Point2D> rightHull,
-            ConvexHull.TriFunction<CQNode<Point2D>, Double, Position, Integer> casesFunction) {
+            TriFunction<CQNode<Point2D>, Double, Position, Integer> casesFunction) {
 
         //locate the appropriate pointers on both hulls
         CQNode<Point2D> leftIterator = leftHull.root;
@@ -137,8 +199,7 @@ public class CH {
     }
 
 
-    static double getSlope(CQNode<Point2D> leftNode,
-                           CQNode<Point2D> rightNode) {
+    static double getSlope(CQNode<Point2D> leftNode, CQNode<Point2D> rightNode) {
         return Point2D.getSlope(leftNode.data, rightNode.data);
     }
 
@@ -265,9 +326,7 @@ public class CH {
     }
 
 
-    static int getLowerBaseCase(CQNode<Point2D> node,
-                                double tangentSlope,
-                                Position nodePosition) {
+    static int getLowerBaseCase(CQNode<Point2D> node, double tangentSlope, Position nodePosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
 

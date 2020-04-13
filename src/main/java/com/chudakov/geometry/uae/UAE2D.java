@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
+import static com.chudakov.geometry.uae.CH.CutData;
 import static com.chudakov.geometry.uae.ConcatenableQueue.CQNode;
 
 public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
@@ -114,19 +115,19 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         ConcatenableQueue<Point2D> rightLower = right.convexHull.lowerSubhull.subhull;
 
         // 1. move utmost points up and compute upper tangent
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1 = moveUtmostPointsUp(leftUpper, leftLower);
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1 = CH.moveUtmostPointsUp(leftUpper, leftLower);
         leftUpper = p1.getLeft();
         leftLower = p1.getRight();
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p2 = moveUtmostPointsUp(rightUpper, rightLower);
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p2 = CH.moveUtmostPointsUp(rightUpper, rightLower);
         rightUpper = p2.getLeft();
         rightLower = p2.getRight();
         Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent = CH.tangent(leftUpper, rightUpper, CH::getUpperTangentCase);
 
         // 2. move utmost points down and compute lower tangent
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p3 = moveUtmostPointsDown(leftUpper, leftLower);
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p3 = CH.moveUtmostPointsDown(leftUpper, leftLower);
         leftUpper = p3.getLeft();
         leftLower = p3.getRight();
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p4 = moveUtmostPointsDown(rightUpper, rightLower);
+        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p4 = CH.moveUtmostPointsDown(rightUpper, rightLower);
         rightUpper = p4.getLeft();
         rightLower = p4.getRight();
         Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent = CH.tangent(leftLower, rightLower, CH::getLowerTangentCase);
@@ -136,7 +137,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         Pair<DTEdge, DTEdge> triangulationEdges = Pair.of(null, null);
 
         // 4. cut convex hull w.r.t the tangents
-        CutData data = cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
+        CutData data = CH.cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
         leftUpper = data.leftUpper;
         leftLower = data.leftLower;
         rightUpper = data.rightUpper;
@@ -152,105 +153,6 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         ConvexHull convexHull = new ConvexHull(upperSubhull, lowerSubhull);
 
         return new UAEResult(convexHull, triangulationEdges.getLeft(), triangulationEdges.getRight());
-    }
-
-    private CutData cutSubhulls(ConcatenableQueue<Point2D> leftUpper,
-                                ConcatenableQueue<Point2D> leftLower,
-                                ConcatenableQueue<Point2D> rightUpper,
-                                ConcatenableQueue<Point2D> rightLower,
-                                Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
-                                Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
-        CQNode<Point2D> ul = upperTangent.getLeft();
-        CQNode<Point2D> ur = upperTangent.getRight();
-        CQNode<Point2D> ll = lowerTangent.getLeft();
-        CQNode<Point2D> lr = lowerTangent.getRight();
-
-        // 1. cut left subhulls
-        if (ul.equals(leftLower.minNode)) {
-            leftUpper.clear();
-            leftLower.cutRight(ll.data);
-        } else if (ul.equals(leftLower.maxNode)) {
-            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveRightmostPointUp(leftUpper, leftLower);
-            leftUpper = p.getLeft();
-            leftLower = p.getRight();
-            leftLower.cutRight(ll.data);
-        } else {
-            leftUpper.cutRight(ul.data);
-            leftLower.cutRight(ll.data);
-        }
-
-        // 2. cut right subhulls
-        if (ur.equals(rightLower.minNode)) {
-            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveLeftmostPointUp(rightUpper, rightLower);
-            rightUpper = p.getLeft();
-            rightLower = p.getRight();
-            rightLower.cutLeft(lr.data);
-        } else if (ur.equals(rightLower.maxNode)) {
-            rightUpper.clear();
-            rightLower.cutLeft(lr.data);
-        } else {
-            rightUpper.cutLeft(ur.data);
-            rightLower.cutLeft(lr.data);
-        }
-
-        return new CutData(leftUpper, leftLower, rightUpper, rightLower);
-    }
-
-    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveUtmostPointsUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1
-                = moveLeftmostPointUp(upper, lower);
-        upper = p1.getLeft();
-        lower = p1.getValue();
-        return moveRightmostPointUp(upper, lower);
-    }
-
-    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveUtmostPointsDown(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        ConcatenableQueue<Point2D> upperRest1 = upper;
-        boolean moveLeftmostPoint = upper.minNode != null && lower.minNode == null;
-        moveLeftmostPoint |= upper.minNode != null && lower.minNode != null
-                && upper.minNode.data.x < lower.minNode.data.x;
-        if (moveLeftmostPoint) {
-            upperRest1 = upper.cutRight(upper.minNode.data);
-            lower = ConcatenableQueue.concatenate(upper, lower);
-        }
-
-        ConcatenableQueue<Point2D> upperRest2 = upperRest1;
-        boolean moveRightmostPoint = upperRest1.maxNode != null && lower.maxNode == null;
-        moveRightmostPoint |= upperRest1.maxNode != null && lower.maxNode != null
-                && upperRest1.maxNode.data.x > lower.maxNode.data.x;
-        if (moveRightmostPoint) {
-            upperRest2 = upperRest1.cutLeft(upperRest1.maxNode.data);
-            lower = ConcatenableQueue.concatenate(lower, upperRest1);
-        }
-        return Pair.of(upperRest2, lower);
-    }
-
-    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveLeftmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        ConcatenableQueue<Point2D> lowerRest = lower;
-        boolean moveLeftmostPoint = lower.minNode != null && upper.minNode == null;
-        moveLeftmostPoint |= lower.minNode != null && upper.minNode != null
-                && lower.minNode.data.x < upper.minNode.data.x;
-        if (moveLeftmostPoint) {
-            lowerRest = lower.cutRight(lower.minNode.data);
-            upper = ConcatenableQueue.concatenate(lower, upper);
-        }
-        return Pair.of(upper, lowerRest);
-    }
-
-    private Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveRightmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        ConcatenableQueue<Point2D> lowerRest = lower;
-        boolean moveRightmostPoint = lower.maxNode != null && upper.maxNode == null;
-        moveRightmostPoint |= lower.maxNode != null && upper.minNode != null
-                && lower.maxNode.data.x > upper.maxNode.data.x;
-        if (moveRightmostPoint) {
-            lowerRest = lower.cutLeft(lower.maxNode.data);
-            upper = ConcatenableQueue.concatenate(upper, lower);
-        }
-        return Pair.of(upper, lowerRest);
     }
 
 
@@ -329,66 +231,6 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         }
         return Pair.of(ldo, rdo);
     }
-
-    private static class CutData {
-        ConcatenableQueue<Point2D> leftUpper;
-        ConcatenableQueue<Point2D> leftLower;
-        ConcatenableQueue<Point2D> rightUpper;
-        ConcatenableQueue<Point2D> rightLower;
-
-        public CutData(ConcatenableQueue<Point2D> leftUpper,
-                       ConcatenableQueue<Point2D> leftLower,
-                       ConcatenableQueue<Point2D> rightUpper,
-                       ConcatenableQueue<Point2D> rightLower) {
-            this.leftUpper = leftUpper;
-            this.leftLower = leftLower;
-            this.rightUpper = rightUpper;
-            this.rightLower = rightLower;
-        }
-    }
-
-
-    private ConvexHull oldJoin(ConvexHull left, ConvexHull right) {
-        ConcatenableQueue<Point2D> leftUpper = left.upperSubhull.subhull;
-        ConcatenableQueue<Point2D> leftLower = left.lowerSubhull.subhull;
-        ConcatenableQueue<Point2D> rightUpper = right.upperSubhull.subhull;
-        ConcatenableQueue<Point2D> rightLower = right.lowerSubhull.subhull;
-
-        // 1. prepare upper queues
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1 = CH.moveCornerPointsUp(leftUpper, leftLower);
-        leftUpper = p1.getLeft();
-        leftLower = p1.getRight();
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p2 = CH.moveCornerPointsUp(rightUpper, rightLower);
-        rightUpper = p2.getLeft();
-        rightLower = p2.getRight();
-
-        // 2. cut rests of upper queues
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> rests =
-                CH.cutRest(leftUpper, rightUpper, CH::getUpperTangentCase);
-        ConcatenableQueue<Point2D> leftUpperRest = rests.getLeft();
-        ConcatenableQueue<Point2D> rightUpperRest = rests.getRight();
-
-        // 3. prepare lower queues
-        leftLower = CH.moveRightCornerPointDown(leftUpperRest, leftLower);
-        rightLower = CH.moveLeftCornerPointDown(rightUpperRest, rightLower);
-
-        // 4: cut rests of lower queues
-        CH.cutRest(leftLower, rightLower, CH::getLowerTangentCase);
-
-        // 5. concatenate upper and lower queue
-        ConcatenableQueue<Point2D> upperResult = ConcatenableQueue.concatenate(leftUpper, rightUpper);
-        ConcatenableQueue<Point2D> lowerResult = ConcatenableQueue.concatenate(leftLower, rightLower);
-
-        // 6. adjusting lower hull
-        lowerResult = CH.adjustLowerHull(upperResult, lowerResult);
-
-        // 7. create sub-hulls and convex hull
-        ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
-        ConvexSubhull lowerSubhull = new ConvexSubhull(lowerResult, ConvexSubhull.Type.LOWER);
-
-        return new ConvexHull(upperSubhull, lowerSubhull);
-    }
-
 
     @Override
     public Pair<List<Point2D>, List<Point2D>> divide(List<Point2D> input) {

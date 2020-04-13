@@ -5,11 +5,6 @@ import com.chudakov.geometry.common.Point2D;
 import java.util.Iterator;
 
 public class ConvexHull implements Iterable<Point2D> {
-    @FunctionalInterface
-    interface TriFunction<A, B, C, R> {
-        R apply(A a, B b, C c);
-    }
-
     enum Position {LEFT, RIGHT}
 
     final ConvexSubhull upperSubhull;
