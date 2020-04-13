@@ -9,7 +9,7 @@ public abstract class BaseDaCExecutionSpecifics<IT, OT> implements DaCExecutionS
 
     @Override
     public OT solve(IT points) {
-        algorithmSpecifics.precompute(points);
+        points = algorithmSpecifics.precompute(points);
         return solveRecursively(points);
     }
 

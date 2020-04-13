@@ -1,6 +1,7 @@
 package com.chudakov.geometry;
 
 import com.chudakov.geometry.common.Point2D;
+import com.chudakov.geometry.uae.UAE2D;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,14 +19,16 @@ import java.util.Random;
 public class TestUtils {
     private static final long SEED = 17L;
 
-    public static void writePoints(String directory, int numberOfFiles, int numberOfPoints) {
+    private static UAE2D uae = new UAE2D();
+
+    public static void writePoints(String directory, int numberOfFiles, int numberOfPoints, int integerOrDouble) {
         Random random = new Random(SEED);
 
         for (int i = 0; i < numberOfFiles; ++i) {
             String fileName = fileName(i);
             String filePath = Paths.get(directory, fileName).toString();
 
-            List<Point2D> points = generatePoints(numberOfPoints, random);
+            List<Point2D> points = generatePoints(numberOfPoints, random, integerOrDouble);
             writePoints(filePath, points);
         }
     }
@@ -92,15 +95,22 @@ public class TestUtils {
         return Integer.parseInt(fileName);
     }
 
-    private static List<Point2D> generatePoints(int numberOfPoints, Random random) {
+    private static List<Point2D> generatePoints(int numberOfPoints, Random random, int integerOrDouble) {
         List<Point2D> result = new ArrayList<>(numberOfPoints);
-        for (int i = 0; i < numberOfPoints; ++i) {
-            double x = trimDouble(random.nextDouble());
-            double y = trimDouble(random.nextDouble());
-//            int x = random.nextInt(100);
-//            int y = random.nextInt(100);
+        while (result.size() < numberOfPoints) {
+            double x;
+            double y;
+            if (integerOrDouble == 0) {
+                x = random.nextInt(100);
+                y = random.nextInt(100);
+            } else {
+                x = trimDouble(random.nextDouble());
+                y = trimDouble(random.nextDouble());
+            }
             Point2D point = new Point2D(x, y);
             result.add(point);
+
+            result = uae.precompute(result);
         }
         return result;
     }
@@ -109,8 +119,9 @@ public class TestUtils {
         return ((int) (d * 1_000.0)) / 1_000.0;
     }
 
-    public static void cleanDirectory(String path) {
-        File file = new File(path);
+    public static void cleanDirectory(String directory) {
+        System.out.println("Cleaning directory: " + directory);
+        File file = new File(directory);
         if (!file.exists()) {
             throw new IllegalArgumentException("directory does not exist");
         }
@@ -118,8 +129,7 @@ public class TestUtils {
             throw new IllegalArgumentException("path points to a file");
         }
         for (String s : file.list()) {
-            String absolutePath = Paths.get(path, s).toString();
-            System.out.println(absolutePath);
+            String absolutePath = Paths.get(directory, s).toString();
             new File(absolutePath).delete();
         }
     }

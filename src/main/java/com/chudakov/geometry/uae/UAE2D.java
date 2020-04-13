@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -35,14 +36,41 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
         ConcatenableQueue<Point2D> upper = new ConcatenableQueue<>();
         ConcatenableQueue<Point2D> lower = new ConcatenableQueue<>();
-
-        List<Point2D> ySorted = new ArrayList<>(points);
-        ySorted.sort(new AntiLOPointComparator());
-
-        lower.add(ySorted.get(0));
-        upper.add(ySorted.get(1));
-        if (size == 3) {
-            upper.add(ySorted.get(2));
+        if (size == 2) {
+            if (points.get(0).y <= points.get(1).y) {
+                lower.add(points.get(0));
+                upper.add(points.get(1));
+            } else {
+                lower.add(points.get(1));
+                upper.add(points.get(0));
+            }
+        } else {
+            Point2D first = points.get(0);
+            Point2D second = points.get(1);
+            Point2D third = points.get(2);
+            double leftSlope = Point2D.getSlope(first, second);
+            double rightSlope = Point2D.getSlope(second, third);
+            if (leftSlope < rightSlope) {
+                if (first.y < second.y) {
+                    upper.add(first);
+                    upper.add(third);
+                    lower.add(second);
+                } else {
+                    upper.add(first);
+                    upper.add(third);
+                    lower.add(second);
+                }
+            } else {//leftSlope > rightSlope
+                if (first.y < second.y) {
+                    upper.add(second);
+                    upper.add(third);
+                    lower.add(first);
+                } else {
+                    upper.add(first);
+                    upper.add(second);
+                    lower.add(third);
+                }
+            }
         }
 
         ConvexSubhull upperSubhull = new ConvexSubhull(upper, ConvexSubhull.Type.UPPER);
@@ -370,6 +398,8 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
     @Override
     public List<Point2D> precompute(List<Point2D> points) {
+        points = new ArrayList<>(new HashSet<>(points));
+        // TODO: do not remove vertically and horizontally collinear points
         points.sort(new AntiLOPointComparator());
         removeDuplicated(points, Comparator.comparingDouble(p -> p.y));
         points.sort(Point2D::compareTo);
