@@ -12,15 +12,25 @@ public class PointsGenerator {
             BASE + "100/input/",
             BASE + "100_d/input/",
     };
-    public static final String[] OUTPUT_DIRS = {
-            BASE + "10/output/",
-            BASE + "10_d/output/",
-            BASE + "20/output/",
-            BASE + "20_d/output/",
-            BASE + "40/output/",
-            BASE + "40_d/output/",
-            BASE + "100/output/",
-            BASE + "100_d/output/",
+    public static final String[] CH_DIRS = {
+            BASE + "10/ch/",
+            BASE + "10_d/ch/",
+            BASE + "20/ch/",
+            BASE + "20_d/ch/",
+            BASE + "40/ch/",
+            BASE + "40_d/ch/",
+            BASE + "100/ch/",
+            BASE + "100_d/ch/",
+    };
+    public static final String[] DT_DIRS = {
+            BASE + "10/dt/",
+            BASE + "10_d/dt/",
+            BASE + "20/dt/",
+            BASE + "20_d/dt/",
+            BASE + "40/dt/",
+            BASE + "40_d/dt/",
+            BASE + "100/dt/",
+            BASE + "100_d/dt/",
     };
 
     private static final int[][] FILES_DATA = {
@@ -38,7 +48,7 @@ public class PointsGenerator {
         for (String directory : INPUT_DIRS) {
             TestUtils.cleanDirectory(directory);
         }
-        for (String directory : OUTPUT_DIRS) {
+        for (String directory : CH_DIRS) {
             TestUtils.cleanDirectory(directory);
         }
 

@@ -1,6 +1,7 @@
 package com.chudakov.geometry;
 
 import com.chudakov.geometry.common.Point2D;
+import com.chudakov.geometry.uae.Edge;
 import com.chudakov.geometry.uae.UAE2D;
 
 import java.io.BufferedReader;
@@ -20,6 +21,80 @@ public class TestUtils {
     private static final long SEED = 17L;
 
     private static UAE2D uae = new UAE2D();
+
+    public static List<List<Point2D>> readPointsDir(String directory) {
+        File[] files = Objects.requireNonNull(new File(directory).listFiles());
+
+        List<List<Point2D>> result = new ArrayList<>(Collections.nCopies(files.length, null));
+        for (File file : files) {
+            String filePath = file.getAbsolutePath();
+            String fileName = file.getName();
+            int fileIndex = fileIndex(fileName);
+
+            List<Point2D> points = readPointsFile(filePath);
+            result.set(fileIndex, points);
+        }
+
+        return result;
+    }
+
+    public static List<Point2D> readPointsFile(String file) {
+        List<Point2D> result = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().equals("")) {
+                    continue;
+                }
+
+                String[] coordinates = line.split(" ");
+                if (coordinates.length != 2) {
+                    throw new RuntimeException("illegal points format: " + line);
+                }
+
+                result.add(new Point2D(Double.parseDouble(coordinates[0]),
+                        Double.parseDouble(coordinates[1])));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public static List<List<Edge>> readEdgesDir(String directory) {
+        File[] files = Objects.requireNonNull(new File(directory).listFiles());
+
+        List<List<Edge>> result = new ArrayList<>(Collections.nCopies(files.length, null));
+        for (File file : files) {
+            String filePath = file.getAbsolutePath();
+            String fileName = file.getName();
+            int fileIndex = fileIndex(fileName);
+
+            List<Edge> edges = readEdgesFile(filePath);
+            result.set(fileIndex, edges);
+        }
+
+        return result;
+    }
+
+    public static List<Edge> readEdgesFile(String file) {
+        List<Edge> result = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] coordinates = line.split(" ");
+                Point2D org = new Point2D(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+                Point2D dest = new Point2D(Double.parseDouble(coordinates[2]), Double.parseDouble(coordinates[3]));
+                Edge edge = new Edge(org, dest);
+                result.add(edge);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     public static void writePoints(String directory, int numberOfFiles, int numberOfPoints, int integerOrDouble) {
         Random random = new Random(SEED);
@@ -44,47 +119,6 @@ public class TestUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static List<List<Point2D>> readPointsDir(String directory) {
-        File[] files = Objects.requireNonNull(new File(directory).listFiles());
-
-        List<List<Point2D>> result = new ArrayList<>(Collections.nCopies(files.length, null));
-        for (File file : files) {
-            String filePath = file.getAbsolutePath();
-            String fileName = file.getName();
-            int fileIndex = fileIndex(fileName);
-
-            List<Point2D> points = readPointsFile(filePath);
-            result.set(fileIndex, points);
-        }
-
-        return result;
-    }
-
-    public static List<Point2D> readPointsFile(String path) {
-        List<Point2D> result = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().equals("")) {
-                    continue;
-                }
-
-                String[] coordinates = line.split(" ");
-                if (coordinates.length != 2) {
-                    throw new RuntimeException("illegal points format: " + line);
-                }
-
-                result.add(new Point2D(Double.parseDouble(coordinates[0]),
-                        Double.parseDouble(coordinates[1])));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return result;
     }
 
     private static String fileName(int fileIndex) {

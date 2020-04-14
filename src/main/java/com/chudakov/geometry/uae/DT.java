@@ -2,11 +2,18 @@ package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 
+import java.util.List;
+
 public class DT {
 
-    static DTEdge makeEdge(Point2D org, Point2D dest) {
-        DTEdge e = new DTEdge(org, dest);
-        DTEdge es = new DTEdge(dest, org);
+    public static List<Edge> convert(QuadEdge quadEdge) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+
+    static QuadEdge makeEdge(Point2D org, Point2D dest) {
+        QuadEdge e = new QuadEdge(org, dest);
+        QuadEdge es = new QuadEdge(dest, org);
 
         // make edges mutually symmetrical
         e.sym = es;
@@ -21,7 +28,7 @@ public class DT {
         return e;
     }
 
-    static void splice(DTEdge a, DTEdge b) {
+    static void splice(QuadEdge a, QuadEdge b) {
         if (a.equals(b)) {
             System.out.println("Splicing edge with itself, ignored: " + a + ".");
             return;
@@ -34,14 +41,14 @@ public class DT {
         b.onext = a.onext;
     }
 
-    static DTEdge connect(DTEdge a, DTEdge b) {
-        DTEdge e = makeEdge(a.dest, b.org);
+    static QuadEdge connect(QuadEdge a, QuadEdge b) {
+        QuadEdge e = makeEdge(a.dest, b.org);
         splice(e, a.sym.oprev);
         splice(e.sym, b);
         return e;
     }
 
-    static void deleteEdge(DTEdge e) {
+    static void deleteEdge(QuadEdge e) {
         splice(e, e.oprev);
         splice(e.sym, e.sym.oprev);
 
@@ -72,14 +79,14 @@ public class DT {
         return det < 0;
     }
 
-    static boolean rightOf(Point2D p, DTEdge e) {
+    static boolean rightOf(Point2D p, QuadEdge e) {
         Point2D a = e.org;
         Point2D b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
         return det > 0;
     }
 
-    static boolean leftOf(Point2D p, DTEdge e) {
+    static boolean leftOf(Point2D p, QuadEdge e) {
         Point2D a = e.org;
         Point2D b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);

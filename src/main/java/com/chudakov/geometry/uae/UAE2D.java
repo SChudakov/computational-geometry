@@ -28,8 +28,8 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     @Override
     public UAEResult solveBaseCase(List<Point2D> points) {
         ConvexHull convexHull = convexHullBaseCase(points);
-//        Pair<DTEdge, DTEdge> p = delaunayTriangulationBaseCase(points);
-        return new UAEResult(convexHull, /*p.getLeft(), p.getRight()*/null, null);
+        Pair<QuadEdge, QuadEdge> p = delaunayTriangulationBaseCase(points);
+        return new UAEResult(convexHull, p.getLeft(), p.getRight());
     }
 
     private ConvexHull convexHullBaseCase(List<Point2D> points) {
@@ -80,9 +80,9 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         return new ConvexHull(upperSubhull, lowerSubhull);
     }
 
-    private Pair<DTEdge, DTEdge> delaunayTriangulationBaseCase(List<Point2D> points) {
+    private Pair<QuadEdge, QuadEdge> delaunayTriangulationBaseCase(List<Point2D> points) {
         if (points.size() == 2) {
-            DTEdge e = DT.makeEdge(points.get(0), points.get(1));
+            QuadEdge e = DT.makeEdge(points.get(0), points.get(1));
             return Pair.of(e, e.sym);
         }
 
@@ -91,16 +91,16 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         Point2D p2 = points.get(1);
         Point2D p3 = points.get(2);
 
-        DTEdge a = DT.makeEdge(p1, p2);
-        DTEdge b = DT.makeEdge(p2, p3);
+        QuadEdge a = DT.makeEdge(p1, p2);
+        QuadEdge b = DT.makeEdge(p2, p3);
         DT.splice(a.sym, b);
 
         // Close the triangle.
-        if (DT.leftOf(p3, a)) {
+        if (DT.rightOf(p3, a)) {
             DT.connect(b, a);
             return Pair.of(a, b.sym);
         } else if (DT.leftOf(p3, a)) {
-            DTEdge c = DT.connect(b, a);
+            QuadEdge c = DT.connect(b, a);
             return Pair.of(c.sym, c);
         } else { // the three points are collinear
             return Pair.of(a, b.sym);
@@ -133,8 +133,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent = CH.tangent(leftLower, rightLower, CH::getLowerTangentCase);
 
         // 3. use tangents in triangulation
-//        Pair<DTEdge, DTEdge> triangulationEdges = getTriangulationEdges(left, right, upperTangent, lowerTangent);
-        Pair<DTEdge, DTEdge> triangulationEdges = Pair.of(null, null);
+        Pair<QuadEdge, QuadEdge> triangulationEdges = getTriangulationEdges(left, right, upperTangent, lowerTangent);
 
         // 4. cut convex hull w.r.t the tangents
         CutData data = CH.cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
@@ -156,14 +155,14 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     }
 
 
-    private Pair<DTEdge, DTEdge> getTriangulationEdges(UAEResult left, UAEResult right,
-                                                       Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
-                                                       Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
-        DTEdge ldo = left.e1;
-        DTEdge ldi = left.e2;
+    private Pair<QuadEdge, QuadEdge> getTriangulationEdges(UAEResult left, UAEResult right,
+                                                           Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
+                                                           Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
+        QuadEdge ldo = left.e1;
+        QuadEdge ldi = left.e2;
 
-        DTEdge rdi = right.e1;
-        DTEdge rdo = right.e2;
+        QuadEdge rdi = right.e1;
+        QuadEdge rdo = right.e2;
 
         // Compute the upper common tangent of L and R.
         while (true) {
@@ -177,7 +176,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         }
 
         // Create a first cross edge base from rdi.org to ldi.org.
-        DTEdge base = DT.connect(ldi.sym, rdi);
+        QuadEdge base = DT.connect(ldi.sym, rdi);
 
         // Adjust ldo and rdo
         if (ldi.org.x == ldo.org.x && ldi.org.y == ldo.org.y) {
@@ -190,8 +189,8 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
         // Merge
         while (true) {
             // Locate the first R and L points to be encountered by the diving bubble.
-            DTEdge rcand = base.sym.onext;
-            DTEdge lcand = base.oprev;
+            QuadEdge rcand = base.sym.onext;
+            QuadEdge lcand = base.oprev;
 
             // If both lcand and rcand are invalid, then base is the lower common tangent.
             boolean v_rcand = DT.rightOf(rcand.dest, base);
@@ -204,7 +203,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
             if (v_rcand) {
                 while (DT.rightOf(rcand.onext.dest, base) ||
                         DT.inCircle(base.dest, base.org, rcand.dest, rcand.onext.dest)) {
-                    DTEdge t = rcand.onext;
+                    QuadEdge t = rcand.onext;
                     DT.deleteEdge(rcand);
                     rcand = t;
                 }
@@ -213,7 +212,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
             if (v_lcand) {
                 while (DT.rightOf(lcand.oprev.dest, base) &&
                         DT.inCircle(base.dest, base.org, lcand.dest, lcand.oprev.dest)) {
-                    DTEdge t = lcand.oprev;
+                    QuadEdge t = lcand.oprev;
                     DT.deleteEdge(lcand);
                     lcand = t;
                 }
