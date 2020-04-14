@@ -208,7 +208,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
             // Delete R edges out of base.dest that fail the circle test.
             if (v_rcand) {
-                while (DT.rightOf(rcand.onext.dest, base) ||
+                while (DT.rightOf(rcand.onext.dest, base) &&
                         DT.inCircle(base.dest, base.org, rcand.dest, rcand.onext.dest)) {
                     QuadEdge t = rcand.onext;
                     DT.deleteEdge(rcand);
@@ -240,7 +240,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
     @Override
     public Pair<List<Point2D>, List<Point2D>> divide(List<Point2D> input) {
-        int mid = (input.size() + 1) / 2;
+        int mid = input.size() / 2;
         return Pair.of(input.subList(0, mid), input.subList(mid, input.size()));
     }
 

@@ -163,8 +163,8 @@ public class TestUtils {
             double x;
             double y;
             if (integerOrDouble == 0) {
-                x = random.nextInt(100);
-                y = random.nextInt(100);
+                x = random.nextInt(1000);
+                y = random.nextInt(1000);
             } else {
                 x = trimDouble(random.nextDouble());
                 y = trimDouble(random.nextDouble());
