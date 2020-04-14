@@ -121,6 +121,34 @@ public class TestUtils {
         }
     }
 
+    public static void writeEdgesDir(String directory, List<List<Edge>> edges) {
+        for (int i = 0; i < edges.size(); ++i) {
+            String fileName = fileName(i);
+            String filePath = Paths.get(directory, fileName).toString();
+
+            List<Edge> es = edges.get(i);
+            writeEdgesFile(filePath, es);
+        }
+    }
+
+
+    public static void writeEdgesFile(String file, List<Edge> edges) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (Edge edge : edges) {
+                writer.write(String.valueOf(edge.getOrg().x));
+                writer.write(' ');
+                writer.write(String.valueOf(edge.getOrg().y));
+                writer.write(' ');
+                writer.write(String.valueOf(edge.getDest().x));
+                writer.write(' ');
+                writer.write(String.valueOf(edge.getDest().y));
+                writer.write('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static String fileName(int fileIndex) {
         return String.valueOf(fileIndex);
     }

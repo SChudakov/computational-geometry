@@ -1,8 +1,9 @@
 package com.chudakov.geometry;
 
 public class PointsGenerator {
-    private static final String BASE = "./src/test/resources/convexhull/";
+    private static final String BASE = "./src/test/resources/testcases/";
     public static final String[] INPUT_DIRS = {
+            BASE + "5/input/",
             BASE + "10/input/",
             BASE + "10_d/input/",
             BASE + "20/input/",
@@ -13,6 +14,7 @@ public class PointsGenerator {
             BASE + "100_d/input/",
     };
     public static final String[] CH_DIRS = {
+            BASE + "5/ch/",
             BASE + "10/ch/",
             BASE + "10_d/ch/",
             BASE + "20/ch/",
@@ -23,6 +25,7 @@ public class PointsGenerator {
             BASE + "100_d/ch/",
     };
     public static final String[] DT_DIRS = {
+            BASE + "5/dt/",
             BASE + "10/dt/",
             BASE + "10_d/dt/",
             BASE + "20/dt/",
@@ -34,6 +37,7 @@ public class PointsGenerator {
     };
 
     private static final int[][] FILES_DATA = {
+            {1000, 5, 0},
             {1000, 10, 0},
             {1000, 10, 1},
             {1000, 20, 0},

@@ -2,12 +2,41 @@ package com.chudakov.geometry.uae;
 
 import com.chudakov.geometry.common.Point2D;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DT {
 
     public static List<Edge> convert(QuadEdge quadEdge) {
-        throw new UnsupportedOperationException("not implemented");
+        if (quadEdge == null) {
+            return Collections.emptyList();
+        }
+
+        List<Edge> result = new ArrayList<>();
+        Set<Point2D> visited = new HashSet<>();
+
+        dfs(quadEdge, visited, result);
+
+        return result;
+    }
+
+    private static void dfs(QuadEdge quadEdge, Set<Point2D> visited, List<Edge> result) {
+        if (visited.contains(quadEdge.org)) {
+            return;
+        }
+        visited.add(quadEdge.org);
+        result.add(new Edge(quadEdge.org, quadEdge.dest));
+        dfs(quadEdge.sym, visited, result);
+
+        QuadEdge it = quadEdge.onext;
+        while (!it.equals(quadEdge)) {
+            result.add(new Edge(it.org, it.dest));
+            dfs(it.sym, visited, result);
+            it = it.onext;
+        }
     }
 
 
@@ -37,8 +66,9 @@ public class DT {
         a.onext.oprev = b;
         b.onext.oprev = a;
 
+        QuadEdge tmp = a.onext;
         a.onext = b.onext;
-        b.onext = a.onext;
+        b.onext = tmp;
     }
 
     static QuadEdge connect(QuadEdge a, QuadEdge b) {

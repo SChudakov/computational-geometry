@@ -3,6 +3,11 @@ package com.chudakov.geometry.uae;
 import com.chudakov.geometry.common.Point2D;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static com.chudakov.geometry.uae.ConcatenableQueue.CQNode;
 import static com.chudakov.geometry.uae.ConvexHull.Position;
 
@@ -11,6 +16,15 @@ public class CH {
     interface TriFunction<A, B, C, R> {
         R apply(A a, B b, C c);
     }
+
+    public static List<Point2D> convert(ConvexHull convexHull) {
+        List<Point2D> result = new ArrayList<>();
+        for (Point2D point : convexHull) {
+            result.add(point);
+        }
+        return result;
+    }
+
 
     static CutData cutSubhulls(ConcatenableQueue<Point2D> leftUpper,
                                ConcatenableQueue<Point2D> leftLower,

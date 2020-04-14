@@ -20,14 +20,8 @@ public class UAE2DTest {
 
     @Test
     public void testCH1() {
-        List<Point2D> points = new ArrayList<>(8);
-        points.add(new Point2D(1, 2));
-        points.add(new Point2D(2, 5));
-        points.add(new Point2D(3, 1));
-        points.add(new Point2D(5, 7));
-        points.add(new Point2D(9, 8));
-        points.add(new Point2D(12, 1));
-        points.add(new Point2D(13, 3));
+        double[][] input = new double[][]{{1, 2}, {2, 5}, {3, 1}, {5, 7}, {9, 8}, {12, 1}, {13, 3}};
+        List<Point2D> points = readPoints(input);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
@@ -36,27 +30,15 @@ public class UAE2DTest {
 
     @Test
     public void testCH2() {
-        List<Point2D> points = new ArrayList<>(12);
-        points.add(new Point2D(2, 4));
-        points.add(new Point2D(4, 4));
-        points.add(new Point2D(6, 4));
-        points.add(new Point2D(8, 4));
-        points.add(new Point2D(2, 6));
-        points.add(new Point2D(8, 6));
-        points.add(new Point2D(2, 8));
-        points.add(new Point2D(8, 8));
-        points.add(new Point2D(2, 10));
-        points.add(new Point2D(4, 10));
-        points.add(new Point2D(6, 10));
-        points.add(new Point2D(8, 10));
+        double[][] input = new double[][]{
+                {2, 4}, {4, 4}, {6, 4}, {8, 4},
+                {2, 6}, {8, 6},
+                {2, 8}, {8, 8},
+                {2, 10}, {4, 10}, {6, 10}, {8, 10}};
+        double[][] output = new double[][]{{2, 4}, {8, 4}, {2, 10}, {8, 10}};
 
-
-        List<Point2D> expected = new ArrayList<>(4);
-        expected.add(new Point2D(2, 4));
-        expected.add(new Point2D(8, 4));
-        expected.add(new Point2D(2, 10));
-        expected.add(new Point2D(8, 10));
-
+        List<Point2D> points = readPoints(input);
+        List<Point2D> expected = readPoints(output);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
@@ -65,20 +47,10 @@ public class UAE2DTest {
 
     @Test
     public void testCH3() {
-        List<Point2D> points = new ArrayList<>(12);
-        points.add(new Point2D(1, 1));
-        points.add(new Point2D(2, 1));
-        points.add(new Point2D(3, 1));
-        points.add(new Point2D(4, 1));
-        points.add(new Point2D(5, 1));
-        points.add(new Point2D(6, 1));
-        points.add(new Point2D(7, 1));
-        points.add(new Point2D(8, 1));
-
-
-        List<Point2D> expected = new ArrayList<>(2);
-        expected.add(new Point2D(1, 1));
-        expected.add(new Point2D(8, 1));
+        double[][] input = new double[][]{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, {6, 1}, {7, 1}, {8, 1}};
+        double[][] output = new double[][]{{1, 1}, {8, 1}};
+        List<Point2D> points = readPoints(input);
+        List<Point2D> expected = readPoints(output);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
@@ -87,35 +59,80 @@ public class UAE2DTest {
 
     @Test
     public void testCH4() {
-        List<Point2D> points = new ArrayList<>(12);
-        points.add(new Point2D(1, 1));
-        points.add(new Point2D(1, 2));
-        points.add(new Point2D(1, 3));
-        points.add(new Point2D(1, 4));
-        points.add(new Point2D(1, 5));
-        points.add(new Point2D(1, 6));
-        points.add(new Point2D(1, 7));
-        points.add(new Point2D(1, 8));
-
-
-        List<Point2D> expected = new ArrayList<>(2);
-        expected.add(new Point2D(1, 1));
-        expected.add(new Point2D(1, 8));
+        double[][] input = new double[][]{{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6}, {1, 7}, {1, 8}};
+        double[][] output = new double[][]{{1, 1}, {1, 8}};
+        List<Point2D> points = readPoints(input);
+        List<Point2D> expected = readPoints(output);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
         assertEqualCH(expected, hull);
     }
 
+
     @Test
     public void testDT1() {
+        SequentialUAE2D uae = new SequentialUAE2D();
+
+        List<Point2D> input1 = Collections.emptyList();
+        List<Edge> output1 = Collections.emptyList();
+        List<Edge> expected1 = DT.convert(uae.solve(input1).e1);
+        assertEqualDT(expected1, output1);
+
+
+        List<Point2D> input2 = Collections.singletonList(new Point2D(1, 1));
+        List<Edge> output2 = Collections.emptyList();
+        List<Edge> expected2 = DT.convert(uae.solve(input2).e1);
+        assertEqualDT(expected2, output2);
+
+
+        List<Point2D> input3 = Arrays.asList(new Point2D(1, 1), new Point2D(2, 2));
+        List<Edge> output3 = Arrays.asList(new Edge(input3.get(0), input3.get(1)), new Edge(input3.get(1), input3.get(0)));
+        List<Edge> expected3 = DT.convert(uae.solve(input3).e1);
+        assertEqualDT(expected3, output3);
     }
 
+    @Test
     public void testDT2() {
+        SequentialUAE2D uae = new SequentialUAE2D();
+
+        double[][] points1 = new double[][]{{1, 1}, {2, 2}, {3, 1}};
+        double[][] edges1 = new double[][]{{1, 1, 2, 2}, {2, 2, 3, 1}, {3, 1, 1, 1}};
+        List<Point2D> input1 = readPoints(points1);
+        List<Edge> output1 = readEdges(edges1);
+        List<Edge> actual1 = DT.convert(uae.solve(input1).e1);
+        assertEqualDT(output1, actual1);
+
+        double[][] points2 = new double[][]{{1, 1}, {2, 2}, {3, 3}};
+        double[][] edges2 = new double[][]{{1, 1, 2, 2}, {2, 2, 3, 3}};
+        List<Point2D> input2 = readPoints(points2);
+        List<Edge> output2 = readEdges(edges2);
+        List<Edge> actual2 = DT.convert(uae.solve(input2).e1);
+        assertEqualDT(output2, actual2);
     }
 
+    @Test
     public void testDT3() {
+        SequentialUAE2D uae = new SequentialUAE2D();
+
+        double[][] points1 = new double[][]{{1, 1}, {2, 4}, {7, 6}, {6, 0}};
+        double[][] edges1 = new double[][]{{1, 1, 2, 4}, {1, 1, 6, 0}, {2, 4, 6, 0}, {2, 4, 7, 6}, {7, 6, 6, 0}};
+        List<Point2D> input1 = readPoints(points1);
+        List<Edge> output1 = readEdges(edges1);
+        List<Edge> actual1 = DT.convert(uae.solve(input1).e1);
+        assertEqualDT(output1, actual1);
+
+        double[][] points2 = new double[][]{{1, 1}, {4, 3}, {4, 6}, {7, 1}};
+        double[][] edges2 = new double[][]{
+                {1, 1, 4, 6}, {1, 1, 4, 3}, {1, 1, 7, 1},
+                {4, 3, 4, 6}, {4, 3, 7, 1},
+                {4, 6, 7, 1}};
+        List<Point2D> input2 = readPoints(points2);
+        List<Edge> output2 = readEdges(edges2);
+        List<Edge> actual2 = DT.convert(uae.solve(input2).e1);
+        assertEqualDT(output2, actual2);
     }
+
 
     @Test
     public void testRemoveDuplicated() {
@@ -206,14 +223,44 @@ public class UAE2DTest {
 
 
     @Test
-    public void tesSequentialConvexHull() {
+    public void tesSequentialUAE2D() {
         testConvexHull(new SequentialUAE2D());
     }
 
     @Test
-    public void tesParallelConvexHull() {
+    public void tesParallelUAE2D() {
         testConvexHull(new ParallelUAE2D());
     }
+
+
+    @Test
+    public void helperCH() {
+        //  (0.866;0.013) (0.905;0.064) (0.931;0.098)
+        //  (0.905;0.064)
+        String inputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/100_d/input/348";
+        String chDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/100_d/ch/348";
+
+        List<Point2D> input = TestUtils.readPointsFile(inputDir);
+        List<Point2D> expectedCH = TestUtils.readPointsFile(chDir);
+
+        ConvexHull actualCH = new SequentialUAE2D().solve(input).convexHull;
+        assertEqualCH(expectedCH, actualCH);
+    }
+
+    @Test
+    public void helperDT() {
+        String inputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/5/input/0";
+        String outputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/5/dt/0";
+        String saveFilePath = "/home/semen/drive/python/points-visualization/edges";
+
+        List<Point2D> input = TestUtils.readPointsFile(inputDir);
+        List<Edge> expectedDT = TestUtils.readEdgesFile(outputDir);
+
+        List<Edge> actualDT = DT.convert(new SequentialUAE2D().solve(input).e1);
+        TestUtils.writeEdgesFile(saveFilePath, actualDT);
+        assertEqualDT(expectedDT, actualDT);
+    }
+
 
     private void testConvexHull(DaCExecutionSpecifics<List<Point2D>, UAEResult> specifics) {
         for (int i = 0; i < PointsGenerator.INPUT_DIRS.length; ++i) {
@@ -249,15 +296,10 @@ public class UAE2DTest {
     }
 
     private void assertEqualCH(List<Point2D> expectedCH, ConvexHull actualCH) {
-        Set<Point2D> expectedPoints = new HashSet<>(expectedCH);
-        List<Point2D> actualList = new ArrayList<>();
-        for (Point2D point : actualCH) {
-            actualList.add(point);
-        }
+        List<Point2D> actualList = CH.convert(actualCH);
         actualList = removeCollinear(actualList);
 
-        expectedCH.sort(Point2D::compareTo);
-
+        Set<Point2D> expectedPoints = new HashSet<>(expectedCH);
         Set<Point2D> actualPoints = new HashSet<>(actualList);
 
         assertEquals(expectedPoints, actualPoints);
@@ -268,6 +310,27 @@ public class UAE2DTest {
         Set<Edge> actualDTSet = new HashSet<>(actualDT);
         assertEquals(expectedDTSet, actualDTSet);
     }
+
+
+    private List<Point2D> readPoints(double[][] points) {
+        List<Point2D> result = new ArrayList<>(points.length);
+        for (double[] point : points) {
+            result.add(new Point2D(point[0], point[1]));
+        }
+        return result;
+    }
+
+    private List<Edge> readEdges(double[][] points) {
+        List<Edge> result = new ArrayList<>(points.length);
+        for (double[] point : points) {
+            Point2D org = new Point2D(point[0], point[1]);
+            Point2D dest = new Point2D(point[2], point[3]);
+            result.add(new Edge(org, dest));
+            result.add(new Edge(dest, org));
+        }
+        return result;
+    }
+
 
     private List<Point2D> removeCollinear(List<Point2D> points) {
         boolean[] removed = new boolean[points.size()];
@@ -295,31 +358,5 @@ public class UAE2DTest {
             }
         }
         return result;
-    }
-
-    @Test
-    public void helperCH() {
-        //  (0.866;0.013) (0.905;0.064) (0.931;0.098)
-        //  (0.905;0.064)
-        String inputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/convexhull/100_d/input/348";
-        String chDir = "/home/semen/drive/java/computational-geometry/src/test/resources/convexhull/100_d/output/348";
-
-        List<Point2D> input = TestUtils.readPointsFile(inputDir);
-        List<Point2D> expectedCH = TestUtils.readPointsFile(chDir);
-
-        ConvexHull actualCH = new SequentialUAE2D().solve(input).convexHull;
-        assertEqualCH(expectedCH, actualCH);
-    }
-
-    @Test
-    public void helperDT() {
-        String inputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/convexhull/100_d/input/348";
-        String outputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/convexhull/100_d/output/348";
-
-        List<Point2D> input = TestUtils.readPointsFile(inputDir);
-        List<Edge> expectedDT = TestUtils.readEdgesFile(outputDir);
-
-        List<Edge> actualDT = DT.convert(new SequentialUAE2D().solve(input).e1);
-        assertEqualDT(expectedDT, actualDT);
     }
 }

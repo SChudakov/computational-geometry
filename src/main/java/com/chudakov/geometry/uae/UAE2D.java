@@ -16,8 +16,7 @@ import static com.chudakov.geometry.uae.ConcatenableQueue.CQNode;
 public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     @Override
     public boolean isBaseCase(List<Point2D> points) {
-        int size = points.size();
-        return size == 2 || size == 3;
+        return points.size() <= 3;
     }
 
     @Override
@@ -29,6 +28,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     public UAEResult solveBaseCase(List<Point2D> points) {
         ConvexHull convexHull = convexHullBaseCase(points);
         Pair<QuadEdge, QuadEdge> p = delaunayTriangulationBaseCase(points);
+//        Pair<QuadEdge, QuadEdge> p = Pair.of(null, null);
         return new UAEResult(convexHull, p.getLeft(), p.getRight());
     }
 
@@ -37,7 +37,9 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
         ConcatenableQueue<Point2D> upper = new ConcatenableQueue<>();
         ConcatenableQueue<Point2D> lower = new ConcatenableQueue<>();
-        if (size == 2) {
+        if (size == 1) {
+            upper.add(points.get(0));
+        } else if (size == 2) {
             if (points.get(0).y <= points.get(1).y) {
                 lower.add(points.get(0));
                 upper.add(points.get(1));
@@ -45,7 +47,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
                 lower.add(points.get(1));
                 upper.add(points.get(0));
             }
-        } else {
+        } else if (size == 3) {
             Point2D first = points.get(0);
             Point2D second = points.get(1);
             Point2D third = points.get(2);
@@ -81,6 +83,10 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     }
 
     private Pair<QuadEdge, QuadEdge> delaunayTriangulationBaseCase(List<Point2D> points) {
+        if (points.size() == 0 || points.size() == 1) {
+            return Pair.of(null, null);
+        }
+
         if (points.size() == 2) {
             QuadEdge e = DT.makeEdge(points.get(0), points.get(1));
             return Pair.of(e, e.sym);
@@ -134,6 +140,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
         // 3. use tangents in triangulation
         Pair<QuadEdge, QuadEdge> triangulationEdges = getTriangulationEdges(left, right, upperTangent, lowerTangent);
+//        Pair<QuadEdge, QuadEdge> triangulationEdges = Pair.of(null, null);
 
         // 4. cut convex hull w.r.t the tangents
         CutData data = CH.cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
@@ -233,7 +240,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
 
     @Override
     public Pair<List<Point2D>, List<Point2D>> divide(List<Point2D> input) {
-        int mid = input.size() / 2;
+        int mid = (input.size() + 1) / 2;
         return Pair.of(input.subList(0, mid), input.subList(mid, input.size()));
     }
 
