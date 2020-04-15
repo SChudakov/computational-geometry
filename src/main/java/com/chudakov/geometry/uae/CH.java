@@ -4,9 +4,7 @@ import com.chudakov.geometry.common.Point2D;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.chudakov.geometry.uae.ConcatenableQueue.CQNode;
 import static com.chudakov.geometry.uae.ConvexHull.Position;

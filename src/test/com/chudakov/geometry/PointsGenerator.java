@@ -1,42 +1,24 @@
 package com.chudakov.geometry;
 
 public class PointsGenerator {
-    private static final String BASE = "./src/test/resources/testcases/";
-    public static final String[] INPUT_DIRS = {
-            BASE + "5/input/",
-            BASE + "10/input/",
-            BASE + "10_d/input/",
-            BASE + "20/input/",
-            BASE + "20_d/input/",
-            BASE + "40/input/",
-            BASE + "40_d/input/",
-            BASE + "100/input/",
-            BASE + "100_d/input/",
+    private static final String root = "./src/test/resources/testcases/";
+    public static final String[] testDirs = {
+            root + "5/",
+            root + "10/",
+            root + "10_d/",
+            root + "20/",
+            root + "20_d/",
+            root + "40/",
+            root + "40_d/",
+            root + "100/",
+            root + "100_d/",
     };
-    public static final String[] CH_DIRS = {
-            BASE + "5/ch/",
-            BASE + "10/ch/",
-            BASE + "10_d/ch/",
-            BASE + "20/ch/",
-            BASE + "20_d/ch/",
-            BASE + "40/ch/",
-            BASE + "40_d/ch/",
-            BASE + "100/ch/",
-            BASE + "100_d/ch/",
+    public static final String[] subdirs = {
+            "input/",
+            "ch/",
+            "dt/"
     };
-    public static final String[] DT_DIRS = {
-            BASE + "5/dt/",
-            BASE + "10/dt/",
-            BASE + "10_d/dt/",
-            BASE + "20/dt/",
-            BASE + "20_d/dt/",
-            BASE + "40/dt/",
-            BASE + "40_d/dt/",
-            BASE + "100/dt/",
-            BASE + "100_d/dt/",
-    };
-
-    private static final int[][] FILES_DATA = {
+    private static final int[][] filesData = {
             {1000, 5, 0},
             {1000, 10, 0},
             {1000, 10, 1},
@@ -49,23 +31,23 @@ public class PointsGenerator {
     };
 
     public static void main(String[] args) {
-        for (String directory : INPUT_DIRS) {
-            TestUtils.cleanDirectory(directory);
-        }
-        for (String directory : CH_DIRS) {
-            TestUtils.cleanDirectory(directory);
-        }
+        for (int i = 0; i < testDirs.length; ++i) {
+            String testDir = testDirs[i];
+            String inputDir = testDir + subdirs[0];
+            String chDir = testDir + subdirs[1];
+            String dtDir = testDir + subdirs[2];
 
-        assert INPUT_DIRS.length == FILES_DATA.length;
-        for (int i = 0; i < INPUT_DIRS.length; ++i) {
-            String directory = INPUT_DIRS[i];
-            int numberOfFiles = FILES_DATA[i][0];
-            int numberOfPoints = FILES_DATA[i][1];
-            int integerOrDouble = FILES_DATA[i][2];
+            TestUtils.cleanDirectory(inputDir);
+            TestUtils.cleanDirectory(chDir);
+            TestUtils.cleanDirectory(dtDir);
 
-            System.out.println("Generating directory: " + directory);
+            int numberOfFiles = filesData[i][0];
+            int numberOfPoints = filesData[i][1];
+            int integerOrDouble = filesData[i][2];
 
-            TestUtils.writePoints(directory, numberOfFiles, numberOfPoints, integerOrDouble);
+            System.out.println("Generating directory: " + inputDir);
+
+            TestUtils.writePoints(inputDir, numberOfFiles, numberOfPoints, integerOrDouble);
         }
     }
 }
