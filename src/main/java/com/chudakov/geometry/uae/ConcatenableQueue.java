@@ -7,25 +7,25 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class ConcatenableQueue<E> implements Iterable<E> {
+public class ConcatenableQueue<T> implements Iterable<T> {
 
-    CQNode<E> root;
+    CQVertex<T> root;
 
-    CQNode<E> minNode;
-    CQNode<E> maxNode;
+    CQVertex<T> minNode;
+    CQVertex<T> maxNode;
 
-    Comparator<E> cmp;
+    Comparator<T> cmp;
 
 
     public ConcatenableQueue() {
         this(null, null, null, null);
     }
 
-    public ConcatenableQueue(Comparator<E> cmp) {
+    public ConcatenableQueue(Comparator<T> cmp) {
         this(null, null, null, cmp);
     }
 
-    ConcatenableQueue(CQNode<E> root, CQNode<E> minNode, CQNode<E> maxNode, Comparator<E> cmp) {
+    ConcatenableQueue(CQVertex<T> root, CQVertex<T> minNode, CQVertex<T> maxNode, Comparator<T> cmp) {
         this.root = root;
         this.minNode = minNode;
         this.maxNode = maxNode;
@@ -33,9 +33,24 @@ public class ConcatenableQueue<E> implements Iterable<E> {
     }
 
 
-    public void add(E e) {
+    private CQVertex<T> createLeafBetween(CQVertex<T> leftNode, CQVertex<T> rightNode, T data) {
+        CQVertex<T> result = new CQVertex<>(data, leftNode, rightNode);
+        if (leftNode != null) {
+            leftNode.rSon = result;
+        } else {
+            minNode = result;
+        }
+        if (rightNode != null) {
+            rightNode.lSon = result;
+        } else {
+            maxNode = result;
+        }
+        return result;
+    }
+
+    public void add(T e) {
         if (root == null) {
-            CQNode<E> node = new CQNode<>(e);
+            CQVertex<T> node = new CQVertex<>(e);
             root = node;
             minNode = node;
             maxNode = node;
@@ -44,108 +59,91 @@ public class ConcatenableQueue<E> implements Iterable<E> {
         }
     }
 
-    private CQNode<E> insert(CQNode<E> node, E e) {
-        CQNode<E> result = null;
-        if (compareImpl(e, node.leftSubtreeMax.data) <= 0) { // go to the left sub-tree
-            if (node.isLeaf) {
-                if (compareImpl(e, node.data) == 0) {  // corner case, replace old value by the new one
-                    node.data = e;
-                } else { // create new leaf between n.left & n, hence data < node.leftSubtreeMax.data
-                    CQNode<E> createdLeaf = createLeafBetween(e, node.left, node);
-                    result = new CQNode<>(createdLeaf, createdLeaf, node);
-                }
-            } else { // go left & update node.left pointer
-                node.left = insert(node.left, e);
+    private CQVertex<T> insert(CQVertex<T> vertex, T data) {
+        CQVertex<T> result = null;
+        if (compareImpl(data, vertex.leftSubtreeMax.value) > 0) {
+            if (!vertex.isLeaf) {
+                vertex.rSon = insert(vertex.rSon, data);
+            } else {
+                CQVertex<T> createdLeaf = createLeafBetween(vertex, vertex.rSon, data);
+                result = new CQVertex<>(vertex, vertex, createdLeaf);
             }
         } else {
-            if (node.isLeaf) { // create new leaf between n & n.right, hence data > node.leftSubtreeMax.data
-                CQNode<E> createdLeaf = createLeafBetween(e, node, node.right);
-                result = new CQNode<>(node, node, createdLeaf);
-            } else { // go left & update node.right pointer
-                node.right = insert(node.right, e);
+            if (!vertex.isLeaf) {
+                vertex.lSon = insert(vertex.lSon, data);
+            } else {
+                if (compareImpl(data, vertex.value) != 0) {
+                    CQVertex<T> createdLeaf = createLeafBetween(vertex.lSon, vertex, data);
+                    result = new CQVertex<>(createdLeaf, createdLeaf, vertex);
+                } else {
+                    vertex.value = data;
+                }
             }
         }
 
         if (result == null) {
-            result = node;
+            result = vertex;
         }
 
         updateHeight(result);
         return result;
     }
 
-    private CQNode<E> createLeafBetween(E data, CQNode<E> leftNode, CQNode<E> rightNode) {
-        CQNode<E> result = new CQNode<>(data, leftNode, rightNode);
-        if (leftNode != null) {
-            leftNode.right = result;
-        } else {
-            minNode = result;
-        }
-        if (rightNode != null) {
-            rightNode.left = result;
-        } else {
-            maxNode = result;
-        }
-        return result;
-    }
 
-
-    public ConcatenableQueue<E> cutLeft(E e) {
-        CQNode<E> node = searchNode(e);
+    public ConcatenableQueue<T> cutLeft(T e) {
+        CQVertex<T> node = searchNode(e);
         assertCorrectSearchResult(node, e);
 
-        // base case: return empty queue
         if (node.equals(minNode)) {
             return new ConcatenableQueue<>(cmp);
         }
 
-        CQNode<E> splitterNode = node.left;
+        CQVertex<T> splitterNode = node.lSon;
 
-        Pair<ConcatenableQueue<E>, ConcatenableQueue<E>> cuts = split(splitterNode.data);
+        Pair<ConcatenableQueue<T>, ConcatenableQueue<T>> cuts = split(splitterNode.value);
 
-        ConcatenableQueue<E> left = cuts.getLeft();
-        ConcatenableQueue<E> right = cuts.getRight();
+        ConcatenableQueue<T> left = cuts.getLeft();
+        ConcatenableQueue<T> right = cuts.getRight();
 
         copy(right, this);
 
         return left;
     }
 
-    public ConcatenableQueue<E> cutRight(E e) {
-        CQNode<E> node = searchNode(e);
+    public ConcatenableQueue<T> cutRight(T e) {
+        CQVertex<T> node = searchNode(e);
         assertCorrectSearchResult(node, e);
 
-        // base case: return empty queue
         if (node.equals(maxNode)) {
             return new ConcatenableQueue<>(cmp);
         }
 
-        Pair<ConcatenableQueue<E>, ConcatenableQueue<E>> cuts = split(e);
+        Pair<ConcatenableQueue<T>, ConcatenableQueue<T>> cuts = split(e);
 
-        ConcatenableQueue<E> left = cuts.getLeft();
-        ConcatenableQueue<E> right = cuts.getRight();
+        ConcatenableQueue<T> left = cuts.getLeft();
+        ConcatenableQueue<T> right = cuts.getRight();
 
         copy(left, this);
 
         return right;
     }
 
-    private void assertCorrectSearchResult(CQNode<E> node, E e) {
+    private void assertCorrectSearchResult(CQVertex<T> node, T e) {
         if (node == null) {
             throw new IllegalArgumentException("queue does not contain element " + e);
         }
     }
 
-    CQNode<E> searchNode(E e) {
-        CQNode<E> it = root;
+    CQVertex<T> searchNode(T e) {
+        CQVertex<T> it = root;
         while (it != null && !it.isLeaf) {
-            if (compareImpl(e, it.leftSubtreeMax.data) <= 0) { // go left
-                it = it.left;
-            } else { // go right
-                it = it.right;
+            if (compareImpl(e, it.leftSubtreeMax.value) <= 0) {
+                it = it.lSon;
+            } else {
+                it = it.rSon;
             }
         }
-        if (it == null || compareImpl(it.data, e) != 0) { // not found
+        if (it == null || compareImpl(it.value, e) != 0) {
             return null;
         }
         return it;
@@ -166,7 +164,6 @@ public class ConcatenableQueue<E> implements Iterable<E> {
 
         assertSameComparator(leftQueue, rightQueue);
 
-        // corner cases
         if (leftQueue.root == null) {
             return rightQueue;
         }
@@ -174,21 +171,18 @@ public class ConcatenableQueue<E> implements Iterable<E> {
             return leftQueue;
         }
 
-        // concatenate the leafs
-        leftQueue.maxNode.right = rightQueue.minNode;
-        rightQueue.minNode.left = leftQueue.maxNode;
+        leftQueue.maxNode.rSon = rightQueue.minNode;
+        rightQueue.minNode.lSon = leftQueue.maxNode;
 
-        // concatenate the two trees
-        CQNode<E> newRoot = concatenateNodes(leftQueue.root, rightQueue.root, leftQueue.maxNode);
+        CQVertex<E> newRoot = concatenateNodes(leftQueue.root, rightQueue.root, leftQueue.maxNode);
 
         return new ConcatenableQueue<>(newRoot, leftQueue.minNode, rightQueue.maxNode, null);
     }
 
 
-    // when called e is for sure present in the queue
-    Pair<ConcatenableQueue<E>, ConcatenableQueue<E>> split(E e) {
-        ConcatenableQueue<E> left = new ConcatenableQueue<>(cmp);
-        ConcatenableQueue<E> right = new ConcatenableQueue<>(cmp);
+    Pair<ConcatenableQueue<T>, ConcatenableQueue<T>> split(T e) {
+        ConcatenableQueue<T> left = new ConcatenableQueue<>(cmp);
+        ConcatenableQueue<T> right = new ConcatenableQueue<>(cmp);
 
         left.minNode = minNode;
         right.maxNode = maxNode;
@@ -198,87 +192,83 @@ public class ConcatenableQueue<E> implements Iterable<E> {
         return Pair.of(left, right);
     }
 
-    void split(CQNode<E> node, E e, ConcatenableQueue<E> leftQueue, ConcatenableQueue<E> rightQueue) {
-        if (node.isLeaf) { // data`s node found (right leaf)
-            // e == node.data
-            // node has already proper height
+    void split(CQVertex<T> node, T e, ConcatenableQueue<T> leftQueue, ConcatenableQueue<T> rightQueue) {
+        if (node.isLeaf) {
             leftQueue.root = node;
             leftQueue.maxNode = node;
 
-            rightQueue.minNode = node.right;
+            rightQueue.minNode = node.rSon;
 
-            cut(node); // cut the queue connections
+            cut(node);
         } else {
-            if (compareImpl(e, node.leftSubtreeMax.data) == 0) { // base case, also if data`s node is a left leaf
-                leftQueue.root = node.left;
+            if (compareImpl(e, node.leftSubtreeMax.value) == 0) {
+                leftQueue.root = node.lSon;
                 leftQueue.maxNode = node.leftSubtreeMax;
 
-                rightQueue.root = node.right;
-                rightQueue.minNode = node.leftSubtreeMax.right;
+                rightQueue.root = node.rSon;
+                rightQueue.minNode = node.leftSubtreeMax.rSon;
 
                 cut(node.leftSubtreeMax);
-            } else if (compareImpl(e, node.leftSubtreeMax.data) < 0) { // to the left subtree
-                // leftSubtreeMax remains the same for node
+            } else if (compareImpl(e, node.leftSubtreeMax.value) < 0) {
+                split(node.lSon, e, leftQueue, rightQueue);
 
-                split(node.left, e, leftQueue, rightQueue);
+                rightQueue.root = concatenateNodes(rightQueue.root, node.rSon, node.leftSubtreeMax);
+            } else {
 
-                rightQueue.root = concatenateNodes(rightQueue.root, node.right, node.leftSubtreeMax);
-            } else { // to the right subtree
+                split(node.rSon, e, leftQueue, rightQueue);
 
-                split(node.right, e, leftQueue, rightQueue);
-
-                leftQueue.root = concatenateNodes(node.left, leftQueue.root, node.leftSubtreeMax);
+                leftQueue.root = concatenateNodes(node.lSon, leftQueue.root, node.leftSubtreeMax);
             }
         }
     }
 
-    void cut(CQNode<E> leaf) {
-        if (leaf.right != null) {
-            leaf.right.left = null;
-            leaf.right = null;
+    void cut(CQVertex<T> leaf) {
+        if (leaf.rSon != null) {
+            leaf.rSon.lSon = null;
+            leaf.rSon = null;
         }
     }
 
-    static <E> CQNode<E> concatenateNodes(CQNode<E> leftNode, CQNode<E> rightNode, CQNode<E> lMax) {
-        if (leftNode == null) { // left sub-tree is empty
+    static <E> CQVertex<E> concatenateNodes(CQVertex<E> leftNode, CQVertex<E> rightNode, CQVertex<E> lMax) {
+        if (leftNode == null) {
             return rightNode;
-        } else if (rightNode == null) { // right sub-tree is empty
+        } else if (rightNode == null) {
             return leftNode;
-        } else if (leftNode.height == rightNode.height) { // same height => create a new node
-            CQNode<E> result = new CQNode<>(lMax, leftNode, rightNode);
+        } else if (leftNode.height == rightNode.height) {
+            CQVertex<E> result = new CQVertex<>(lMax, leftNode, rightNode);
             updateHeight(result);
             return result;
-        } else if (leftNode.height < rightNode.height) { // right sub-tree is higher
-            rightNode.left = concatenateNodes(leftNode, rightNode.left, lMax);
+        } else if (leftNode.height < rightNode.height) {
+            rightNode.lSon = concatenateNodes(leftNode, rightNode.lSon, lMax);
             updateHeight(rightNode);
             return rightNode;
-        } else { // right sub-tree is higher
-            leftNode.right = concatenateNodes(leftNode.right, rightNode, lMax);
+        } else {
+            leftNode.rSon = concatenateNodes(leftNode.rSon, rightNode, lMax);
             updateHeight(leftNode);
             return leftNode;
         }
     }
 
 
-    static <E> void updateHeight(CQNode<E> node) {
+    static <E> void updateHeight(CQVertex<E> node) {
         int leftHeight = 0;
-        if (node.left != null) {
-            leftHeight = node.left.height;
+        if (node.lSon != null) {
+            leftHeight = node.lSon.height;
         }
         int rightHeight = 0;
-        if (node.left != null) {
-            rightHeight = node.right.height;
+        if (node.lSon != null) {
+            rightHeight = node.rSon.height;
         }
         node.height = Math.max(leftHeight, rightHeight) + 1;
     }
 
-    private int compareImpl(E e1, E e2) {
-        if (cmp == null) { // use Comparable interface for comparisons
+    private int compareImpl(T e1, T e2) {
+        if (cmp == null) {
             @SuppressWarnings("unchecked")
-            Comparable<E> casted = (Comparable<E>) e1;
+            Comparable<T> casted = (Comparable<T>) e1;
             return casted.compareTo(e2);
         }
-        // use comparator for comparisons
+
         return cmp.compare(e1, e2);
     }
 
@@ -297,16 +287,16 @@ public class ConcatenableQueue<E> implements Iterable<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
+    public Iterator<T> iterator() {
         return new CQIterator();
     }
 
-    public Iterator<E> reverseIterator() {
+    public Iterator<T> reverseIterator() {
         return new CQReverseIterator();
     }
 
-    private class CQIterator implements Iterator<E> {
-        private CQNode<E> nextNode;
+    private class CQIterator implements Iterator<T> {
+        private CQVertex<T> nextNode;
 
         CQIterator() {
             nextNode = minNode;
@@ -318,18 +308,18 @@ public class ConcatenableQueue<E> implements Iterable<E> {
         }
 
         @Override
-        public E next() {
+        public T next() {
             if (nextNode == null) {
                 throw new NoSuchElementException();
             }
-            E result = nextNode.data;
-            nextNode = nextNode.right;
+            T result = nextNode.value;
+            nextNode = nextNode.rSon;
             return result;
         }
     }
 
-    private class CQReverseIterator implements Iterator<E> {
-        private CQNode<E> nextNode;
+    private class CQReverseIterator implements Iterator<T> {
+        private CQVertex<T> nextNode;
 
         CQReverseIterator() {
             nextNode = maxNode;
@@ -341,51 +331,47 @@ public class ConcatenableQueue<E> implements Iterable<E> {
         }
 
         @Override
-        public E next() {
+        public T next() {
             if (nextNode == null) {
                 throw new NoSuchElementException();
             }
-            E result = nextNode.data;
-            nextNode = nextNode.left;
+            T result = nextNode.value;
+            nextNode = nextNode.lSon;
             return result;
         }
     }
 
-    static class CQNode<E> {
-        E data;
+    static class CQVertex<E> {
+        E value;
 
-        // height in terms of maximum
-        // number of steps to reach a leaf
         int height;
 
-        // if isLeaf == true, mean left & right neighboring leaves
-        // else means left and right sons in the tree structure
-        CQNode<E> left;
-        CQNode<E> right;
+        CQVertex<E> lSon;
+        CQVertex<E> rSon;
 
-        CQNode<E> leftSubtreeMax;
+        CQVertex<E> leftSubtreeMax;
 
         boolean isLeaf;
 
-        public CQNode() {
+        public CQVertex() {
         }
 
-        CQNode(E data) {
-            this(data, null, null, null, true);
+        CQVertex(E value) {
+            this(value, null, null, null, true);
         }
 
-        CQNode(E data, CQNode<E> leftLeaf, CQNode<E> rightLeaf) {
-            this(data, leftLeaf, rightLeaf, null, true);
+        CQVertex(E value, CQVertex<E> leftLeaf, CQVertex<E> rightLeaf) {
+            this(value, leftLeaf, rightLeaf, null, true);
         }
 
-        CQNode(CQNode<E> leftSubtreeMax, CQNode<E> leftLeaf, CQNode<E> rightLeaf) {
+        CQVertex(CQVertex<E> leftSubtreeMax, CQVertex<E> leftLeaf, CQVertex<E> rightLeaf) {
             this(null, leftLeaf, rightLeaf, leftSubtreeMax, false);
         }
 
-        CQNode(E data, CQNode<E> left, CQNode<E> right, CQNode<E> leftSubtreeMax, boolean isLeaf) {
-            this.data = data;
-            this.left = left;
-            this.right = right;
+        CQVertex(E value, CQVertex<E> lSon, CQVertex<E> rSon, CQVertex<E> leftSubtreeMax, boolean isLeaf) {
+            this.value = value;
+            this.lSon = lSon;
+            this.rSon = rSon;
             if (leftSubtreeMax == null) {
                 this.leftSubtreeMax = this;
             } else {
@@ -397,7 +383,7 @@ public class ConcatenableQueue<E> implements Iterable<E> {
         @Override
         public String toString() {
             return "CQNode{" +
-                    "data=" + data +
+                    "data=" + value +
                     ", height=" + height +
                     ", isLeaf=" + isLeaf +
                     '}';
@@ -408,14 +394,14 @@ public class ConcatenableQueue<E> implements Iterable<E> {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            CQNode<?> cqNode = (CQNode<?>) o;
+            CQVertex<?> cqVertex = (CQVertex<?>) o;
 
-            return data != null ? data.equals(cqNode.data) : cqNode.data == null;
+            return value != null ? value.equals(cqVertex.value) : cqVertex.value == null;
         }
 
         @Override
         public int hashCode() {
-            return data != null ? data.hashCode() : 0;
+            return value != null ? value.hashCode() : 0;
         }
     }
 }

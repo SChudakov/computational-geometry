@@ -1,5 +1,8 @@
 package com.chudakov.geometry.uae;
 
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,14 +17,14 @@ public class DT {
         }
 
         List<Edge> result = new ArrayList<>();
-        Set<Vertex2D> visited = new HashSet<>();
+        Set<Vertex> visited = new HashSet<>();
 
         dfs(quadEdge, visited, result);
 
         return result;
     }
 
-    private static void dfs(QuadEdge quadEdge, Set<Vertex2D> visited, List<Edge> result) {
+    private static void dfs(QuadEdge quadEdge, Set<Vertex> visited, List<Edge> result) {
         if (visited.contains(quadEdge.org)) {
             return;
         }
@@ -38,10 +41,17 @@ public class DT {
     }
 
 
-    static QuadEdge makeEdge(Vertex2D org, Vertex2D dest) {
+    static QuadEdge makeEdge(Vertex org, Vertex dest) {
         QuadEdge e = new QuadEdge(org, dest);
         QuadEdge es = new QuadEdge(dest, org);
-        System.out.println("create: " + e);
+        if (org.edge == null) {
+            org.edge = e;
+        }
+        if (dest.edge == null) {
+            dest.edge = es;
+        }
+
+//        System.out.println("create: " + e);
 
         // make edges mutually symmetrical
         e.sym = es;
@@ -78,17 +88,21 @@ public class DT {
     }
 
     static void deleteEdge(QuadEdge e) {
-        System.out.println("delete: " + e);
+//        System.out.println("delete: " + e);
+
+        if (e.org.edge.equals(e)) {
+            e.org.edge = e.oprev;
+        }
+        if (e.dest.edge.equals(e.sym)) {
+            e.dest.edge = e.sym.oprev;
+        }
 
         splice(e, e.oprev);
         splice(e.sym, e.sym.oprev);
-
-        e.data = true;
-        e.sym.data = true;
     }
 
 
-    static boolean inCircle(Vertex2D a, Vertex2D b, Vertex2D c, Vertex2D d) {
+    static boolean inCircle(Vertex a, Vertex b, Vertex c, Vertex d) {
         double a1 = a.x - d.x;
         double a2 = a.y - d.y;
 
@@ -110,17 +124,59 @@ public class DT {
         return det < 0;
     }
 
-    static boolean rightOf(Vertex2D p, QuadEdge e) {
-        Vertex2D a = e.org;
-        Vertex2D b = e.dest;
+    static boolean rightOf(Vertex p, QuadEdge e) {
+        Vertex a = e.org;
+        Vertex b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
         return det > 0;
     }
 
-    static boolean leftOf(Vertex2D p, QuadEdge e) {
-        Vertex2D a = e.org;
-        Vertex2D b = e.dest;
+    static boolean leftOf(Vertex p, QuadEdge e) {
+        Vertex a = e.org;
+        Vertex b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
         return det < 0;
+    }
+
+
+    static Pair<QuadEdge, QuadEdge> getTangentEdges(Vertex left, Vertex right) {
+        // compute left tangent edge
+        QuadEdge leftEdge = left.edge;
+        while (!leftEdge.equals(leftEdge.onext) &&
+                (rightOf(leftEdge.onext.dest, leftEdge) ||
+                        rightOf(leftEdge.oprev.dest, leftEdge))) {
+            if (rightOf(leftEdge.onext.dest, leftEdge)) {
+                leftEdge = leftEdge.onext;
+            } else {
+                leftEdge = leftEdge.oprev;
+            }
+        }
+
+        // compute right tangent edge
+        QuadEdge rightEdge = right.edge;
+        while (!rightEdge.equals(rightEdge.onext) &&
+                (leftOf(rightEdge.onext.dest, rightEdge) ||
+                        leftOf(rightEdge.oprev.dest, rightEdge))) {
+            if (leftOf(rightEdge.onext.dest, rightEdge)) {
+                rightEdge = rightEdge.onext;
+            } else {
+                rightEdge = rightEdge.oprev;
+            }
+        }
+
+        return Pair.of(leftEdge, rightEdge);
+    }
+
+    private static double angle(QuadEdge e1, QuadEdge e2) {
+        double a = distance(e1.org, e1.dest);
+        double b = distance(e2.org, e2.dest);
+        double c = distance(e1.dest, e2.dest);
+
+        double cosAlpha = (a * a + b * b + c * c) / 2 * a * b;
+        return Math.acos(cosAlpha);
+    }
+
+    private static double distance(Vertex a, Vertex b) {
+        return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
     }
 }

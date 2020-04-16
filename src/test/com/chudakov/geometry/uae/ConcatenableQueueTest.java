@@ -22,15 +22,15 @@ public class ConcatenableQueueTest {
         CQUtil.assertSameFields(queue, null, null, null, null);
 
         queue.add(1);
-        ConcatenableQueue.CQNode<Integer> root = queue.root;
+        ConcatenableQueue.CQVertex<Integer> root = queue.root;
         CQUtil.assertSameFields(root, 1, null, null, root, 0, true);
 
         CQUtil.assertSameFields(queue, root, root, root, null);
 
         queue.add(2);
         root = queue.root;
-        ConcatenableQueue.CQNode<Integer> left = root.left;
-        ConcatenableQueue.CQNode<Integer> right = root.right;
+        ConcatenableQueue.CQVertex<Integer> left = root.lSon;
+        ConcatenableQueue.CQVertex<Integer> right = root.rSon;
         CQUtil.assertSameFields(root, null, left, right, left, 1, false);
         CQUtil.assertSameFields(left, 1, null, right, left, 0, true);
         CQUtil.assertSameFields(right, 2, left, null, right, 0, true);
@@ -43,9 +43,9 @@ public class ConcatenableQueueTest {
         ConcatenableQueue<Integer> queue = new ConcatenableQueue<>(reversedCmp);
         queue.add(1);
         queue.add(2);
-        ConcatenableQueue.CQNode<Integer> root = queue.root;
-        ConcatenableQueue.CQNode<Integer> left = root.left;
-        ConcatenableQueue.CQNode<Integer> right = root.right;
+        ConcatenableQueue.CQVertex<Integer> root = queue.root;
+        ConcatenableQueue.CQVertex<Integer> left = root.lSon;
+        ConcatenableQueue.CQVertex<Integer> right = root.rSon;
         CQUtil.assertSameFields(root, null, left, right, left, 1, false);
         CQUtil.assertSameFields(left, 2, null, right, left, 0, true);
         CQUtil.assertSameFields(right, 1, left, null, right, 0, true);
@@ -59,13 +59,13 @@ public class ConcatenableQueueTest {
         queue.add(3);
         queue.add(1);
         queue.add(4);
-        ConcatenableQueue.CQNode<Integer> root = queue.root;
-        ConcatenableQueue.CQNode<Integer> rootLeft = root.left;
-        ConcatenableQueue.CQNode<Integer> rootRight = root.right;
-        ConcatenableQueue.CQNode<Integer> leaf1 = rootLeft.left;
-        ConcatenableQueue.CQNode<Integer> leaf2 = rootLeft.right;
-        ConcatenableQueue.CQNode<Integer> leaf3 = rootRight.left;
-        ConcatenableQueue.CQNode<Integer> leaf4 = rootRight.right;
+        ConcatenableQueue.CQVertex<Integer> root = queue.root;
+        ConcatenableQueue.CQVertex<Integer> rootLeft = root.lSon;
+        ConcatenableQueue.CQVertex<Integer> rootRight = root.rSon;
+        ConcatenableQueue.CQVertex<Integer> leaf1 = rootLeft.lSon;
+        ConcatenableQueue.CQVertex<Integer> leaf2 = rootLeft.rSon;
+        ConcatenableQueue.CQVertex<Integer> leaf3 = rootRight.lSon;
+        ConcatenableQueue.CQVertex<Integer> leaf4 = rootRight.rSon;
 
         CQUtil.assertSameFields(queue, root, leaf1, leaf4, cmp);
 
@@ -90,7 +90,7 @@ public class ConcatenableQueueTest {
         ConcatenableQueue<Integer> queue = new ConcatenableQueue<>(cmp);
 
         queue.add(1);
-        ConcatenableQueue.CQNode<Integer> root = queue.root;
+        ConcatenableQueue.CQVertex<Integer> root = queue.root;
 
         ConcatenableQueue<Integer> left = queue.cutLeft(1);
         CQUtil.assertSameFields(queue, root, root, root, cmp);
@@ -102,18 +102,18 @@ public class ConcatenableQueueTest {
         ConcatenableQueue<Integer> queue1 = new ConcatenableQueue<>(cmp);
         queue1.add(1);
         queue1.add(2);
-        ConcatenableQueue.CQNode<Integer> root1 = queue1.root;
+        ConcatenableQueue.CQVertex<Integer> root1 = queue1.root;
 
         ConcatenableQueue<Integer> leftQueue1 = queue1.cutLeft(1);
-        CQUtil.assertSameFields(queue1, root1, root1.left, root1.right, cmp);
+        CQUtil.assertSameFields(queue1, root1, root1.lSon, root1.rSon, cmp);
         CQUtil.assertSameFields(leftQueue1, null, null, null, cmp);
 
 
         ConcatenableQueue<Integer> queue2 = new ConcatenableQueue<>(cmp);
         queue2.add(1);
         queue2.add(2);
-        ConcatenableQueue.CQNode<Integer> left2 = queue2.root.left;
-        ConcatenableQueue.CQNode<Integer> right2 = queue2.root.right;
+        ConcatenableQueue.CQVertex<Integer> left2 = queue2.root.lSon;
+        ConcatenableQueue.CQVertex<Integer> right2 = queue2.root.rSon;
 
         ConcatenableQueue<Integer> leftQueue2 = queue2.cutLeft(2);
         CQUtil.assertSameFields(queue2, right2, right2, right2, cmp);
@@ -128,15 +128,15 @@ public class ConcatenableQueueTest {
 
         ConcatenableQueue<Integer> queue2 = getConcatenableQueue1();
 
-        ConcatenableQueue.CQNode<Integer> node2_5 = queue2.root.right;
-        ConcatenableQueue.CQNode<Integer> node2_6 = queue2.root.right.right;
-        ConcatenableQueue.CQNode<Integer> node2_3 = queue2.root.left.right;
+        ConcatenableQueue.CQVertex<Integer> node2_5 = queue2.root.rSon;
+        ConcatenableQueue.CQVertex<Integer> node2_6 = queue2.root.rSon.rSon;
+        ConcatenableQueue.CQVertex<Integer> node2_3 = queue2.root.lSon.rSon;
 
-        ConcatenableQueue.CQNode<Integer> leaf2_12 = queue2.root.right.left;
+        ConcatenableQueue.CQVertex<Integer> leaf2_12 = queue2.root.rSon.lSon;
 
-        ConcatenableQueue.CQNode<Integer> node2_22 = queue2.maxNode;
-        ConcatenableQueue.CQNode<Integer> node2_2 = queue2.minNode;
-        ConcatenableQueue.CQNode<Integer> node2_4 = queue2.minNode.right;
+        ConcatenableQueue.CQVertex<Integer> node2_22 = queue2.maxNode;
+        ConcatenableQueue.CQVertex<Integer> node2_2 = queue2.minNode;
+        ConcatenableQueue.CQVertex<Integer> node2_4 = queue2.minNode.rSon;
 
         ConcatenableQueue<Integer> left2 = queue2.cutLeft(4);
 
@@ -156,7 +156,7 @@ public class ConcatenableQueueTest {
         ConcatenableQueue<Integer> queue = new ConcatenableQueue<>(cmp);
 
         queue.add(1);
-        ConcatenableQueue.CQNode<Integer> root = queue.root;
+        ConcatenableQueue.CQVertex<Integer> root = queue.root;
 
         ConcatenableQueue<Integer> right = queue.cutRight(1);
         CQUtil.assertSameFields(queue, root, root, root, cmp);
@@ -168,18 +168,18 @@ public class ConcatenableQueueTest {
         ConcatenableQueue<Integer> queue1 = new ConcatenableQueue<>(cmp);
         queue1.add(1);
         queue1.add(2);
-        ConcatenableQueue.CQNode<Integer> root1 = queue1.root;
+        ConcatenableQueue.CQVertex<Integer> root1 = queue1.root;
 
         ConcatenableQueue<Integer> rightQueue1 = queue1.cutRight(2);
-        CQUtil.assertSameFields(queue1, root1, root1.left, root1.right, cmp);
+        CQUtil.assertSameFields(queue1, root1, root1.lSon, root1.rSon, cmp);
         CQUtil.assertSameFields(rightQueue1, null, null, null, cmp);
 
 
         ConcatenableQueue<Integer> queue2 = new ConcatenableQueue<>(cmp);
         queue2.add(1);
         queue2.add(2);
-        ConcatenableQueue.CQNode<Integer> left2 = queue2.root.left;
-        ConcatenableQueue.CQNode<Integer> right2 = queue2.root.right;
+        ConcatenableQueue.CQVertex<Integer> left2 = queue2.root.lSon;
+        ConcatenableQueue.CQVertex<Integer> right2 = queue2.root.rSon;
 
         ConcatenableQueue<Integer> leftQueue2 = queue2.cutRight(1);
         CQUtil.assertSameFields(queue2, left2, left2, left2, cmp);
@@ -190,13 +190,13 @@ public class ConcatenableQueueTest {
     public void testSearchNode1() {
         ConcatenableQueue<Integer> queue = new ConcatenableQueue<>();
 
-        ConcatenableQueue.CQNode<Integer> node1 = queue.searchNode(1);
+        ConcatenableQueue.CQVertex<Integer> node1 = queue.searchNode(1);
         assertNull(node1);
 
         queue.add(1);
-        ConcatenableQueue.CQNode<Integer> node2 = queue.searchNode(1);
-        ConcatenableQueue.CQNode<Integer> node3 = queue.searchNode(0);
-        ConcatenableQueue.CQNode<Integer> node4 = queue.searchNode(2);
+        ConcatenableQueue.CQVertex<Integer> node2 = queue.searchNode(1);
+        ConcatenableQueue.CQVertex<Integer> node3 = queue.searchNode(0);
+        ConcatenableQueue.CQVertex<Integer> node4 = queue.searchNode(2);
         CQUtil.assertSameFields(node2, 1, null, null, node2, 0, true);
         assertNull(node3);
         assertNull(node4);
@@ -209,23 +209,23 @@ public class ConcatenableQueueTest {
         queue.add(6);
         queue.add(2);
         queue.add(8);
-        ConcatenableQueue.CQNode<Integer> node1 = queue.searchNode(1);
-        ConcatenableQueue.CQNode<Integer> node2 = queue.searchNode(2);
-        ConcatenableQueue.CQNode<Integer> node3 = queue.searchNode(3);
-        ConcatenableQueue.CQNode<Integer> node4 = queue.searchNode(4);
-        ConcatenableQueue.CQNode<Integer> node5 = queue.searchNode(5);
-        ConcatenableQueue.CQNode<Integer> node6 = queue.searchNode(6);
-        ConcatenableQueue.CQNode<Integer> node7 = queue.searchNode(7);
-        ConcatenableQueue.CQNode<Integer> node8 = queue.searchNode(8);
-        ConcatenableQueue.CQNode<Integer> node9 = queue.searchNode(9);
+        ConcatenableQueue.CQVertex<Integer> node1 = queue.searchNode(1);
+        ConcatenableQueue.CQVertex<Integer> node2 = queue.searchNode(2);
+        ConcatenableQueue.CQVertex<Integer> node3 = queue.searchNode(3);
+        ConcatenableQueue.CQVertex<Integer> node4 = queue.searchNode(4);
+        ConcatenableQueue.CQVertex<Integer> node5 = queue.searchNode(5);
+        ConcatenableQueue.CQVertex<Integer> node6 = queue.searchNode(6);
+        ConcatenableQueue.CQVertex<Integer> node7 = queue.searchNode(7);
+        ConcatenableQueue.CQVertex<Integer> node8 = queue.searchNode(8);
+        ConcatenableQueue.CQVertex<Integer> node9 = queue.searchNode(9);
         assertNull(node1);
-        assertEquals((Integer) 2, node2.data);
+        assertEquals((Integer) 2, node2.value);
         assertNull(node3);
-        assertEquals((Integer) 4, node4.data);
+        assertEquals((Integer) 4, node4.value);
         assertNull(node5);
-        assertEquals((Integer) 6, node6.data);
+        assertEquals((Integer) 6, node6.value);
         assertNull(node7);
-        assertEquals((Integer) 8, node8.data);
+        assertEquals((Integer) 8, node8.value);
         assertNull(node9);
     }
 
@@ -233,7 +233,7 @@ public class ConcatenableQueueTest {
     public void testSearchNode3() {
         ConcatenableQueue<Integer> queue = getConcatenableQueue1();
 
-        List<ConcatenableQueue.CQNode<Integer>> searchResults = new ArrayList<>();
+        List<ConcatenableQueue.CQVertex<Integer>> searchResults = new ArrayList<>();
 
 
         for (int i = 1; i <= 23; i++) {
@@ -246,7 +246,7 @@ public class ConcatenableQueueTest {
                 assertNull(searchResults.get(i));
             } else {
                 assertNotNull(searchResults.get(i));
-                int data = searchResults.get(i).data;
+                int data = searchResults.get(i).value;
                 assertEquals(dataValue, data);
                 dataValue += 2;
             }
@@ -255,28 +255,28 @@ public class ConcatenableQueueTest {
     }
 
     private ConcatenableQueue<Integer> getConcatenableQueue1() {
-        ConcatenableQueue.CQNode<Integer> node0 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node1 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node2 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node3 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node4 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node5 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node6 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node7 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node8 = new ConcatenableQueue.CQNode<>(null);
-        ConcatenableQueue.CQNode<Integer> node9 = new ConcatenableQueue.CQNode<>(null);
+        ConcatenableQueue.CQVertex<Integer> node0 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node1 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node2 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node3 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node4 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node5 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node6 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node7 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node8 = new ConcatenableQueue.CQVertex<>(null);
+        ConcatenableQueue.CQVertex<Integer> node9 = new ConcatenableQueue.CQVertex<>(null);
 
-        ConcatenableQueue.CQNode<Integer> leaf1 = new ConcatenableQueue.CQNode<>(2);
-        ConcatenableQueue.CQNode<Integer> leaf2 = new ConcatenableQueue.CQNode<>(4);
-        ConcatenableQueue.CQNode<Integer> leaf3 = new ConcatenableQueue.CQNode<>(6);
-        ConcatenableQueue.CQNode<Integer> leaf4 = new ConcatenableQueue.CQNode<>(8);
-        ConcatenableQueue.CQNode<Integer> leaf5 = new ConcatenableQueue.CQNode<>(10);
-        ConcatenableQueue.CQNode<Integer> leaf6 = new ConcatenableQueue.CQNode<>(12);
-        ConcatenableQueue.CQNode<Integer> leaf7 = new ConcatenableQueue.CQNode<>(14);
-        ConcatenableQueue.CQNode<Integer> leaf8 = new ConcatenableQueue.CQNode<>(16);
-        ConcatenableQueue.CQNode<Integer> leaf9 = new ConcatenableQueue.CQNode<>(18);
-        ConcatenableQueue.CQNode<Integer> leaf10 = new ConcatenableQueue.CQNode<>(20);
-        ConcatenableQueue.CQNode<Integer> leaf11 = new ConcatenableQueue.CQNode<>(22);
+        ConcatenableQueue.CQVertex<Integer> leaf1 = new ConcatenableQueue.CQVertex<>(2);
+        ConcatenableQueue.CQVertex<Integer> leaf2 = new ConcatenableQueue.CQVertex<>(4);
+        ConcatenableQueue.CQVertex<Integer> leaf3 = new ConcatenableQueue.CQVertex<>(6);
+        ConcatenableQueue.CQVertex<Integer> leaf4 = new ConcatenableQueue.CQVertex<>(8);
+        ConcatenableQueue.CQVertex<Integer> leaf5 = new ConcatenableQueue.CQVertex<>(10);
+        ConcatenableQueue.CQVertex<Integer> leaf6 = new ConcatenableQueue.CQVertex<>(12);
+        ConcatenableQueue.CQVertex<Integer> leaf7 = new ConcatenableQueue.CQVertex<>(14);
+        ConcatenableQueue.CQVertex<Integer> leaf8 = new ConcatenableQueue.CQVertex<>(16);
+        ConcatenableQueue.CQVertex<Integer> leaf9 = new ConcatenableQueue.CQVertex<>(18);
+        ConcatenableQueue.CQVertex<Integer> leaf10 = new ConcatenableQueue.CQVertex<>(20);
+        ConcatenableQueue.CQVertex<Integer> leaf11 = new ConcatenableQueue.CQVertex<>(22);
 
         CQUtil.setFields(node0, node1, node5, leaf5, 5, false);
         CQUtil.setFields(node1, node2, node3, leaf2, 3, false);

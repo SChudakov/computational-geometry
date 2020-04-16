@@ -65,54 +65,54 @@ public class ConvexHullTest {
 
     @Test
     public void testTangents1() {
-        Vertex2D point1 = new Vertex2D(3, 1);
-        Vertex2D point2 = new Vertex2D(7, 1);
-        Vertex2D point3 = new Vertex2D(12, 1);
+        Vertex point1 = new Vertex(3, 1);
+        Vertex point2 = new Vertex(7, 1);
+        Vertex point3 = new Vertex(12, 1);
 
-        ConcatenableQueue<Vertex2D> left = new ConcatenableQueue<>();
+        ConcatenableQueue<Vertex> left = new ConcatenableQueue<>();
         left.add(point1);
 
-        ConcatenableQueue<Vertex2D> right = new ConcatenableQueue<>();
+        ConcatenableQueue<Vertex> right = new ConcatenableQueue<>();
         right.add(point2);
         right.add(point3);
 
-        Pair<ConcatenableQueue.CQNode<Vertex2D>, ConcatenableQueue.CQNode<Vertex2D>> tangent =
+        Pair<ConcatenableQueue.CQVertex<Vertex>, ConcatenableQueue.CQVertex<Vertex>> tangent =
                 CH.tangent(left, right, CH::getLowerTangentCase);
 
 
-        assertEquals(point1, tangent.getLeft().data);
-        assertEquals(point3, tangent.getRight().data);
+        assertEquals(point1, tangent.getLeft().value);
+        assertEquals(point3, tangent.getRight().value);
     }
 
     @Test
     public void testTangents2() {
-        Vertex2D point1 = new Vertex2D(2, 4);
-        Vertex2D point2 = new Vertex2D(2, 6);
-        Vertex2D point3 = new Vertex2D(2, 8);
-        Vertex2D point4 = new Vertex2D(2, 10);
-        Vertex2D point5 = new Vertex2D(4, 10);
-        Vertex2D point6 = new Vertex2D(4, 4);
+        Vertex point1 = new Vertex(2, 4);
+        Vertex point2 = new Vertex(2, 6);
+        Vertex point3 = new Vertex(2, 8);
+        Vertex point4 = new Vertex(2, 10);
+        Vertex point5 = new Vertex(4, 10);
+        Vertex point6 = new Vertex(4, 4);
 
-        ConcatenableQueue<Vertex2D> left = new ConcatenableQueue<>();
+        ConcatenableQueue<Vertex> left = new ConcatenableQueue<>();
         left.add(point2);
         left.add(point3);
         left.add(point1);
 
-        ConcatenableQueue<Vertex2D> right1 = new ConcatenableQueue<>();
+        ConcatenableQueue<Vertex> right1 = new ConcatenableQueue<>();
         right1.add(point4);
         right1.add(point5);
 
-        ConcatenableQueue<Vertex2D> right2 = new ConcatenableQueue<>();
+        ConcatenableQueue<Vertex> right2 = new ConcatenableQueue<>();
         right2.add(point6);
 
-        ConcatenableQueue<Vertex2D> right = ConcatenableQueue.concatenate(right1, right2);
+        ConcatenableQueue<Vertex> right = ConcatenableQueue.concatenate(right1, right2);
 
-        Pair<ConcatenableQueue.CQNode<Vertex2D>, ConcatenableQueue.CQNode<Vertex2D>> tangent =
+        Pair<ConcatenableQueue.CQVertex<Vertex>, ConcatenableQueue.CQVertex<Vertex>> tangent =
                 CH.tangent(left, right, CH::getUpperTangentCase);
 
 
-        assertEquals(point1, tangent.getLeft().data);
-        assertEquals(point4, tangent.getRight().data);
+        assertEquals(point1, tangent.getLeft().value);
+        assertEquals(point4, tangent.getRight().value);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class ConvexHullTest {
 
 //      ----------------------------------   one point case -------------------------------------------------
 
-        ConcatenableQueue.CQNode<Vertex2D> node1_1 = new ConcatenableQueue.CQNode<>(new Vertex2D(1, 1));
+        ConcatenableQueue.CQVertex<Vertex> node1_1 = new ConcatenableQueue.CQVertex<>(new Vertex(1, 1));
         CQUtil.setFields(node1_1, null, null, node1_1, 0, true);
 
 
@@ -137,13 +137,13 @@ public class ConvexHullTest {
 //        ----------------------------------   two point case -------------------------------------------------
 
 
-        ConcatenableQueue.CQNode<Vertex2D> node2_1 = new ConcatenableQueue.CQNode<>();
-        ConcatenableQueue.CQNode<Vertex2D> node2_2 = new ConcatenableQueue.CQNode<>();
+        ConcatenableQueue.CQVertex<Vertex> node2_1 = new ConcatenableQueue.CQVertex<>();
+        ConcatenableQueue.CQVertex<Vertex> node2_2 = new ConcatenableQueue.CQVertex<>();
         CQUtil.setFields(node2_1, null, node2_2, node2_1, 0, true);
         CQUtil.setFields(node2_2, node2_1, null, node2_2, 0, true);
 
-        node2_1.data = new Vertex2D(1, 1);
-        node2_2.data = new Vertex2D(2, 2);
+        node2_1.value = new Vertex(1, 1);
+        node2_2.value = new Vertex(2, 2);
 
         assertEquals(-1, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
         assertEquals(-1, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
@@ -160,8 +160,8 @@ public class ConvexHullTest {
         assertEquals(+1, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.LEFT));
         assertEquals(+1, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.RIGHT));
 
-        node2_1.data = new Vertex2D(2, 2);
-        node2_2.data = new Vertex2D(3, 2);
+        node2_1.value = new Vertex(2, 2);
+        node2_2.value = new Vertex(3, 2);
 
         assertEquals(0, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
         assertEquals(-1, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
@@ -178,8 +178,8 @@ public class ConvexHullTest {
         assertEquals(0, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.LEFT));
         assertEquals(+1, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.RIGHT));
 
-        node2_1.data = new Vertex2D(2, 2);
-        node2_2.data = new Vertex2D(3, 1);
+        node2_1.value = new Vertex(2, 2);
+        node2_2.value = new Vertex(3, 1);
 
         assertEquals(0, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
         assertEquals(0, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
@@ -200,9 +200,9 @@ public class ConvexHullTest {
 //      ----------------------------------   three point case -------------------------------------------------
 
 
-        ConcatenableQueue.CQNode<Vertex2D> node3_1 = new ConcatenableQueue.CQNode<>();
-        ConcatenableQueue.CQNode<Vertex2D> node3_2 = new ConcatenableQueue.CQNode<>();
-        ConcatenableQueue.CQNode<Vertex2D> node3_3 = new ConcatenableQueue.CQNode<>();
+        ConcatenableQueue.CQVertex<Vertex> node3_1 = new ConcatenableQueue.CQVertex<>();
+        ConcatenableQueue.CQVertex<Vertex> node3_2 = new ConcatenableQueue.CQVertex<>();
+        ConcatenableQueue.CQVertex<Vertex> node3_3 = new ConcatenableQueue.CQVertex<>();
         CQUtil.setFields(node3_1, null, node3_2, node3_1, 0, true);
         CQUtil.setFields(node3_2, node3_1, node3_3, node3_2, 0, true);
         CQUtil.setFields(node3_3, node3_2, null, node3_3, 0, true);
@@ -211,34 +211,34 @@ public class ConvexHullTest {
 //      ---------------------------------------      1st row     -----------------------------------------------------
 
 
-        node3_1.data = new Vertex2D(1, 1);
-        node3_2.data = new Vertex2D(2, 3);
-        node3_3.data = new Vertex2D(3, 4);
+        node3_1.value = new Vertex(1, 1);
+        node3_2.value = new Vertex(2, 3);
+        node3_3.value = new Vertex(3, 4);
 
         assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.data = new Vertex2D(1, 1);
-        node3_2.data = new Vertex2D(2, 3);
-        node3_3.data = new Vertex2D(3, 3);
+        node3_1.value = new Vertex(1, 1);
+        node3_2.value = new Vertex(2, 3);
+        node3_3.value = new Vertex(3, 3);
 
         assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.data = new Vertex2D(1, 1);
-        node3_2.data = new Vertex2D(2, 2);
-        node3_3.data = new Vertex2D(3, 1);
+        node3_1.value = new Vertex(1, 1);
+        node3_2.value = new Vertex(2, 2);
+        node3_3.value = new Vertex(3, 1);
 
         assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
 
 //        ---------------------------------------      2nd row     -----------------------------------------------------
 
-        node3_1.data = new Vertex2D(1, 2);
-        node3_2.data = new Vertex2D(2, 2);
-        node3_3.data = new Vertex2D(3, 3);
+        node3_1.value = new Vertex(1, 2);
+        node3_2.value = new Vertex(2, 2);
+        node3_3.value = new Vertex(3, 3);
 
         assertEquals(+1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
@@ -247,9 +247,9 @@ public class ConvexHullTest {
         assertEquals(+1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.data = new Vertex2D(1, 2);
-        node3_2.data = new Vertex2D(2, 2);
-        node3_3.data = new Vertex2D(3, 2);
+        node3_1.value = new Vertex(1, 2);
+        node3_2.value = new Vertex(2, 2);
+        node3_3.value = new Vertex(3, 2);
 
         assertEquals(+1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
@@ -260,9 +260,9 @@ public class ConvexHullTest {
         assertEquals(+1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.data = new Vertex2D(1, 2);
-        node3_2.data = new Vertex2D(2, 2);
-        node3_3.data = new Vertex2D(3, 1);
+        node3_1.value = new Vertex(1, 2);
+        node3_2.value = new Vertex(2, 2);
+        node3_3.value = new Vertex(3, 1);
 
         assertEquals(+1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
@@ -271,9 +271,9 @@ public class ConvexHullTest {
 //      ---------------------------------------      3rd row     -----------------------------------------------------
 
 
-        node3_1.data = new Vertex2D(1, 2);
-        node3_2.data = new Vertex2D(2, 1);
-        node3_3.data = new Vertex2D(3, 2);
+        node3_1.value = new Vertex(1, 2);
+        node3_2.value = new Vertex(2, 1);
+        node3_3.value = new Vertex(3, 2);
 
         assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
@@ -281,9 +281,9 @@ public class ConvexHullTest {
         assertEquals(0, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(0, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
 
-        node3_1.data = new Vertex2D(1, 2);
-        node3_2.data = new Vertex2D(2, 1);
-        node3_3.data = new Vertex2D(3, 1);
+        node3_1.value = new Vertex(1, 2);
+        node3_2.value = new Vertex(2, 1);
+        node3_3.value = new Vertex(3, 1);
 
         assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(-1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
@@ -292,9 +292,9 @@ public class ConvexHullTest {
         assertEquals(0, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.data = new Vertex2D(1, 2);
-        node3_2.data = new Vertex2D(2, 1);
-        node3_3.data = new Vertex2D(3, 0);
+        node3_1.value = new Vertex(1, 2);
+        node3_2.value = new Vertex(2, 1);
+        node3_3.value = new Vertex(3, 0);
 
         assertEquals(-1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
         assertEquals(-1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));

@@ -1,6 +1,6 @@
 package com.chudakov.visualisation;
 
-import com.chudakov.geometry.uae.Vertex2D;
+import com.chudakov.geometry.uae.Vertex;
 
 import javax.swing.JPanel;
 import java.awt.BasicStroke;
@@ -14,8 +14,8 @@ public class DrawingPanel extends JPanel {
     private static final Color DEFAULT_POINTS_COLOR = Color.BLUE;
     private static final Color DEFAULT_LINES_COLOR = Color.RED;
 
-    List<Vertex2D> generated;
-    List<Vertex2D> convexHull;
+    List<Vertex> generated;
+    List<Vertex> convexHull;
 
     @Override
     public void paintComponent(Graphics graphics) {
@@ -29,34 +29,34 @@ public class DrawingPanel extends JPanel {
         }
     }
 
-    private void drawPoints(Graphics graphics, List<Vertex2D> vertex2DS) {
-        for (Vertex2D vertex2D : vertex2DS) {
-            drawPoint(graphics, vertex2D, DEFAULT_POINTS_COLOR);
+    private void drawPoints(Graphics graphics, List<Vertex> vertices) {
+        for (Vertex vertex : vertices) {
+            drawPoint(graphics, vertex, DEFAULT_POINTS_COLOR);
         }
     }
 
-    private void drawLines(Graphics graphics, List<Vertex2D> vertex2DS) {
-        for (int i = 0; i < vertex2DS.size() - 1; ++i) {
-            drawLine(graphics, vertex2DS.get(i),
-                    vertex2DS.get(i + 1),
+    private void drawLines(Graphics graphics, List<Vertex> vertices) {
+        for (int i = 0; i < vertices.size() - 1; ++i) {
+            drawLine(graphics, vertices.get(i),
+                    vertices.get(i + 1),
                     DEFAULT_LINES_COLOR);
         }
-        drawLine(graphics, vertex2DS.get(0),
-                vertex2DS.get(vertex2DS.size() - 1),
+        drawLine(graphics, vertices.get(0),
+                vertices.get(vertices.size() - 1),
                 DEFAULT_LINES_COLOR);
     }
 
-    public void drawPoint(Graphics graphics, Vertex2D vertex2D, Color color) {
+    public void drawPoint(Graphics graphics, Vertex vertex, Color color) {
         int diameter = 15;
         graphics.setColor(color);
         Graphics2D graphics2D = (Graphics2D) graphics;
-        Ellipse2D.Double circle = new Ellipse2D.Double(vertex2D.x - diameter / 2,
-                vertex2D.y - diameter / 2,
+        Ellipse2D.Double circle = new Ellipse2D.Double(vertex.x - diameter / 2,
+                vertex.y - diameter / 2,
                 diameter, diameter);
         graphics2D.fill(circle);
     }
 
-    public void drawLine(Graphics graphics, Vertex2D point1, Vertex2D point2, Color color) {
+    public void drawLine(Graphics graphics, Vertex point1, Vertex point2, Color color) {
         graphics.setColor(color);
         graphics.setColor(color);
         Graphics2D graphics2D = (Graphics2D) graphics;

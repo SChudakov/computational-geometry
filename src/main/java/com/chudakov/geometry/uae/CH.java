@@ -5,7 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.chudakov.geometry.uae.ConcatenableQueue.CQNode;
+import static com.chudakov.geometry.uae.ConcatenableQueue.CQVertex;
 import static com.chudakov.geometry.uae.ConvexHull.Position;
 
 public class CH {
@@ -14,124 +14,124 @@ public class CH {
         R apply(A a, B b, C c);
     }
 
-    public static List<Vertex2D> convert(ConvexHull convexHull) {
-        List<Vertex2D> result = new ArrayList<>();
-        for (Vertex2D point : convexHull) {
+    public static List<Vertex> convert(ConvexHull convexHull) {
+        List<Vertex> result = new ArrayList<>();
+        for (Vertex point : convexHull) {
             result.add(point);
         }
         return result;
     }
 
 
-    static CutData cutSubhulls(ConcatenableQueue<Vertex2D> leftUpper,
-                               ConcatenableQueue<Vertex2D> leftLower,
-                               ConcatenableQueue<Vertex2D> rightUpper,
-                               ConcatenableQueue<Vertex2D> rightLower,
-                               Pair<CQNode<Vertex2D>, CQNode<Vertex2D>> upperTangent,
-                               Pair<CQNode<Vertex2D>, CQNode<Vertex2D>> lowerTangent) {
-        CQNode<Vertex2D> ul = upperTangent.getLeft();
-        CQNode<Vertex2D> ur = upperTangent.getRight();
-        CQNode<Vertex2D> ll = lowerTangent.getLeft();
-        CQNode<Vertex2D> lr = lowerTangent.getRight();
+    static CutData cutSubhulls(ConcatenableQueue<Vertex> leftUpper,
+                               ConcatenableQueue<Vertex> leftLower,
+                               ConcatenableQueue<Vertex> rightUpper,
+                               ConcatenableQueue<Vertex> rightLower,
+                               Pair<CQVertex<Vertex>, CQVertex<Vertex>> upperTangent,
+                               Pair<CQVertex<Vertex>, CQVertex<Vertex>> lowerTangent) {
+        CQVertex<Vertex> ul = upperTangent.getLeft();
+        CQVertex<Vertex> ur = upperTangent.getRight();
+        CQVertex<Vertex> ll = lowerTangent.getLeft();
+        CQVertex<Vertex> lr = lowerTangent.getRight();
 
         // 1. cut left subhulls
         if (ul.equals(leftLower.minNode)) {
             leftUpper.clear();
-            leftLower.cutRight(ll.data);
+            leftLower.cutRight(ll.value);
         } else if (ul.equals(leftLower.maxNode)) {
-            Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>> p = moveRightmostPointUp(leftUpper, leftLower);
+            Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>> p = moveRightmostPointUp(leftUpper, leftLower);
             leftUpper = p.getLeft();
             leftLower = p.getRight();
-            leftLower.cutRight(ll.data);
+            leftLower.cutRight(ll.value);
         } else {
-            leftUpper.cutRight(ul.data);
-            leftLower.cutRight(ll.data);
+            leftUpper.cutRight(ul.value);
+            leftLower.cutRight(ll.value);
         }
 
         // 2. cut right subhulls
         if (ur.equals(rightLower.minNode)) {
-            Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>> p = moveLeftmostPointUp(rightUpper, rightLower);
+            Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>> p = moveLeftmostPointUp(rightUpper, rightLower);
             rightUpper = p.getLeft();
             rightLower = p.getRight();
-            rightLower.cutLeft(lr.data);
+            rightLower.cutLeft(lr.value);
         } else if (ur.equals(rightLower.maxNode)) {
             rightUpper.clear();
-            rightLower.cutLeft(lr.data);
+            rightLower.cutLeft(lr.value);
         } else {
-            rightUpper.cutLeft(ur.data);
-            rightLower.cutLeft(lr.data);
+            rightUpper.cutLeft(ur.value);
+            rightLower.cutLeft(lr.value);
         }
 
         return new CutData(leftUpper, leftLower, rightUpper, rightLower);
     }
 
-    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
-    moveUtmostPointsUp(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
-        Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>> p1
+    static Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>>
+    moveUtmostPointsUp(ConcatenableQueue<Vertex> upper, ConcatenableQueue<Vertex> lower) {
+        Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>> p1
                 = moveLeftmostPointUp(upper, lower);
         upper = p1.getLeft();
         lower = p1.getValue();
         return moveRightmostPointUp(upper, lower);
     }
 
-    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
-    moveUtmostPointsDown(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
-        ConcatenableQueue<Vertex2D> upperRest1 = upper;
+    static Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>>
+    moveUtmostPointsDown(ConcatenableQueue<Vertex> upper, ConcatenableQueue<Vertex> lower) {
+        ConcatenableQueue<Vertex> upperRest1 = upper;
         boolean moveLeftmostPoint = upper.minNode != null && lower.minNode == null;
         moveLeftmostPoint |= upper.minNode != null && lower.minNode != null
-                && upper.minNode.data.x < lower.minNode.data.x;
+                && upper.minNode.value.x < lower.minNode.value.x;
         if (moveLeftmostPoint) {
-            upperRest1 = upper.cutRight(upper.minNode.data);
+            upperRest1 = upper.cutRight(upper.minNode.value);
             lower = ConcatenableQueue.concatenate(upper, lower);
         }
 
-        ConcatenableQueue<Vertex2D> upperRest2 = upperRest1;
+        ConcatenableQueue<Vertex> upperRest2 = upperRest1;
         boolean moveRightmostPoint = upperRest1.maxNode != null && lower.maxNode == null;
         moveRightmostPoint |= upperRest1.maxNode != null && lower.maxNode != null
-                && upperRest1.maxNode.data.x > lower.maxNode.data.x;
+                && upperRest1.maxNode.value.x > lower.maxNode.value.x;
         if (moveRightmostPoint) {
-            upperRest2 = upperRest1.cutLeft(upperRest1.maxNode.data);
+            upperRest2 = upperRest1.cutLeft(upperRest1.maxNode.value);
             lower = ConcatenableQueue.concatenate(lower, upperRest1);
         }
         return Pair.of(upperRest2, lower);
     }
 
-    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
-    moveLeftmostPointUp(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
-        ConcatenableQueue<Vertex2D> lowerRest = lower;
+    static Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>>
+    moveLeftmostPointUp(ConcatenableQueue<Vertex> upper, ConcatenableQueue<Vertex> lower) {
+        ConcatenableQueue<Vertex> lowerRest = lower;
         boolean moveLeftmostPoint = lower.minNode != null && upper.minNode == null;
         moveLeftmostPoint |= lower.minNode != null && upper.minNode != null
-                && lower.minNode.data.x < upper.minNode.data.x;
+                && lower.minNode.value.x < upper.minNode.value.x;
         if (moveLeftmostPoint) {
-            lowerRest = lower.cutRight(lower.minNode.data);
+            lowerRest = lower.cutRight(lower.minNode.value);
             upper = ConcatenableQueue.concatenate(lower, upper);
         }
         return Pair.of(upper, lowerRest);
     }
 
-    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
-    moveRightmostPointUp(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
-        ConcatenableQueue<Vertex2D> lowerRest = lower;
+    static Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>>
+    moveRightmostPointUp(ConcatenableQueue<Vertex> upper, ConcatenableQueue<Vertex> lower) {
+        ConcatenableQueue<Vertex> lowerRest = lower;
         boolean moveRightmostPoint = lower.maxNode != null && upper.maxNode == null;
         moveRightmostPoint |= lower.maxNode != null && upper.minNode != null
-                && lower.maxNode.data.x > upper.maxNode.data.x;
+                && lower.maxNode.value.x > upper.maxNode.value.x;
         if (moveRightmostPoint) {
-            lowerRest = lower.cutLeft(lower.maxNode.data);
+            lowerRest = lower.cutLeft(lower.maxNode.value);
             upper = ConcatenableQueue.concatenate(upper, lower);
         }
         return Pair.of(upper, lowerRest);
     }
 
     static class CutData {
-        ConcatenableQueue<Vertex2D> leftUpper;
-        ConcatenableQueue<Vertex2D> leftLower;
-        ConcatenableQueue<Vertex2D> rightUpper;
-        ConcatenableQueue<Vertex2D> rightLower;
+        ConcatenableQueue<Vertex> leftUpper;
+        ConcatenableQueue<Vertex> leftLower;
+        ConcatenableQueue<Vertex> rightUpper;
+        ConcatenableQueue<Vertex> rightLower;
 
-        public CutData(ConcatenableQueue<Vertex2D> leftUpper,
-                       ConcatenableQueue<Vertex2D> leftLower,
-                       ConcatenableQueue<Vertex2D> rightUpper,
-                       ConcatenableQueue<Vertex2D> rightLower) {
+        public CutData(ConcatenableQueue<Vertex> leftUpper,
+                       ConcatenableQueue<Vertex> leftLower,
+                       ConcatenableQueue<Vertex> rightUpper,
+                       ConcatenableQueue<Vertex> rightLower) {
             this.leftUpper = leftUpper;
             this.leftLower = leftLower;
             this.rightUpper = rightUpper;
@@ -140,17 +140,16 @@ public class CH {
     }
 
 
-    static Pair<CQNode<Vertex2D>, CQNode<Vertex2D>> tangent(
-            ConcatenableQueue<Vertex2D> leftHull,
-            ConcatenableQueue<Vertex2D> rightHull,
-            TriFunction<CQNode<Vertex2D>, Double, Position, Integer> casesFunction) {
+    static Pair<CQVertex<Vertex>, CQVertex<Vertex>> tangent(
+            ConcatenableQueue<Vertex> leftHull,
+            ConcatenableQueue<Vertex> rightHull,
+            TriFunction<CQVertex<Vertex>, Double, Position, Integer> casesFunction) {
 
-        //locate the appropriate pointers on both hulls
-        CQNode<Vertex2D> leftIterator = leftHull.root;
-        CQNode<Vertex2D> rightIterator = rightHull.root;
+        CQVertex<Vertex> leftIterator = leftHull.root;
+        CQVertex<Vertex> rightIterator = rightHull.root;
 
         boolean done = false;
-        double middleX = (leftHull.maxNode.data.x + rightHull.minNode.data.x) / 2.0;
+        double middleX = (leftHull.maxNode.value.x + rightHull.minNode.value.x) / 2.0;
 
         while (!done) {
             double tangentSlope = getSlope(leftIterator.leftSubtreeMax, rightIterator.leftSubtreeMax);
@@ -159,50 +158,50 @@ public class CH {
 
             if (leftCase == -1) {
                 if (rightCase == -1) {
-                    rightIterator = rightIterator.right;
+                    rightIterator = rightIterator.rSon;
                 } else if (rightCase == 0) {
-                    leftIterator = leftIterator.right;
-                    if (!rightIterator.isLeaf && rightIterator.right != null) {
-                        rightIterator = rightIterator.right;
+                    leftIterator = leftIterator.rSon;
+                    if (!rightIterator.isLeaf && rightIterator.rSon != null) {
+                        rightIterator = rightIterator.rSon;
                     }
                 } else {
-                    double leftHeight = leftIterator.leftSubtreeMax.data.y +
-                            getSlope(leftIterator.leftSubtreeMax, leftIterator.leftSubtreeMax.right) * (middleX - leftIterator.leftSubtreeMax.data.x);
-                    double rightHeight = rightIterator.leftSubtreeMax.data.y +
-                            getSlope(rightIterator.leftSubtreeMax.left, rightIterator.leftSubtreeMax) * (middleX - rightIterator.leftSubtreeMax.data.x);
+                    double leftHeight = leftIterator.leftSubtreeMax.value.y +
+                            getSlope(leftIterator.leftSubtreeMax, leftIterator.leftSubtreeMax.rSon) * (middleX - leftIterator.leftSubtreeMax.value.x);
+                    double rightHeight = rightIterator.leftSubtreeMax.value.y +
+                            getSlope(rightIterator.leftSubtreeMax.lSon, rightIterator.leftSubtreeMax) * (middleX - rightIterator.leftSubtreeMax.value.x);
                     if (leftHeight <= rightHeight) {
-                        rightIterator = rightIterator.left;
+                        rightIterator = rightIterator.lSon;
                     } else { // rightCase == 1
-                        leftIterator = leftIterator.right;
+                        leftIterator = leftIterator.rSon;
                     }
                 }
             } else if (leftCase == 0) {
                 if (rightCase == -1) {
-                    if (!leftIterator.isLeaf && leftIterator.left != null) {
-                        leftIterator = leftIterator.left;
+                    if (!leftIterator.isLeaf && leftIterator.lSon != null) {
+                        leftIterator = leftIterator.lSon;
                     }
-                    rightIterator = rightIterator.right;
+                    rightIterator = rightIterator.rSon;
                 } else if (rightCase == 0) {
                     leftIterator = leftIterator.leftSubtreeMax;
                     rightIterator = rightIterator.leftSubtreeMax;
                     done = true;
                 } else { // rightCase == 1
-                    if (!leftIterator.isLeaf && leftIterator.left != null) {
-                        leftIterator = leftIterator.left;
+                    if (!leftIterator.isLeaf && leftIterator.lSon != null) {
+                        leftIterator = leftIterator.lSon;
                     }
-                    rightIterator = rightIterator.left;
+                    rightIterator = rightIterator.lSon;
                 }
             } else { // leftCase == 1
                 if (rightCase == -1) {
-                    leftIterator = leftIterator.left;
-                    rightIterator = rightIterator.right;
+                    leftIterator = leftIterator.lSon;
+                    rightIterator = rightIterator.rSon;
                 } else if (rightCase == 0) {
-                    leftIterator = leftIterator.left;
-                    if (!rightIterator.isLeaf && rightIterator.right != null) {
-                        rightIterator = rightIterator.right;
+                    leftIterator = leftIterator.lSon;
+                    if (!rightIterator.isLeaf && rightIterator.rSon != null) {
+                        rightIterator = rightIterator.rSon;
                     }
                 } else { // rightCase == 1
-                    leftIterator = leftIterator.left;
+                    leftIterator = leftIterator.lSon;
                 }
             }
         }
@@ -210,26 +209,26 @@ public class CH {
     }
 
 
-    static double getSlope(CQNode<Vertex2D> leftNode, CQNode<Vertex2D> rightNode) {
-        return Vertex2D.getSlope(leftNode.data, rightNode.data);
+    static double getSlope(CQVertex<Vertex> leftNode, CQVertex<Vertex> rightNode) {
+        return Vertex.getSlope(leftNode.value, rightNode.value);
     }
 
 
-    static int getUpperTangentCase(CQNode<Vertex2D> node, double tangentSlope,
+    static int getUpperTangentCase(CQVertex<Vertex> node, double tangentSlope,
                                    Position subHullPosition) {
         boolean leftSlopeGreater = true;
         boolean rightSlopeGreater = false;
 
-        if (node.left != null) {
-            double leftSlope = getSlope(node.left, node);
+        if (node.lSon != null) {
+            double leftSlope = getSlope(node.lSon, node);
             if ((subHullPosition.equals(Position.LEFT) && leftSlope <= tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && leftSlope < tangentSlope)) {
                 leftSlopeGreater = false;
             }
         }
 
-        if (node.right != null) {
-            double rightSlope = getSlope(node, node.right);
+        if (node.rSon != null) {
+            double rightSlope = getSlope(node, node.rSon);
             if ((subHullPosition.equals(Position.LEFT) && rightSlope > tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && rightSlope >= tangentSlope)) {
                 rightSlopeGreater = true;
@@ -248,21 +247,21 @@ public class CH {
         }
     }
 
-    static int getLowerTangentCase(CQNode<Vertex2D> node, double tangentSlope,
+    static int getLowerTangentCase(CQVertex<Vertex> node, double tangentSlope,
                                    Position subHullPosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
 
-        if (node.left != null) {
-            double leftSlope = getSlope(node.left, node);
+        if (node.lSon != null) {
+            double leftSlope = getSlope(node.lSon, node);
             if ((subHullPosition.equals(Position.LEFT) && leftSlope >= tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && leftSlope > tangentSlope)) {
                 leftSlopeGreater = true;
             }
         }
 
-        if (node.right != null) {
-            double rightSlope = getSlope(node, node.right);
+        if (node.rSon != null) {
+            double rightSlope = getSlope(node, node.rSon);
             if ((subHullPosition.equals(Position.LEFT) && rightSlope < tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && rightSlope <= tangentSlope)) {
                 rightSlopeGreater = false;
@@ -282,21 +281,21 @@ public class CH {
     }
 
 
-    static ConcatenableQueue<Vertex2D> adjustLowerHull(ConcatenableQueue<Vertex2D> upperHull,
-                                                       ConcatenableQueue<Vertex2D> lowerHull) {
+    static ConcatenableQueue<Vertex> adjustLowerHull(ConcatenableQueue<Vertex> upperHull,
+                                                     ConcatenableQueue<Vertex> lowerHull) {
         if (lowerHull.root == null) {
             return lowerHull;
         }
-        CQNode<Vertex2D> leftBaseNode = getBaseNode(lowerHull, upperHull.minNode, Position.LEFT);
-        CQNode<Vertex2D> rightBaseNode = getBaseNode(lowerHull, upperHull.maxNode, Position.RIGHT);
+        CQVertex<Vertex> leftBaseNode = getBaseNode(lowerHull, upperHull.minNode, Position.LEFT);
+        CQVertex<Vertex> rightBaseNode = getBaseNode(lowerHull, upperHull.maxNode, Position.RIGHT);
 
         // corner case
-        if (leftBaseNode.data.compareTo(rightBaseNode.data) > 0) {
+        if (leftBaseNode.value.compareTo(rightBaseNode.value) > 0) {
             return new ConcatenableQueue<>(lowerHull.cmp);
         }
 
-        lowerHull.cutLeft(leftBaseNode.data);
-        lowerHull.cutRight(rightBaseNode.data);
+        lowerHull.cutLeft(leftBaseNode.value);
+        lowerHull.cutRight(rightBaseNode.value);
 
         double leftSlope = getSlope(upperHull.minNode, lowerHull.minNode);
         double rightSlope = getSlope(lowerHull.maxNode, upperHull.maxNode);
@@ -309,10 +308,10 @@ public class CH {
     }
 
 
-    static CQNode<Vertex2D> getBaseNode(ConcatenableQueue<Vertex2D> lowerHull,
-                                        CQNode<Vertex2D> compareNode,
+    static CQVertex<Vertex> getBaseNode(ConcatenableQueue<Vertex> lowerHull,
+                                        CQVertex<Vertex> compareNode,
                                         Position compareNodePosition) {
-        CQNode<Vertex2D> hullIterator = lowerHull.root;
+        CQVertex<Vertex> hullIterator = lowerHull.root;
 
         boolean done = false;
         while (!done) {
@@ -325,32 +324,32 @@ public class CH {
             int slopeCase = getLowerBaseCase(hullIterator.leftSubtreeMax, tangentSlope, compareNodePosition);
 
             if (slopeCase == -1) {
-                hullIterator = hullIterator.right;
+                hullIterator = hullIterator.rSon;
             } else if (slopeCase == 0) { // done
                 done = true;
                 hullIterator = hullIterator.leftSubtreeMax;
             } else { // slopeCase == 1
-                hullIterator = hullIterator.left;
+                hullIterator = hullIterator.lSon;
             }
         }
         return hullIterator;
     }
 
 
-    static int getLowerBaseCase(CQNode<Vertex2D> node, double tangentSlope, Position nodePosition) {
+    static int getLowerBaseCase(CQVertex<Vertex> node, double tangentSlope, Position nodePosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
 
-        if (node.left != null) {
-            double leftSlope = getSlope(node.left, node);
+        if (node.lSon != null) {
+            double leftSlope = getSlope(node.lSon, node);
             if ((nodePosition.equals(Position.LEFT) && leftSlope > tangentSlope) ||
                     (nodePosition.equals(Position.RIGHT) && leftSlope >= tangentSlope)) {
                 leftSlopeGreater = true;
             }
         }
 
-        if (node.right != null) {
-            double rightSlope = getSlope(node, node.right);
+        if (node.rSon != null) {
+            double rightSlope = getSlope(node, node.rSon);
             if ((nodePosition.equals(Position.LEFT) && rightSlope <= tangentSlope) ||
                     (nodePosition.equals(Position.RIGHT) && rightSlope < tangentSlope)) {
                 rightSlopeGreater = false;

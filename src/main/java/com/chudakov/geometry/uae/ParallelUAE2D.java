@@ -4,7 +4,7 @@ import com.chudakov.geometry.core.ParallelDaCExecutionSpecifics;
 
 import java.util.List;
 
-public class ParallelUAE2D extends ParallelDaCExecutionSpecifics<List<Vertex2D>, UAEResult> {
+public class ParallelUAE2D extends ParallelDaCExecutionSpecifics<List<Vertex>, UAEResult> {
     public ParallelUAE2D() {
         super(new UAE2D());
     }

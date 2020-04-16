@@ -2,7 +2,7 @@ package com.chudakov.geometry.perf.overmars;
 
 import com.chudakov.geometry.uae.ParallelUAE2D;
 import com.chudakov.geometry.uae.SequentialUAE2D;
-import com.chudakov.geometry.uae.Vertex2D;
+import com.chudakov.geometry.uae.Vertex;
 import com.chudakov.geometry.uae.UAEResult;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -46,7 +46,7 @@ public class ConvexHull2DPerf {
         public int tasksPerThread;
 
         public int inputSizeThreshold;
-        public List<Vertex2D> points;
+        public List<Vertex> points;
 
         @Setup(Level.Trial)
         public void generatePoints() {
@@ -54,7 +54,7 @@ public class ConvexHull2DPerf {
             int upperLimit = 1_000_000;
             this.points = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                points.add(new Vertex2D(
+                points.add(new Vertex(
                         (int) (Math.random() * upperLimit),
                         (int) (Math.random() * upperLimit)
                 ));
