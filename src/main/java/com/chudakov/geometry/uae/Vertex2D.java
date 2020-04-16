@@ -1,17 +1,19 @@
-package com.chudakov.geometry.common;
+package com.chudakov.geometry.uae;
 
 import java.util.Objects;
 
-public class Point2D implements Comparable<Point2D> {
+public class Vertex2D implements Comparable<Vertex2D> {
     public final double x;
     public final double y;
 
-    public Point2D(double x, double y) {
+    QuadEdge edge;
+
+    public Vertex2D(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public static double getSlope(Point2D left, Point2D right) {
+    public static double getSlope(Vertex2D left, Vertex2D right) {
         if (right.x - left.x < 0) {
             throw new IllegalArgumentException("invalid positioning of points");
         }
@@ -22,9 +24,9 @@ public class Point2D implements Comparable<Point2D> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Point2D point2D = (Point2D) o;
-        return Double.compare(point2D.x, x) == 0 &&
-                Double.compare(point2D.y, y) == 0;
+        Vertex2D vertex2D = (Vertex2D) o;
+        return Double.compare(vertex2D.x, x) == 0 &&
+                Double.compare(vertex2D.y, y) == 0;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class Point2D implements Comparable<Point2D> {
     }
 
     @Override
-    public int compareTo(Point2D p) {
+    public int compareTo(Vertex2D p) {
         if (x < p.x || (x == p.x && y < p.y)) {
             return -1;
         }

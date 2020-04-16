@@ -1,20 +1,18 @@
 package com.chudakov.geometry.uae;
 
-import com.chudakov.geometry.common.Point2D;
-
 public class Edge {
-    Point2D org;
-    Point2D dest;
+    Vertex2D org;
+    Vertex2D dest;
 
-    public Point2D getOrg() {
+    public Vertex2D getOrg() {
         return org;
     }
 
-    public Point2D getDest() {
+    public Vertex2D getDest() {
         return dest;
     }
 
-    public Edge(Point2D org, Point2D dest) {
+    public Edge(Vertex2D org, Vertex2D dest) {
         this.org = org;
         this.dest = dest;
     }

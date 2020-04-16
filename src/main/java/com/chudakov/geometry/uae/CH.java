@@ -1,6 +1,5 @@
 package com.chudakov.geometry.uae;
 
-import com.chudakov.geometry.common.Point2D;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -15,32 +14,32 @@ public class CH {
         R apply(A a, B b, C c);
     }
 
-    public static List<Point2D> convert(ConvexHull convexHull) {
-        List<Point2D> result = new ArrayList<>();
-        for (Point2D point : convexHull) {
+    public static List<Vertex2D> convert(ConvexHull convexHull) {
+        List<Vertex2D> result = new ArrayList<>();
+        for (Vertex2D point : convexHull) {
             result.add(point);
         }
         return result;
     }
 
 
-    static CutData cutSubhulls(ConcatenableQueue<Point2D> leftUpper,
-                               ConcatenableQueue<Point2D> leftLower,
-                               ConcatenableQueue<Point2D> rightUpper,
-                               ConcatenableQueue<Point2D> rightLower,
-                               Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
-                               Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
-        CQNode<Point2D> ul = upperTangent.getLeft();
-        CQNode<Point2D> ur = upperTangent.getRight();
-        CQNode<Point2D> ll = lowerTangent.getLeft();
-        CQNode<Point2D> lr = lowerTangent.getRight();
+    static CutData cutSubhulls(ConcatenableQueue<Vertex2D> leftUpper,
+                               ConcatenableQueue<Vertex2D> leftLower,
+                               ConcatenableQueue<Vertex2D> rightUpper,
+                               ConcatenableQueue<Vertex2D> rightLower,
+                               Pair<CQNode<Vertex2D>, CQNode<Vertex2D>> upperTangent,
+                               Pair<CQNode<Vertex2D>, CQNode<Vertex2D>> lowerTangent) {
+        CQNode<Vertex2D> ul = upperTangent.getLeft();
+        CQNode<Vertex2D> ur = upperTangent.getRight();
+        CQNode<Vertex2D> ll = lowerTangent.getLeft();
+        CQNode<Vertex2D> lr = lowerTangent.getRight();
 
         // 1. cut left subhulls
         if (ul.equals(leftLower.minNode)) {
             leftUpper.clear();
             leftLower.cutRight(ll.data);
         } else if (ul.equals(leftLower.maxNode)) {
-            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveRightmostPointUp(leftUpper, leftLower);
+            Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>> p = moveRightmostPointUp(leftUpper, leftLower);
             leftUpper = p.getLeft();
             leftLower = p.getRight();
             leftLower.cutRight(ll.data);
@@ -51,7 +50,7 @@ public class CH {
 
         // 2. cut right subhulls
         if (ur.equals(rightLower.minNode)) {
-            Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p = moveLeftmostPointUp(rightUpper, rightLower);
+            Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>> p = moveLeftmostPointUp(rightUpper, rightLower);
             rightUpper = p.getLeft();
             rightLower = p.getRight();
             rightLower.cutLeft(lr.data);
@@ -66,18 +65,18 @@ public class CH {
         return new CutData(leftUpper, leftLower, rightUpper, rightLower);
     }
 
-    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveUtmostPointsUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>> p1
+    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
+    moveUtmostPointsUp(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
+        Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>> p1
                 = moveLeftmostPointUp(upper, lower);
         upper = p1.getLeft();
         lower = p1.getValue();
         return moveRightmostPointUp(upper, lower);
     }
 
-    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveUtmostPointsDown(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        ConcatenableQueue<Point2D> upperRest1 = upper;
+    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
+    moveUtmostPointsDown(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
+        ConcatenableQueue<Vertex2D> upperRest1 = upper;
         boolean moveLeftmostPoint = upper.minNode != null && lower.minNode == null;
         moveLeftmostPoint |= upper.minNode != null && lower.minNode != null
                 && upper.minNode.data.x < lower.minNode.data.x;
@@ -86,7 +85,7 @@ public class CH {
             lower = ConcatenableQueue.concatenate(upper, lower);
         }
 
-        ConcatenableQueue<Point2D> upperRest2 = upperRest1;
+        ConcatenableQueue<Vertex2D> upperRest2 = upperRest1;
         boolean moveRightmostPoint = upperRest1.maxNode != null && lower.maxNode == null;
         moveRightmostPoint |= upperRest1.maxNode != null && lower.maxNode != null
                 && upperRest1.maxNode.data.x > lower.maxNode.data.x;
@@ -97,9 +96,9 @@ public class CH {
         return Pair.of(upperRest2, lower);
     }
 
-    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveLeftmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        ConcatenableQueue<Point2D> lowerRest = lower;
+    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
+    moveLeftmostPointUp(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
+        ConcatenableQueue<Vertex2D> lowerRest = lower;
         boolean moveLeftmostPoint = lower.minNode != null && upper.minNode == null;
         moveLeftmostPoint |= lower.minNode != null && upper.minNode != null
                 && lower.minNode.data.x < upper.minNode.data.x;
@@ -110,9 +109,9 @@ public class CH {
         return Pair.of(upper, lowerRest);
     }
 
-    static Pair<ConcatenableQueue<Point2D>, ConcatenableQueue<Point2D>>
-    moveRightmostPointUp(ConcatenableQueue<Point2D> upper, ConcatenableQueue<Point2D> lower) {
-        ConcatenableQueue<Point2D> lowerRest = lower;
+    static Pair<ConcatenableQueue<Vertex2D>, ConcatenableQueue<Vertex2D>>
+    moveRightmostPointUp(ConcatenableQueue<Vertex2D> upper, ConcatenableQueue<Vertex2D> lower) {
+        ConcatenableQueue<Vertex2D> lowerRest = lower;
         boolean moveRightmostPoint = lower.maxNode != null && upper.maxNode == null;
         moveRightmostPoint |= lower.maxNode != null && upper.minNode != null
                 && lower.maxNode.data.x > upper.maxNode.data.x;
@@ -124,15 +123,15 @@ public class CH {
     }
 
     static class CutData {
-        ConcatenableQueue<Point2D> leftUpper;
-        ConcatenableQueue<Point2D> leftLower;
-        ConcatenableQueue<Point2D> rightUpper;
-        ConcatenableQueue<Point2D> rightLower;
+        ConcatenableQueue<Vertex2D> leftUpper;
+        ConcatenableQueue<Vertex2D> leftLower;
+        ConcatenableQueue<Vertex2D> rightUpper;
+        ConcatenableQueue<Vertex2D> rightLower;
 
-        public CutData(ConcatenableQueue<Point2D> leftUpper,
-                       ConcatenableQueue<Point2D> leftLower,
-                       ConcatenableQueue<Point2D> rightUpper,
-                       ConcatenableQueue<Point2D> rightLower) {
+        public CutData(ConcatenableQueue<Vertex2D> leftUpper,
+                       ConcatenableQueue<Vertex2D> leftLower,
+                       ConcatenableQueue<Vertex2D> rightUpper,
+                       ConcatenableQueue<Vertex2D> rightLower) {
             this.leftUpper = leftUpper;
             this.leftLower = leftLower;
             this.rightUpper = rightUpper;
@@ -141,14 +140,14 @@ public class CH {
     }
 
 
-    static Pair<CQNode<Point2D>, CQNode<Point2D>> tangent(
-            ConcatenableQueue<Point2D> leftHull,
-            ConcatenableQueue<Point2D> rightHull,
-            TriFunction<CQNode<Point2D>, Double, Position, Integer> casesFunction) {
+    static Pair<CQNode<Vertex2D>, CQNode<Vertex2D>> tangent(
+            ConcatenableQueue<Vertex2D> leftHull,
+            ConcatenableQueue<Vertex2D> rightHull,
+            TriFunction<CQNode<Vertex2D>, Double, Position, Integer> casesFunction) {
 
         //locate the appropriate pointers on both hulls
-        CQNode<Point2D> leftIterator = leftHull.root;
-        CQNode<Point2D> rightIterator = rightHull.root;
+        CQNode<Vertex2D> leftIterator = leftHull.root;
+        CQNode<Vertex2D> rightIterator = rightHull.root;
 
         boolean done = false;
         double middleX = (leftHull.maxNode.data.x + rightHull.minNode.data.x) / 2.0;
@@ -211,12 +210,12 @@ public class CH {
     }
 
 
-    static double getSlope(CQNode<Point2D> leftNode, CQNode<Point2D> rightNode) {
-        return Point2D.getSlope(leftNode.data, rightNode.data);
+    static double getSlope(CQNode<Vertex2D> leftNode, CQNode<Vertex2D> rightNode) {
+        return Vertex2D.getSlope(leftNode.data, rightNode.data);
     }
 
 
-    static int getUpperTangentCase(CQNode<Point2D> node, double tangentSlope,
+    static int getUpperTangentCase(CQNode<Vertex2D> node, double tangentSlope,
                                    Position subHullPosition) {
         boolean leftSlopeGreater = true;
         boolean rightSlopeGreater = false;
@@ -249,7 +248,7 @@ public class CH {
         }
     }
 
-    static int getLowerTangentCase(CQNode<Point2D> node, double tangentSlope,
+    static int getLowerTangentCase(CQNode<Vertex2D> node, double tangentSlope,
                                    Position subHullPosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
@@ -283,13 +282,13 @@ public class CH {
     }
 
 
-    static ConcatenableQueue<Point2D> adjustLowerHull(ConcatenableQueue<Point2D> upperHull,
-                                                      ConcatenableQueue<Point2D> lowerHull) {
+    static ConcatenableQueue<Vertex2D> adjustLowerHull(ConcatenableQueue<Vertex2D> upperHull,
+                                                       ConcatenableQueue<Vertex2D> lowerHull) {
         if (lowerHull.root == null) {
             return lowerHull;
         }
-        CQNode<Point2D> leftBaseNode = getBaseNode(lowerHull, upperHull.minNode, Position.LEFT);
-        CQNode<Point2D> rightBaseNode = getBaseNode(lowerHull, upperHull.maxNode, Position.RIGHT);
+        CQNode<Vertex2D> leftBaseNode = getBaseNode(lowerHull, upperHull.minNode, Position.LEFT);
+        CQNode<Vertex2D> rightBaseNode = getBaseNode(lowerHull, upperHull.maxNode, Position.RIGHT);
 
         // corner case
         if (leftBaseNode.data.compareTo(rightBaseNode.data) > 0) {
@@ -310,10 +309,10 @@ public class CH {
     }
 
 
-    static CQNode<Point2D> getBaseNode(ConcatenableQueue<Point2D> lowerHull,
-                                       CQNode<Point2D> compareNode,
-                                       Position compareNodePosition) {
-        CQNode<Point2D> hullIterator = lowerHull.root;
+    static CQNode<Vertex2D> getBaseNode(ConcatenableQueue<Vertex2D> lowerHull,
+                                        CQNode<Vertex2D> compareNode,
+                                        Position compareNodePosition) {
+        CQNode<Vertex2D> hullIterator = lowerHull.root;
 
         boolean done = false;
         while (!done) {
@@ -338,7 +337,7 @@ public class CH {
     }
 
 
-    static int getLowerBaseCase(CQNode<Point2D> node, double tangentSlope, Position nodePosition) {
+    static int getLowerBaseCase(CQNode<Vertex2D> node, double tangentSlope, Position nodePosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
 

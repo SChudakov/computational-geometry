@@ -1,10 +1,8 @@
 package com.chudakov.geometry.uae;
 
-import com.chudakov.geometry.common.Point2D;
-
 import java.util.Iterator;
 
-public class ConvexHull implements Iterable<Point2D> {
+public class ConvexHull implements Iterable<Vertex2D> {
     enum Position {LEFT, RIGHT}
 
     final ConvexSubhull upperSubhull;
@@ -24,7 +22,7 @@ public class ConvexHull implements Iterable<Point2D> {
 
     @Override
     public String toString() {
-        Iterator<Point2D> iterator = this.iterator();
+        Iterator<Vertex2D> iterator = this.iterator();
         if (!iterator.hasNext()) {
             return "[]";
         } else {
@@ -32,7 +30,7 @@ public class ConvexHull implements Iterable<Point2D> {
             result.append('[');
 
             while (true) {
-                Point2D element = iterator.next();
+                Vertex2D element = iterator.next();
                 result.append(element);
                 if (!iterator.hasNext()) {
                     return result.append(']').toString();
@@ -44,12 +42,12 @@ public class ConvexHull implements Iterable<Point2D> {
     }
 
     @Override
-    public Iterator<Point2D> iterator() {
+    public Iterator<Vertex2D> iterator() {
         return new CHIterator();
     }
 
-    private class CHIterator implements Iterator<Point2D> {
-        Iterator<Point2D> iterator;
+    private class CHIterator implements Iterator<Vertex2D> {
+        Iterator<Vertex2D> iterator;
         ConvexSubhull.Type hullType;
 
         CHIterator() {
@@ -65,7 +63,7 @@ public class ConvexHull implements Iterable<Point2D> {
         }
 
         @Override
-        public Point2D next() {
+        public Vertex2D next() {
             changeIteratorIfNeeded();
             return iterator.next();
         }

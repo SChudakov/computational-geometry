@@ -1,6 +1,6 @@
 package com.chudakov.geometry;
 
-import com.chudakov.geometry.common.Point2D;
+import com.chudakov.geometry.uae.Vertex2D;
 import com.chudakov.geometry.uae.Edge;
 import com.chudakov.geometry.uae.UAE2D;
 
@@ -22,24 +22,24 @@ public class TestUtils {
 
     private static UAE2D uae = new UAE2D();
 
-    public static List<List<Point2D>> readPointsDir(String directory) {
+    public static List<List<Vertex2D>> readPointsDir(String directory) {
         File[] files = Objects.requireNonNull(new File(directory).listFiles());
 
-        List<List<Point2D>> result = new ArrayList<>(Collections.nCopies(files.length, null));
+        List<List<Vertex2D>> result = new ArrayList<>(Collections.nCopies(files.length, null));
         for (File file : files) {
             String filePath = file.getAbsolutePath();
             String fileName = file.getName();
             int fileIndex = fileIndex(fileName);
 
-            List<Point2D> points = readPointsFile(filePath);
+            List<Vertex2D> points = readPointsFile(filePath);
             result.set(fileIndex, points);
         }
 
         return result;
     }
 
-    public static List<Point2D> readPointsFile(String file) {
-        List<Point2D> result = new ArrayList<>();
+    public static List<Vertex2D> readPointsFile(String file) {
+        List<Vertex2D> result = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -53,7 +53,7 @@ public class TestUtils {
                     throw new RuntimeException("illegal points format: " + line);
                 }
 
-                result.add(new Point2D(Double.parseDouble(coordinates[0]),
+                result.add(new Vertex2D(Double.parseDouble(coordinates[0]),
                         Double.parseDouble(coordinates[1])));
             }
         } catch (IOException e) {
@@ -85,8 +85,8 @@ public class TestUtils {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] coordinates = line.split(" ");
-                Point2D org = new Point2D(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
-                Point2D dest = new Point2D(Double.parseDouble(coordinates[2]), Double.parseDouble(coordinates[3]));
+                Vertex2D org = new Vertex2D(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+                Vertex2D dest = new Vertex2D(Double.parseDouble(coordinates[2]), Double.parseDouble(coordinates[3]));
                 Edge edge = new Edge(org, dest);
                 result.add(edge);
             }
@@ -103,14 +103,14 @@ public class TestUtils {
             String fileName = fileName(i);
             String filePath = Paths.get(directory, fileName).toString();
 
-            List<Point2D> points = generatePoints(numberOfPoints, random, integerOrDouble);
+            List<Vertex2D> points = generatePoints(numberOfPoints, random, integerOrDouble);
             writePoints(filePath, points);
         }
     }
 
-    public static void writePoints(String filePath, List<Point2D> points) {
+    public static void writePoints(String filePath, List<Vertex2D> points) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Point2D point : points) {
+            for (Vertex2D point : points) {
                 writer.write(String.valueOf(point.x));
                 writer.write(" ");
                 writer.write(String.valueOf(point.y));
@@ -157,8 +157,8 @@ public class TestUtils {
         return Integer.parseInt(fileName);
     }
 
-    private static List<Point2D> generatePoints(int numberOfPoints, Random random, int integerOrDouble) {
-        List<Point2D> result = new ArrayList<>(numberOfPoints);
+    private static List<Vertex2D> generatePoints(int numberOfPoints, Random random, int integerOrDouble) {
+        List<Vertex2D> result = new ArrayList<>(numberOfPoints);
         while (result.size() < numberOfPoints) {
             double x;
             double y;
@@ -169,7 +169,7 @@ public class TestUtils {
                 x = trimDouble(random.nextDouble());
                 y = trimDouble(random.nextDouble());
             }
-            Point2D point = new Point2D(x, y);
+            Vertex2D point = new Vertex2D(x, y);
             result.add(point);
 
             result = uae.precompute(result);

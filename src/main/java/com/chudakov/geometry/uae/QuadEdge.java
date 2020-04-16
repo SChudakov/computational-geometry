@@ -1,10 +1,8 @@
 package com.chudakov.geometry.uae;
 
-import com.chudakov.geometry.common.Point2D;
-
 public class QuadEdge {
-    Point2D org;
-    Point2D dest;
+    Vertex2D org;
+    Vertex2D dest;
 
     QuadEdge onext;
     QuadEdge oprev;
@@ -13,7 +11,7 @@ public class QuadEdge {
 
     Object data;
 
-    public QuadEdge(Point2D org, Point2D dest) {
+    public QuadEdge(Vertex2D org, Vertex2D dest) {
         this.org = org;
         this.dest = dest;
     }
@@ -23,7 +21,6 @@ public class QuadEdge {
         return "QuadEdge{" +
                 "org=" + org +
                 ", dest=" + dest +
-                ", data=" + data +
                 '}';
     }
 }

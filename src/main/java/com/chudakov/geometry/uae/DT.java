@@ -1,7 +1,5 @@
 package com.chudakov.geometry.uae;
 
-import com.chudakov.geometry.common.Point2D;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,14 +14,14 @@ public class DT {
         }
 
         List<Edge> result = new ArrayList<>();
-        Set<Point2D> visited = new HashSet<>();
+        Set<Vertex2D> visited = new HashSet<>();
 
         dfs(quadEdge, visited, result);
 
         return result;
     }
 
-    private static void dfs(QuadEdge quadEdge, Set<Point2D> visited, List<Edge> result) {
+    private static void dfs(QuadEdge quadEdge, Set<Vertex2D> visited, List<Edge> result) {
         if (visited.contains(quadEdge.org)) {
             return;
         }
@@ -40,7 +38,7 @@ public class DT {
     }
 
 
-    static QuadEdge makeEdge(Point2D org, Point2D dest) {
+    static QuadEdge makeEdge(Vertex2D org, Vertex2D dest) {
         QuadEdge e = new QuadEdge(org, dest);
         QuadEdge es = new QuadEdge(dest, org);
         System.out.println("create: " + e);
@@ -90,7 +88,7 @@ public class DT {
     }
 
 
-    static boolean inCircle(Point2D a, Point2D b, Point2D c, Point2D d) {
+    static boolean inCircle(Vertex2D a, Vertex2D b, Vertex2D c, Vertex2D d) {
         double a1 = a.x - d.x;
         double a2 = a.y - d.y;
 
@@ -112,16 +110,16 @@ public class DT {
         return det < 0;
     }
 
-    static boolean rightOf(Point2D p, QuadEdge e) {
-        Point2D a = e.org;
-        Point2D b = e.dest;
+    static boolean rightOf(Vertex2D p, QuadEdge e) {
+        Vertex2D a = e.org;
+        Vertex2D b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
         return det > 0;
     }
 
-    static boolean leftOf(Point2D p, QuadEdge e) {
-        Point2D a = e.org;
-        Point2D b = e.dest;
+    static boolean leftOf(Vertex2D p, QuadEdge e) {
+        Vertex2D a = e.org;
+        Vertex2D b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
         return det < 0;
     }
