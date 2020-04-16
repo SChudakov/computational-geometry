@@ -43,7 +43,7 @@ public class DT {
     static QuadEdge makeEdge(Point2D org, Point2D dest) {
         QuadEdge e = new QuadEdge(org, dest);
         QuadEdge es = new QuadEdge(dest, org);
-//        System.out.println("create: " + e);
+        System.out.println("create: " + e);
 
         // make edges mutually symmetrical
         e.sym = es;
@@ -80,7 +80,7 @@ public class DT {
     }
 
     static void deleteEdge(QuadEdge e) {
-//        System.out.println("delete: " + e);
+        System.out.println("delete: " + e);
 
         splice(e, e.oprev);
         splice(e.sym, e.sym.oprev);

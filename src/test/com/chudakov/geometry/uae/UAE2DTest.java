@@ -249,15 +249,15 @@ public class UAE2DTest {
 
     @Test
     public void helperDT() {
-        String inputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/100_d/input/426";
-        String outputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/100_d/dt/426";
-        String saveFilePath = "/home/semen/drive/python/points-visualization/edges";
+        String inputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/10/input/0";
+        String outputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/10/dt/0";
+        String path = "/home/semen/drive/python/points-visualization/uaeDT";
 
         List<Point2D> input = TestUtils.readPointsFile(inputDir);
         List<Edge> expectedDT = TestUtils.readEdgesFile(outputDir);
-        List<Edge> actualDT = DT.convert(new SequentialUAE2D().solve(input).e1);
 
-        TestUtils.writeEdgesFile(saveFilePath, actualDT);
+        List<Edge> actualDT = DT.convert(new SequentialUAE2D().solve(input).e1);
+        TestUtils.writeEdgesFile(path, actualDT);
         assertEqualDT(expectedDT, actualDT);
     }
 

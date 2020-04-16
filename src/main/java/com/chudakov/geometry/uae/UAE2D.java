@@ -33,6 +33,7 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     }
 
     private ConvexHull convexHullBaseCase(List<Point2D> points) {
+        System.out.println("base case: " + points);
         int size = points.size();
 
         ConcatenableQueue<Point2D> upper = new ConcatenableQueue<>();
@@ -165,6 +166,11 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
     private Pair<QuadEdge, QuadEdge> getTriangulationEdges(UAEResult left, UAEResult right,
                                                            Pair<CQNode<Point2D>, CQNode<Point2D>> upperTangent,
                                                            Pair<CQNode<Point2D>, CQNode<Point2D>> lowerTangent) {
+        System.out.println("merge");
+        System.out.println("left e1: " + left.e1);
+        System.out.println("left e2: " + left.e2);
+        System.out.println("right e1: " + right.e1);
+        System.out.println("right e2: " + right.e2);
         QuadEdge ldo = left.e1;
         QuadEdge ldi = left.e2;
 
@@ -181,6 +187,11 @@ public class UAE2D implements DaCAlgorithm<List<Point2D>, UAEResult> {
                 break;
             }
         }
+
+        System.out.println("ldo: " + ldo);
+        System.out.println("ldi: " + ldi);
+        System.out.println("rdi: " + rdi);
+        System.out.println("rdo: " + rdo);
 
         // Create a first cross edge base from rdi.org to ldi.org.
         QuadEdge base = DT.connect(ldi.sym, rdi);
