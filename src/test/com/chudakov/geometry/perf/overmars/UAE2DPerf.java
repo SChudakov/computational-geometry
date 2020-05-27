@@ -1,9 +1,8 @@
 package com.chudakov.geometry.perf.overmars;
 
-import com.chudakov.alg.Graham;
-import com.chudakov.alg.Jarvis;
-import com.chudakov.alg.QuickHull;
-import com.chudakov.geometry.uae.Point;
+import com.chudakov.geometry.uae.ParallelUAE2D;
+import com.chudakov.geometry.uae.SequentialUAE2D;
+import com.chudakov.geometry.uae.UAEResult;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -12,7 +11,7 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Warmup;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -20,20 +19,14 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 3, time = 10)
 @Measurement(iterations = 3, time = 10)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class ConvexHull2DPerf {
-
+public class UAE2DPerf {
     @Benchmark
-    public List<Point> testJarvis(PerformanceState state) {
-        return new Jarvis().computeConvexHull(state.points);
+    public UAEResult benchmarkSequential(PerformanceState state) {
+        return new SequentialUAE2D().solve(new ArrayList<>(state.vertices));
     }
 
     @Benchmark
-    public List<Point> testGraham(PerformanceState state) {
-        return new Graham().computeConvexHull(state.points);
-    }
-
-    @Benchmark
-    public List<Point> testQuickHull(PerformanceState state) {
-        return new QuickHull().computeConvexHull(state.points);
+    public UAEResult benchmarkParallel(PerformanceState state) {
+        return new ParallelUAE2D(state.inputSizeThreshold).solve(new ArrayList<>(state.vertices));
     }
 }
