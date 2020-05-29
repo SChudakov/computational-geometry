@@ -23,17 +23,17 @@ import java.util.concurrent.TimeUnit;
 public class ConvexHull2DPerf {
 
     @Benchmark
-    public List<Point> testJarvis(PerformanceState state) {
+    public List<Point> testJarvis(SequentialState state) {
         return new Jarvis().computeConvexHull(state.points);
     }
 
     @Benchmark
-    public List<Point> testGraham(PerformanceState state) {
+    public List<Point> testGraham(SequentialState state) {
         return new Graham().computeConvexHull(state.points);
     }
 
     @Benchmark
-    public List<Point> testQuickHull(PerformanceState state) {
+    public List<Point> testQuickHull(SequentialState state) {
         return new QuickHull().computeConvexHull(state.points);
     }
 }

@@ -13,6 +13,7 @@ import static com.chudakov.geometry.uae.CH.CutData;
 import static com.chudakov.geometry.uae.ConcatenableQueue.CQVertex;
 
 public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
+//    private static int i = 0;
     @Override
     public boolean isBaseCase(List<Vertex> points) {
         return points.size() <= 3;
@@ -114,6 +115,7 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
 
     @Override
     public UAEResult merge(UAEResult left, UAEResult right) {
+//        System.out.println("merge " + i++);
         ConcatenableQueue<Vertex> leftUpper = left.convexHull.upperSubhull.subhull;
         ConcatenableQueue<Vertex> leftLower = left.convexHull.lowerSubhull.subhull;
         ConcatenableQueue<Vertex> rightUpper = right.convexHull.upperSubhull.subhull;
@@ -155,18 +157,13 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
         ConvexSubhull lowerSubhull = new ConvexSubhull(lowerResult, ConvexSubhull.Type.LOWER);
         ConvexHull convexHull = new ConvexHull(upperSubhull, lowerSubhull);
-
+//        System.out.println("end");
         return new UAEResult(convexHull, triangulationEdges.getLeft(), triangulationEdges.getRight());
     }
 
 
     private Pair<QuadEdge, QuadEdge> getTriangulationEdges(UAEResult left, UAEResult right,
                                                            Pair<CQVertex<Vertex>, CQVertex<Vertex>> lowerTangent) {
-//        System.out.println("merge");
-//        System.out.println("(left e1: " + left.e1);
-//        System.out.println("left e2: " + left.e2);
-//        System.out.println("right e1: " + right.e1);
-//        System.out.println("right e2: " + right.e2);
         QuadEdge ldo = left.e1;
         QuadEdge ldi = left.e2;
 
@@ -184,51 +181,44 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
             }
         }
 
-//        System.out.println("ldo: " + ldo);
-//        System.out.println("ldi: " + ldi);
-//        System.out.println("rdi: " + rdi);
-//        System.out.println("rdo: " + rdo);
-
-        Pair<QuadEdge, QuadEdge> tangentEdges =
-                DT.getTangentEdges(lowerTangent.getLeft().value, lowerTangent.getRight().value);
-//        System.out.println("left tangent edge: " + tangentEdges.getLeft());
-//        System.out.println("right tangent edge: " + tangentEdges.getRight());
-        try {
-            if (
-                    Vertex.getSlope(lowerTangent.getLeft().value, lowerTangent.getRight().value)
-                            ==
-                            Vertex.getSlope(lowerTangent.getLeft().value, ldi.org)
-            ) {
-                System.out.println("collinear");
-            }
-            if (
-                    Vertex.getSlope(lowerTangent.getLeft().value, lowerTangent.getRight().value)
-                            ==
-                            Vertex.getSlope(lowerTangent.getLeft().value, rdi.org)
-            ) {
-                System.out.println("collinear");
-            }
-        } catch (Exception e) {
-            /*NOP*/
-        }
-        try {
-            assert ldi.equals(tangentEdges.getLeft());
-            assert rdi.equals(tangentEdges.getRight());
-        } catch (AssertionError e) {
-            System.out.println("left tangent vertex: " + lowerTangent.getLeft().value);
-            System.out.println("right tangent vertex: " + lowerTangent.getRight().value);
-            System.out.println();
-            System.out.println("ldo: " + ldo);
-            System.out.println("ldi: " + ldi);
-            System.out.println("rdi: " + rdi);
-            System.out.println("rdo: " + rdo);
-            System.out.println();
-            System.out.println("left tangent edge: " + tangentEdges.getLeft());
-            System.out.println("right tangent edge: " + tangentEdges.getRight());
-            throw e;
-        }
-        ldi = tangentEdges.getLeft();
-        rdi = tangentEdges.getRight();
+//        Pair<QuadEdge, QuadEdge> tangentEdges =
+//                DT.getTangentEdges(lowerTangent.getLeft().value, lowerTangent.getRight().value);
+//        try {
+//            if (
+//                    Vertex.getSlope(lowerTangent.getLeft().value, lowerTangent.getRight().value)
+//                            ==
+//                            Vertex.getSlope(lowerTangent.getLeft().value, ldi.org)
+//            ) {
+//                System.out.println("collinear");
+//            }
+//            if (
+//                    Vertex.getSlope(lowerTangent.getLeft().value, lowerTangent.getRight().value)
+//                            ==
+//                            Vertex.getSlope(lowerTangent.getLeft().value, rdi.org)
+//            ) {
+//                System.out.println("collinear");
+//            }
+//        } catch (Exception e) {
+//            /*NOP*/
+//        }
+//        try {
+//            assert ldi.equals(tangentEdges.getLeft());
+//            assert rdi.equals(tangentEdges.getRight());
+//        } catch (AssertionError e) {
+//            System.out.println("left tangent vertex: " + lowerTangent.getLeft().value);
+//            System.out.println("right tangent vertex: " + lowerTangent.getRight().value);
+//            System.out.println();
+//            System.out.println("ldo: " + ldo);
+//            System.out.println("ldi: " + ldi);
+//            System.out.println("rdi: " + rdi);
+//            System.out.println("rdo: " + rdo);
+//            System.out.println();
+//            System.out.println("left tangent edge: " + tangentEdges.getLeft());
+//            System.out.println("right tangent edge: " + tangentEdges.getRight());
+//            throw e;
+//        }
+//        ldi = tangentEdges.getLeft();
+//        rdi = tangentEdges.getRight();
 
         // Create a first cross edge base from rdi.org to ldi.org.
         QuadEdge base = DT.connect(ldi.sym, rdi);
