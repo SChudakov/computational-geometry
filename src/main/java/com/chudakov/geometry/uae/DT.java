@@ -42,63 +42,63 @@ public class DT {
 
 
     static QuadEdge makeEdge(Vertex org, Vertex dest) {
-        QuadEdge e = new QuadEdge(org, dest);
-        QuadEdge es = new QuadEdge(dest, org);
+        QuadEdge edge = new QuadEdge(org, dest);
+        QuadEdge symEdge = new QuadEdge(dest, org);
         if (org.edge == null) {
-            org.edge = e;
+            org.edge = edge;
         }
         if (dest.edge == null) {
-            dest.edge = es;
+            dest.edge = symEdge;
         }
 
 //        System.out.println("create: " + e);
 
         // make edges mutually symmetrical
-        e.sym = es;
-        es.sym = e;
+        edge.sym = symEdge;
+        symEdge.sym = edge;
 
-        e.onext = e;
-        e.oprev = e;
+        edge.onext = edge;
+        edge.oprev = edge;
 
-        es.onext = es;
-        es.oprev = es;
+        symEdge.onext = symEdge;
+        symEdge.oprev = symEdge;
 
-        return e;
+        return edge;
     }
 
-    static void splice(QuadEdge a, QuadEdge b) {
-        if (a.equals(b)) {
-            System.out.println("Splicing edge with itself, ignored: " + a + ".");
+    static void splice(QuadEdge edge1, QuadEdge edge2) {
+        if (edge1.equals(edge2)) {
+            System.out.println("Splicing edge with itself, ignored: " + edge1 + ".");
             return;
         }
 
-        a.onext.oprev = b;
-        b.onext.oprev = a;
+        edge1.onext.oprev = edge2;
+        edge2.onext.oprev = edge1;
 
-        QuadEdge tmp = a.onext;
-        a.onext = b.onext;
-        b.onext = tmp;
+        QuadEdge tmp = edge1.onext;
+        edge1.onext = edge2.onext;
+        edge2.onext = tmp;
     }
 
-    static QuadEdge connect(QuadEdge a, QuadEdge b) {
-        QuadEdge e = makeEdge(a.dest, b.org);
-        splice(e, a.sym.oprev);
-        splice(e.sym, b);
+    static QuadEdge connect(QuadEdge edge1, QuadEdge edge2) {
+        QuadEdge e = makeEdge(edge1.dest, edge2.org);
+        splice(e, edge1.sym.oprev);
+        splice(e.sym, edge2);
         return e;
     }
 
-    static void deleteEdge(QuadEdge e) {
+    static void deleteEdge(QuadEdge edge) {
 //        System.out.println("delete: " + e);
 
-        if (e.org.edge.equals(e)) {
-            e.org.edge = e.oprev;
+        if (edge.org.edge.equals(edge)) {
+            edge.org.edge = edge.oprev;
         }
-        if (e.dest.edge.equals(e.sym)) {
-            e.dest.edge = e.sym.oprev;
+        if (edge.dest.edge.equals(edge.sym)) {
+            edge.dest.edge = edge.sym.oprev;
         }
 
-        splice(e, e.oprev);
-        splice(e.sym, e.sym.oprev);
+        splice(edge, edge.oprev);
+        splice(edge.sym, edge.sym.oprev);
     }
 
 
