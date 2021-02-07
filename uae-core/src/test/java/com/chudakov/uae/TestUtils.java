@@ -1,8 +1,8 @@
 package com.chudakov.uae;
 
-import com.chudakov.uae.impl.Vertex;
 import com.chudakov.uae.impl.Edge;
 import com.chudakov.uae.impl.UAE2D;
+import com.chudakov.uae.impl.Vertex;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,7 +23,10 @@ public class TestUtils {
     private static UAE2D uae = new UAE2D();
 
     public static List<List<Vertex>> readPointsDir(String directory) {
-        File[] files = Objects.requireNonNull(new File(directory).listFiles());
+        File[] files = new File(directory).listFiles();
+        if (files == null) {
+            return Collections.emptyList();
+        }
 
         List<List<Vertex>> result = new ArrayList<>(Collections.nCopies(files.length, null));
         for (File file : files) {
@@ -64,7 +67,10 @@ public class TestUtils {
     }
 
     public static List<List<Edge>> readEdgesDir(String directory) {
-        File[] files = Objects.requireNonNull(new File(directory).listFiles());
+        File[] files = new File(directory).listFiles();
+        if(files == null){
+            return Collections.emptyList();
+        }
 
         List<List<Edge>> result = new ArrayList<>(Collections.nCopies(files.length, null));
         for (File file : files) {
