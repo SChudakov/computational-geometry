@@ -50,19 +50,19 @@ cd computational-geometry
 and build the project with
 
 ```
-mvn clean compile assembly:single
+mvn clean install -DskipTests
 ```
 
-This will create `geometry.jar` archive in the `target` subdirectory of the project directory.
+This will create `visualization.jar` archive in the `uae-visualization/target` directory of the project.
 
 ### Run
 
 Start the demo by running
 
 
-Windows         `java -jar target\geometry.jar` 
+Windows         `java -jar uae-visualization\target\visualization.jar` 
 
-Linux / Darwin  `java -jar target/geometry.jar` 
+Linux / Darwin  `java -jar uae-visualization/target/visualization.jar` 
 
 The following window will appear.
 

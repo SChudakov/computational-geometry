@@ -17,6 +17,7 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <executable.jar.name>visualization.jar</executable.jar.name>
     </properties>
 
     <dependencies>
@@ -25,4 +26,24 @@
             <artifactId>uae-core</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.jolira</groupId>
+                <artifactId>onejar-maven-plugin</artifactId>
+                <version>1.4.4</version>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <mainClass>com.chudakov.visualisation.Main</mainClass>
+                            <attachToBuild>true</attachToBuild>
+                            <filename>${executable.jar.name}</filename>
+                        </configuration>
+                        <goals><goal>one-jar</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
