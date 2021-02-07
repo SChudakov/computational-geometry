@@ -24,6 +24,60 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
     }
 
     @Override
+    public List<Vertex> precompute(List<Vertex> points) {
+        points = new ArrayList<>(new HashSet<>(points));
+        // TODO: do not remove vertically and horizontally collinear points
+        points.sort(new AntiLOPointComparator());
+        removeDuplicated(points, Comparator.comparingDouble(p -> p.y));
+        points.sort(Vertex::compareTo);
+        removeDuplicated(points, Comparator.comparingDouble(p -> p.x));
+        return points;
+    }
+
+    static void removeDuplicated(List<Vertex> points, Comparator<Vertex> comparator) {
+        ListIterator<Vertex> it1 = points.listIterator();
+        ListIterator<Vertex> it2 = points.listIterator();
+
+        // handle empty input case
+        if (!it1.hasNext()) {
+            return;
+        }
+        it1.next();
+
+        while (it2.hasNext()) {
+            if (it2.nextIndex() > 0 && it2.nextIndex() < points.size() - 1) {
+                Vertex previous = it2.previous();
+                it2.next();
+                Vertex current = it2.next();
+                Vertex next = it2.next();
+                it2.previous();
+
+                if (!(comparator.compare(previous, current) == 0 && comparator.compare(current, next) == 0)) {
+                    it1.set(current);
+                    if (it1.hasNext()) {
+                        it1.next();
+                    }
+                }
+            } else if (it2.nextIndex() == 0) {
+                // one-element list case
+                if (it1.hasNext()) {
+                    it1.next();
+                }
+                it2.next();
+            } else {
+                it1.set(it2.next());
+            }
+        }
+        if (it1.hasNext()) {
+            int it1NextIndex = it1.nextIndex();
+            while (points.size() != it1NextIndex) {
+                points.remove(points.size() - 1);
+            }
+        }
+    }
+
+
+    @Override
     public UAEResult solveBaseCase(List<Vertex> points) {
         ConvexHull convexHull = convexHullBaseCase(points);
         Pair<QuadEdge, QuadEdge> p = delaunayTriangulationBaseCase(points);
@@ -111,6 +165,14 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         }
     }
 
+
+    @Override
+    public Pair<List<Vertex>, List<Vertex>> divide(List<Vertex> input) {
+        int mid = input.size() / 2;
+        return Pair.of(input.subList(0, mid), input.subList(mid, input.size()));
+    }
+
+
     @Override
     public UAEResult merge(UAEResult left, UAEResult right) {
         ConcatenableQueue<Vertex> leftUpper = left.convexHull.upperSubhull.subhull;
@@ -137,7 +199,7 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         Pair<CQVertex<Vertex>, CQVertex<Vertex>> lowerTangent = CH.tangent(leftLower, rightLower, CH::getLowerTangentCase);
 
         // 3. use tangents in triangulation
-        Pair<QuadEdge, QuadEdge> triangulationEdges = getTriangulationEdges(left, right, lowerTangent);
+        Pair<QuadEdge, QuadEdge> triangulationEdges = getTriangulationEdges(left, right);
 
         // 4. cut convex hull w.r.t the tangents
         CutData data = CH.cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
@@ -158,9 +220,7 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         return new UAEResult(convexHull, triangulationEdges.getLeft(), triangulationEdges.getRight());
     }
 
-
-    private Pair<QuadEdge, QuadEdge> getTriangulationEdges(UAEResult left, UAEResult right,
-                                                           Pair<CQVertex<Vertex>, CQVertex<Vertex>> lowerTangent) {
+    private Pair<QuadEdge, QuadEdge> getTriangulationEdges(UAEResult left, UAEResult right) {
         QuadEdge ldo = left.e1;
         QuadEdge ldi = left.e2;
 
@@ -232,66 +292,6 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
             }
         }
         return Pair.of(ldo, rdo);
-    }
-
-    @Override
-    public Pair<List<Vertex>, List<Vertex>> divide(List<Vertex> input) {
-        int mid = input.size() / 2;
-        return Pair.of(input.subList(0, mid), input.subList(mid, input.size()));
-    }
-
-    @Override
-    public List<Vertex> precompute(List<Vertex> points) {
-        points = new ArrayList<>(new HashSet<>(points));
-        // TODO: do not remove vertically and horizontally collinear points
-        points.sort(new AntiLOPointComparator());
-        removeDuplicated(points, Comparator.comparingDouble(p -> p.y));
-        points.sort(Vertex::compareTo);
-        removeDuplicated(points, Comparator.comparingDouble(p -> p.x));
-        return points;
-    }
-
-
-    static void removeDuplicated(List<Vertex> points, Comparator<Vertex> comparator) {
-        ListIterator<Vertex> it1 = points.listIterator();
-        ListIterator<Vertex> it2 = points.listIterator();
-
-        // handle empty input case
-        if (!it1.hasNext()) {
-            return;
-        }
-        it1.next();
-
-        while (it2.hasNext()) {
-            if (it2.nextIndex() > 0 && it2.nextIndex() < points.size() - 1) {
-                Vertex previous = it2.previous();
-                it2.next();
-                Vertex current = it2.next();
-                Vertex next = it2.next();
-                it2.previous();
-
-                if (!(comparator.compare(previous, current) == 0 && comparator.compare(current, next) == 0)) {
-                    it1.set(current);
-                    if (it1.hasNext()) {
-                        it1.next();
-                    }
-                }
-            } else if (it2.nextIndex() == 0) {
-                // one-element list case
-                if (it1.hasNext()) {
-                    it1.next();
-                }
-                it2.next();
-            } else {
-                it1.set(it2.next());
-            }
-        }
-        if (it1.hasNext()) {
-            int it1NextIndex = it1.nextIndex();
-            while (points.size() != it1NextIndex) {
-                points.remove(points.size() - 1);
-            }
-        }
     }
 
     static class AntiLOPointComparator implements Comparator<Vertex> {

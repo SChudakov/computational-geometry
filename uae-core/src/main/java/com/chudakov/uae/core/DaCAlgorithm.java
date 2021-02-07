@@ -7,11 +7,11 @@ public interface DaCAlgorithm<IT, OT> {
 
     int inputSize(IT input);
 
-    OT solveBaseCase(IT input);
+    IT precompute(IT input);
 
-    OT merge(OT first, OT second);
+    OT solveBaseCase(IT input);
 
     Pair<IT, IT> divide(IT input);
 
-    IT precompute(IT input);
+    OT merge(OT first, OT second);
 }

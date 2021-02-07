@@ -13,6 +13,7 @@ public class Point implements Comparable<Point> {
         this.y = y;
     }
 
+
     public static double getSlope(Vertex left, Vertex right) {
         if (right.x - left.x < 0) {
             throw new IllegalArgumentException("invalid positioning of points");

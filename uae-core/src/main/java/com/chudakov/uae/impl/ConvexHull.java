@@ -46,6 +46,7 @@ public class ConvexHull implements Iterable<Vertex> {
         return new CHIterator();
     }
 
+
     private class CHIterator implements Iterator<Vertex> {
         Iterator<Vertex> iterator;
         ConvexSubhull.Type hullType;

@@ -33,20 +33,12 @@ public class ConcatenableQueue<T> implements Iterable<T> {
     }
 
 
-    private CQVertex<T> createLeafBetween(CQVertex<T> leftNode, CQVertex<T> rightNode, T data) {
-        CQVertex<T> result = new CQVertex<>(data, leftNode, rightNode);
-        if (leftNode != null) {
-            leftNode.rSon = result;
-        } else {
-            minNode = result;
-        }
-        if (rightNode != null) {
-            rightNode.lSon = result;
-        } else {
-            maxNode = result;
-        }
-        return result;
+    public void clear() {
+        root = null;
+        minNode = null;
+        maxNode = null;
     }
+
 
     public void add(T e) {
         if (root == null) {
@@ -86,6 +78,21 @@ public class ConcatenableQueue<T> implements Iterable<T> {
         }
 
         updateHeight(result);
+        return result;
+    }
+
+    private CQVertex<T> createLeafBetween(CQVertex<T> leftNode, CQVertex<T> rightNode, T data) {
+        CQVertex<T> result = new CQVertex<>(data, leftNode, rightNode);
+        if (leftNode != null) {
+            leftNode.rSon = result;
+        } else {
+            minNode = result;
+        }
+        if (rightNode != null) {
+            rightNode.lSon = result;
+        } else {
+            maxNode = result;
+        }
         return result;
     }
 
@@ -280,12 +287,6 @@ public class ConcatenableQueue<T> implements Iterable<T> {
     }
 
 
-    public void clear() {
-        root = null;
-        minNode = null;
-        maxNode = null;
-    }
-
     @Override
     public Iterator<T> iterator() {
         return new CQIterator();
@@ -294,6 +295,7 @@ public class ConcatenableQueue<T> implements Iterable<T> {
     public Iterator<T> reverseIterator() {
         return new CQReverseIterator();
     }
+
 
     private class CQIterator implements Iterator<T> {
         private CQVertex<T> nextNode;
