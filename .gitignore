@@ -139,5 +139,5 @@ buildNumber.properties
 
 # End of https://www.gitignore.io/api/java,linux,maven,intellij+all
 
-src/main/java/com/ocl/parser/
-src/main/java/com/ocl/scanner/
+uae-core/src/main/java/com/ocl/parser/
+uae-core/src/main/java/com/ocl/scanner/
