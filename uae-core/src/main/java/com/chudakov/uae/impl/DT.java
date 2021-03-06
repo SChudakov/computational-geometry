@@ -17,14 +17,14 @@ public class DT {
         }
 
         List<Edge> result = new ArrayList<>();
-        Set<Vertex> visited = new HashSet<>();
+        Set<UAEVertex> visited = new HashSet<>();
 
         dfs(quadEdge, visited, result);
 
         return result;
     }
 
-    private static void dfs(QuadEdge quadEdge, Set<Vertex> visited, List<Edge> result) {
+    private static void dfs(QuadEdge quadEdge, Set<UAEVertex> visited, List<Edge> result) {
         if (visited.contains(quadEdge.org)) {
             return;
         }
@@ -41,7 +41,7 @@ public class DT {
     }
 
 
-    static QuadEdge makeEdge(Vertex org, Vertex dest) {
+    static QuadEdge makeEdge(UAEVertex org, UAEVertex dest) {
         QuadEdge edge = new QuadEdge(org, dest);
         QuadEdge symEdge = new QuadEdge(dest, org);
         if (org.edge == null) {
@@ -98,7 +98,7 @@ public class DT {
     }
 
 
-    static boolean inCircle(Vertex a, Vertex b, Vertex c, Vertex d) {
+    static boolean inCircle(UAEVertex a, UAEVertex b, UAEVertex c, UAEVertex d) {
         double a1 = a.x - d.x;
         double a2 = a.y - d.y;
 
@@ -120,22 +120,22 @@ public class DT {
         return det < 0;
     }
 
-    static boolean rightOf(Vertex p, QuadEdge e) {
-        Vertex a = e.org;
-        Vertex b = e.dest;
+    static boolean rightOf(UAEVertex p, QuadEdge e) {
+        UAEVertex a = e.org;
+        UAEVertex b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
         return det > 0;
     }
 
-    static boolean leftOf(Vertex p, QuadEdge e) {
-        Vertex a = e.org;
-        Vertex b = e.dest;
+    static boolean leftOf(UAEVertex p, QuadEdge e) {
+        UAEVertex a = e.org;
+        UAEVertex b = e.dest;
         double det = (a.x - p.x) * (b.y - p.y) - (a.y - p.y) * (b.x - p.x);
         return det < 0;
     }
 
 
-    static Pair<QuadEdge, QuadEdge> getTangentEdges(Vertex left, Vertex right) {
+    static Pair<QuadEdge, QuadEdge> getTangentEdges(UAEVertex left, UAEVertex right) {
         // compute left tangent edge
         QuadEdge leftEdge = left.edge;
         while (!leftEdge.equals(leftEdge.onext) &&
@@ -172,7 +172,7 @@ public class DT {
         return Math.acos(cosAlpha);
     }
 
-    private static double distance(Vertex a, Vertex b) {
+    private static double distance(UAEVertex a, UAEVertex b) {
         return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
     }
 }

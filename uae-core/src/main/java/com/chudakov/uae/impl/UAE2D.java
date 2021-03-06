@@ -12,31 +12,31 @@ import java.util.ListIterator;
 import static com.chudakov.uae.impl.CH.CutData;
 import static com.chudakov.uae.impl.ConcatenableQueue.CQVertex;
 
-public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
+public class UAE2D implements DaCAlgorithm<List<UAEVertex>, UAEResult> {
     @Override
-    public boolean isBaseCase(List<Vertex> points) {
+    public boolean isBaseCase(List<UAEVertex> points) {
         return points.size() <= 3;
     }
 
     @Override
-    public int inputSize(List<Vertex> input) {
+    public int inputSize(List<UAEVertex> input) {
         return input.size();
     }
 
     @Override
-    public List<Vertex> precompute(List<Vertex> points) {
+    public List<UAEVertex> precompute(List<UAEVertex> points) {
         points = new ArrayList<>(new HashSet<>(points));
         // TODO: do not remove vertically and horizontally collinear points
         points.sort(new AntiLOPointComparator());
         removeDuplicated(points, Comparator.comparingDouble(p -> p.y));
-        points.sort(Vertex::compareTo);
+        points.sort(UAEVertex::compareTo);
         removeDuplicated(points, Comparator.comparingDouble(p -> p.x));
         return points;
     }
 
-    static void removeDuplicated(List<Vertex> points, Comparator<Vertex> comparator) {
-        ListIterator<Vertex> it1 = points.listIterator();
-        ListIterator<Vertex> it2 = points.listIterator();
+    static void removeDuplicated(List<UAEVertex> points, Comparator<UAEVertex> comparator) {
+        ListIterator<UAEVertex> it1 = points.listIterator();
+        ListIterator<UAEVertex> it2 = points.listIterator();
 
         // handle empty input case
         if (!it1.hasNext()) {
@@ -46,10 +46,10 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
 
         while (it2.hasNext()) {
             if (it2.nextIndex() > 0 && it2.nextIndex() < points.size() - 1) {
-                Vertex previous = it2.previous();
+                UAEVertex previous = it2.previous();
                 it2.next();
-                Vertex current = it2.next();
-                Vertex next = it2.next();
+                UAEVertex current = it2.next();
+                UAEVertex next = it2.next();
                 it2.previous();
 
                 if (!(comparator.compare(previous, current) == 0 && comparator.compare(current, next) == 0)) {
@@ -78,17 +78,17 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
 
 
     @Override
-    public UAEResult solveBaseCase(List<Vertex> points) {
+    public UAEResult solveBaseCase(List<UAEVertex> points) {
         ConvexHull convexHull = convexHullBaseCase(points);
         Pair<QuadEdge, QuadEdge> p = delaunayTriangulationBaseCase(points);
         return new UAEResult(convexHull, p.getLeft(), p.getRight());
     }
 
-    private ConvexHull convexHullBaseCase(List<Vertex> points) {
+    private ConvexHull convexHullBaseCase(List<UAEVertex> points) {
         int size = points.size();
 
-        ConcatenableQueue<Vertex> upper = new ConcatenableQueue<>();
-        ConcatenableQueue<Vertex> lower = new ConcatenableQueue<>();
+        ConcatenableQueue<UAEVertex> upper = new ConcatenableQueue<>();
+        ConcatenableQueue<UAEVertex> lower = new ConcatenableQueue<>();
         if (size == 1) {
             upper.add(points.get(0));
         } else if (size == 2) {
@@ -100,11 +100,11 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
                 upper.add(points.get(0));
             }
         } else if (size == 3) {
-            Vertex first = points.get(0);
-            Vertex second = points.get(1);
-            Vertex third = points.get(2);
-            double leftSlope = Vertex.getSlope(first, second);
-            double rightSlope = Vertex.getSlope(second, third);
+            UAEVertex first = points.get(0);
+            UAEVertex second = points.get(1);
+            UAEVertex third = points.get(2);
+            double leftSlope = UAEVertex.getSlope(first, second);
+            double rightSlope = UAEVertex.getSlope(second, third);
             if (leftSlope < rightSlope) {
                 if (first.y < second.y) {
                     upper.add(first);
@@ -134,7 +134,7 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         return new ConvexHull(upperSubhull, lowerSubhull);
     }
 
-    private Pair<QuadEdge, QuadEdge> delaunayTriangulationBaseCase(List<Vertex> points) {
+    private Pair<QuadEdge, QuadEdge> delaunayTriangulationBaseCase(List<UAEVertex> points) {
         if (points.size() == 0 || points.size() == 1) {
             return Pair.of(null, null);
         }
@@ -145,9 +145,9 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         }
 
         // points size = 3
-        Vertex p1 = points.get(0);
-        Vertex p2 = points.get(1);
-        Vertex p3 = points.get(2);
+        UAEVertex p1 = points.get(0);
+        UAEVertex p2 = points.get(1);
+        UAEVertex p3 = points.get(2);
 
         QuadEdge a = DT.makeEdge(p1, p2);
         QuadEdge b = DT.makeEdge(p2, p3);
@@ -167,7 +167,7 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
 
 
     @Override
-    public Pair<List<Vertex>, List<Vertex>> divide(List<Vertex> input) {
+    public Pair<List<UAEVertex>, List<UAEVertex>> divide(List<UAEVertex> input) {
         int mid = input.size() / 2;
         return Pair.of(input.subList(0, mid), input.subList(mid, input.size()));
     }
@@ -175,28 +175,28 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
 
     @Override
     public UAEResult merge(UAEResult left, UAEResult right) {
-        ConcatenableQueue<Vertex> leftUpper = left.convexHull.upperSubhull.subhull;
-        ConcatenableQueue<Vertex> leftLower = left.convexHull.lowerSubhull.subhull;
-        ConcatenableQueue<Vertex> rightUpper = right.convexHull.upperSubhull.subhull;
-        ConcatenableQueue<Vertex> rightLower = right.convexHull.lowerSubhull.subhull;
+        ConcatenableQueue<UAEVertex> leftUpper = left.convexHull.upperSubhull.subhull;
+        ConcatenableQueue<UAEVertex> leftLower = left.convexHull.lowerSubhull.subhull;
+        ConcatenableQueue<UAEVertex> rightUpper = right.convexHull.upperSubhull.subhull;
+        ConcatenableQueue<UAEVertex> rightLower = right.convexHull.lowerSubhull.subhull;
 
         // 1. move utmost points up and compute upper tangent
-        Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>> p1 = CH.moveUtmostPointsUp(leftUpper, leftLower);
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p1 = CH.moveUtmostPointsUp(leftUpper, leftLower);
         leftUpper = p1.getLeft();
         leftLower = p1.getRight();
-        Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>> p2 = CH.moveUtmostPointsUp(rightUpper, rightLower);
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p2 = CH.moveUtmostPointsUp(rightUpper, rightLower);
         rightUpper = p2.getLeft();
         rightLower = p2.getRight();
-        Pair<CQVertex<Vertex>, CQVertex<Vertex>> upperTangent = CH.tangent(leftUpper, rightUpper, CH::getUpperTangentCase);
+        Pair<CQVertex<UAEVertex>, CQVertex<UAEVertex>> upperTangent = CH.tangent(leftUpper, rightUpper, CH::getUpperTangentCase);
 
         // 2. move utmost points down and compute lower tangent
-        Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>> p3 = CH.moveUtmostPointsDown(leftUpper, leftLower);
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p3 = CH.moveUtmostPointsDown(leftUpper, leftLower);
         leftUpper = p3.getLeft();
         leftLower = p3.getRight();
-        Pair<ConcatenableQueue<Vertex>, ConcatenableQueue<Vertex>> p4 = CH.moveUtmostPointsDown(rightUpper, rightLower);
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p4 = CH.moveUtmostPointsDown(rightUpper, rightLower);
         rightUpper = p4.getLeft();
         rightLower = p4.getRight();
-        Pair<CQVertex<Vertex>, CQVertex<Vertex>> lowerTangent = CH.tangent(leftLower, rightLower, CH::getLowerTangentCase);
+        Pair<CQVertex<UAEVertex>, CQVertex<UAEVertex>> lowerTangent = CH.tangent(leftLower, rightLower, CH::getLowerTangentCase);
 
         // 3. use tangents in triangulation
         Pair<QuadEdge, QuadEdge> triangulationEdges = getTriangulationEdges(left, right);
@@ -209,8 +209,8 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         rightLower = data.rightLower;
 
         // 5. concatenate upper and lower queue
-        ConcatenableQueue<Vertex> upperResult = ConcatenableQueue.concatenate(leftUpper, rightUpper);
-        ConcatenableQueue<Vertex> lowerResult = ConcatenableQueue.concatenate(leftLower, rightLower);
+        ConcatenableQueue<UAEVertex> upperResult = ConcatenableQueue.concatenate(leftUpper, rightUpper);
+        ConcatenableQueue<UAEVertex> lowerResult = ConcatenableQueue.concatenate(leftLower, rightLower);
 
         // 6. create sub-hulls and convex hull
         ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
@@ -294,10 +294,10 @@ public class UAE2D implements DaCAlgorithm<List<Vertex>, UAEResult> {
         return Pair.of(ldo, rdo);
     }
 
-    static class AntiLOPointComparator implements Comparator<Vertex> {
+    static class AntiLOPointComparator implements Comparator<UAEVertex> {
 
         @Override
-        public int compare(Vertex x, Vertex y) {
+        public int compare(UAEVertex x, UAEVertex y) {
             if (x.y < y.y || (x.y == y.y && x.x < y.x)) {
                 return -1;
             }

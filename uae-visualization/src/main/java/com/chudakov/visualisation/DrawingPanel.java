@@ -1,6 +1,6 @@
 package com.chudakov.visualisation;
 
-import com.chudakov.uae.impl.Vertex;
+import com.chudakov.uae.impl.UAEVertex;
 
 import javax.swing.JPanel;
 import java.awt.BasicStroke;
@@ -14,8 +14,8 @@ public class DrawingPanel extends JPanel {
     private static final Color DEFAULT_POINTS_COLOR = Color.BLUE;
     private static final Color DEFAULT_LINES_COLOR = Color.RED;
 
-    List<Vertex> generated;
-    List<Vertex> convexHull;
+    List<UAEVertex> generated;
+    List<UAEVertex> convexHull;
 
     @Override
     public void paintComponent(Graphics graphics) {
@@ -29,13 +29,13 @@ public class DrawingPanel extends JPanel {
         }
     }
 
-    private void drawPoints(Graphics graphics, List<Vertex> vertices) {
-        for (Vertex vertex : vertices) {
-            drawPoint(graphics, vertex, DEFAULT_POINTS_COLOR);
+    private void drawPoints(Graphics graphics, List<UAEVertex> vertices) {
+        for (UAEVertex UAEVertex : vertices) {
+            drawPoint(graphics, UAEVertex, DEFAULT_POINTS_COLOR);
         }
     }
 
-    private void drawLines(Graphics graphics, List<Vertex> vertices) {
+    private void drawLines(Graphics graphics, List<UAEVertex> vertices) {
         for (int i = 0; i < vertices.size() - 1; ++i) {
             drawLine(graphics, vertices.get(i),
                     vertices.get(i + 1),
@@ -46,17 +46,17 @@ public class DrawingPanel extends JPanel {
                 DEFAULT_LINES_COLOR);
     }
 
-    public void drawPoint(Graphics graphics, Vertex vertex, Color color) {
+    public void drawPoint(Graphics graphics, UAEVertex UAEVertex, Color color) {
         int diameter = 15;
         graphics.setColor(color);
         Graphics2D graphics2D = (Graphics2D) graphics;
-        Ellipse2D.Double circle = new Ellipse2D.Double(vertex.x - diameter / 2,
-                vertex.y - diameter / 2,
+        Ellipse2D.Double circle = new Ellipse2D.Double(UAEVertex.x - diameter / 2,
+                UAEVertex.y - diameter / 2,
                 diameter, diameter);
         graphics2D.fill(circle);
     }
 
-    public void drawLine(Graphics graphics, Vertex point1, Vertex point2, Color color) {
+    public void drawLine(Graphics graphics, UAEVertex point1, UAEVertex point2, Color color) {
         graphics.setColor(color);
         graphics.setColor(color);
         Graphics2D graphics2D = (Graphics2D) graphics;

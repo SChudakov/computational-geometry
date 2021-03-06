@@ -1,6 +1,6 @@
 package com.chudakov.simple.ch;
 
-import com.chudakov.uae.impl.Vertex;
+import com.chudakov.uae.impl.UAEVertex;
 
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ public class Point implements Comparable<Point> {
     }
 
 
-    public static double getSlope(Vertex left, Vertex right) {
+    public static double getSlope(UAEVertex left, UAEVertex right) {
         if (right.x - left.x < 0) {
             throw new IllegalArgumentException("invalid positioning of points");
         }
@@ -26,9 +26,9 @@ public class Point implements Comparable<Point> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Vertex vertex = (Vertex) o;
-        return Double.compare(vertex.x, x) == 0 &&
-                Double.compare(vertex.y, y) == 0;
+        UAEVertex UAEVertex = (UAEVertex) o;
+        return Double.compare(UAEVertex.x, x) == 0 &&
+                Double.compare(UAEVertex.y, y) == 0;
     }
 
     @Override

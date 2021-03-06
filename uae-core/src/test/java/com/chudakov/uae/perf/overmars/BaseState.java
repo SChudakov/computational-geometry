@@ -1,7 +1,7 @@
 package com.chudakov.uae.perf.overmars;
 
 import com.chudakov.simple.ch.Point;
-import com.chudakov.uae.impl.Vertex;
+import com.chudakov.uae.impl.UAEVertex;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
@@ -15,7 +15,7 @@ public class BaseState {
     public int size;
 
     public List<Point> points;
-    public List<Vertex> vertices;
+    public List<UAEVertex> vertices;
 
     protected void generatePoints() {
         int upperLimit = 1_000_000;
@@ -24,7 +24,7 @@ public class BaseState {
         for (int i = 0; i < size; i++) {
             double x = (Math.random() /** upperLimit*/);
             double y = (Math.random() /** upperLimit*/);
-            Vertex v = new Vertex(x, y);
+            UAEVertex v = new UAEVertex(x, y);
             points.add(v);
             vertices.add(v);
         }

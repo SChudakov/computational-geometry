@@ -5,7 +5,7 @@ package com.chudakov.visualisation;/*
  */
 
 import com.chudakov.uae.impl.SequentialUAE2D;
-import com.chudakov.uae.impl.Vertex;
+import com.chudakov.uae.impl.UAEVertex;
 import com.chudakov.uae.impl.ConvexHull;
 
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class JFrame extends javax.swing.JFrame {
     private SequentialUAE2D convexHull2D;
-    private List<Vertex> generated;
-    private List<Vertex> convexHull;
+    private List<UAEVertex> generated;
+    private List<UAEVertex> convexHull;
 
     /**
      * Creates new form JFrame
@@ -172,10 +172,10 @@ public class JFrame extends javax.swing.JFrame {
 
     private void buildButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if (generated != null) {
-            List<Vertex> convexHullPoints = new ArrayList<>();
+            List<UAEVertex> convexHullPoints = new ArrayList<>();
             ConvexHull hull = this.convexHull2D.solve(this.generated).getConvexHull();
-            for (Vertex vertex : hull) {
-                convexHullPoints.add(vertex);
+            for (UAEVertex UAEVertex : hull) {
+                convexHullPoints.add(UAEVertex);
             }
             pointsPanel.convexHull = convexHullPoints;
             new Thread(() -> {
@@ -187,10 +187,10 @@ public class JFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
 
-    private List<Vertex> generatePoints(int size, int width, int height) {
-        List<Vertex> result = new ArrayList<>(size);
+    private List<UAEVertex> generatePoints(int size, int width, int height) {
+        List<UAEVertex> result = new ArrayList<>(size);
         for (int i = 0; i < size; ++i) {
-            result.add(new Vertex(
+            result.add(new UAEVertex(
                     (int) (Math.random() * width),
                     (int) (Math.random() * height)
             ));

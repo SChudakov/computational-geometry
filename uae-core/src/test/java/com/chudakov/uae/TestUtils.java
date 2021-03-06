@@ -2,7 +2,7 @@ package com.chudakov.uae;
 
 import com.chudakov.uae.impl.Edge;
 import com.chudakov.uae.impl.UAE2D;
-import com.chudakov.uae.impl.Vertex;
+import com.chudakov.uae.impl.UAEVertex;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 public class TestUtils {
@@ -22,27 +21,27 @@ public class TestUtils {
 
     private static UAE2D uae = new UAE2D();
 
-    public static List<List<Vertex>> readPointsDir(String directory) {
+    public static List<List<UAEVertex>> readPointsDir(String directory) {
         File[] files = new File(directory).listFiles();
         if (files == null) {
             return Collections.emptyList();
         }
 
-        List<List<Vertex>> result = new ArrayList<>(Collections.nCopies(files.length, null));
+        List<List<UAEVertex>> result = new ArrayList<>(Collections.nCopies(files.length, null));
         for (File file : files) {
             String filePath = file.getAbsolutePath();
             String fileName = file.getName();
             int fileIndex = fileIndex(fileName);
 
-            List<Vertex> points = readPointsFile(filePath);
+            List<UAEVertex> points = readPointsFile(filePath);
             result.set(fileIndex, points);
         }
 
         return result;
     }
 
-    public static List<Vertex> readPointsFile(String file) {
-        List<Vertex> result = new ArrayList<>();
+    public static List<UAEVertex> readPointsFile(String file) {
+        List<UAEVertex> result = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -56,7 +55,7 @@ public class TestUtils {
                     throw new RuntimeException("illegal points format: " + line);
                 }
 
-                result.add(new Vertex(Double.parseDouble(coordinates[0]),
+                result.add(new UAEVertex(Double.parseDouble(coordinates[0]),
                         Double.parseDouble(coordinates[1])));
             }
         } catch (IOException e) {
@@ -91,8 +90,8 @@ public class TestUtils {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] coordinates = line.split(" ");
-                Vertex org = new Vertex(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
-                Vertex dest = new Vertex(Double.parseDouble(coordinates[2]), Double.parseDouble(coordinates[3]));
+                UAEVertex org = new UAEVertex(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
+                UAEVertex dest = new UAEVertex(Double.parseDouble(coordinates[2]), Double.parseDouble(coordinates[3]));
                 Edge edge = new Edge(org, dest);
                 result.add(edge);
             }
@@ -109,14 +108,14 @@ public class TestUtils {
             String fileName = fileName(i);
             String filePath = Paths.get(directory, fileName).toString();
 
-            List<Vertex> points = generatePoints(numberOfPoints, random, integerOrDouble);
+            List<UAEVertex> points = generatePoints(numberOfPoints, random, integerOrDouble);
             writePoints(filePath, points);
         }
     }
 
-    public static void writePoints(String filePath, List<Vertex> points) {
+    public static void writePoints(String filePath, List<UAEVertex> points) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Vertex point : points) {
+            for (UAEVertex point : points) {
                 writer.write(String.valueOf(point.x));
                 writer.write(" ");
                 writer.write(String.valueOf(point.y));
@@ -163,8 +162,8 @@ public class TestUtils {
         return Integer.parseInt(fileName);
     }
 
-    private static List<Vertex> generatePoints(int numberOfPoints, Random random, int integerOrDouble) {
-        List<Vertex> result = new ArrayList<>(numberOfPoints);
+    private static List<UAEVertex> generatePoints(int numberOfPoints, Random random, int integerOrDouble) {
+        List<UAEVertex> result = new ArrayList<>(numberOfPoints);
         while (result.size() < numberOfPoints) {
             double x;
             double y;
@@ -175,7 +174,7 @@ public class TestUtils {
                 x = trimDouble(random.nextDouble());
                 y = trimDouble(random.nextDouble());
             }
-            Vertex point = new Vertex(x, y);
+            UAEVertex point = new UAEVertex(x, y);
             result.add(point);
 
             result = uae.precompute(result);

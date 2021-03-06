@@ -1,15 +1,15 @@
 package com.chudakov.uae.impl;
 
 public class QuadEdge {
-    Vertex org;
-    Vertex dest;
+    UAEVertex org;
+    UAEVertex dest;
 
     QuadEdge onext;
     QuadEdge oprev;
 
     QuadEdge sym;
 
-    public QuadEdge(Vertex org, Vertex dest) {
+    public QuadEdge(UAEVertex org, UAEVertex dest) {
         this.org = org;
         this.dest = dest;
     }

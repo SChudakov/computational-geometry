@@ -1,18 +1,18 @@
 package com.chudakov.uae.impl;
 
 public class Edge {
-    Vertex org;
-    Vertex dest;
+    UAEVertex org;
+    UAEVertex dest;
 
-    public Vertex getOrg() {
+    public UAEVertex getOrg() {
         return org;
     }
 
-    public Vertex getDest() {
+    public UAEVertex getDest() {
         return dest;
     }
 
-    public Edge(Vertex org, Vertex dest) {
+    public Edge(UAEVertex org, UAEVertex dest) {
         this.org = org;
         this.dest = dest;
     }

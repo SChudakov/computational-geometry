@@ -20,7 +20,7 @@ public class UAE2DTest {
     @Test
     public void testCH1() {
         double[][] input = new double[][]{{1, 2}, {2, 5}, {3, 1}, {5, 7}, {9, 8}, {12, 1}, {13, 3}};
-        List<Vertex> points = readPoints(input);
+        List<UAEVertex> points = readPoints(input);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
@@ -36,8 +36,8 @@ public class UAE2DTest {
                 {2, 10}, {4, 10}, {6, 10}, {8, 10}};
         double[][] output = new double[][]{{2, 4}, {8, 4}, {2, 10}, {8, 10}};
 
-        List<Vertex> points = readPoints(input);
-        List<Vertex> expected = readPoints(output);
+        List<UAEVertex> points = readPoints(input);
+        List<UAEVertex> expected = readPoints(output);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
@@ -48,8 +48,8 @@ public class UAE2DTest {
     public void testCH3() {
         double[][] input = new double[][]{{1, 1}, {2, 1}, {3, 1}, {4, 1}, {5, 1}, {6, 1}, {7, 1}, {8, 1}};
         double[][] output = new double[][]{{1, 1}, {8, 1}};
-        List<Vertex> points = readPoints(input);
-        List<Vertex> expected = readPoints(output);
+        List<UAEVertex> points = readPoints(input);
+        List<UAEVertex> expected = readPoints(output);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
@@ -60,8 +60,8 @@ public class UAE2DTest {
     public void testCH4() {
         double[][] input = new double[][]{{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6}, {1, 7}, {1, 8}};
         double[][] output = new double[][]{{1, 1}, {1, 8}};
-        List<Vertex> points = readPoints(input);
-        List<Vertex> expected = readPoints(output);
+        List<UAEVertex> points = readPoints(input);
+        List<UAEVertex> expected = readPoints(output);
 
         ConvexHull hull = new SequentialUAE2D().solve(points).convexHull;
 
@@ -73,19 +73,19 @@ public class UAE2DTest {
     public void testDT1() {
         SequentialUAE2D uae = new SequentialUAE2D();
 
-        List<Vertex> input1 = Collections.emptyList();
+        List<UAEVertex> input1 = Collections.emptyList();
         List<Edge> output1 = Collections.emptyList();
         List<Edge> expected1 = DT.convert(uae.solve(input1).e1);
         assertEqualDT(expected1, output1);
 
 
-        List<Vertex> input2 = Collections.singletonList(new Vertex(1, 1));
+        List<UAEVertex> input2 = Collections.singletonList(new UAEVertex(1, 1));
         List<Edge> output2 = Collections.emptyList();
         List<Edge> expected2 = DT.convert(uae.solve(input2).e1);
         assertEqualDT(expected2, output2);
 
 
-        List<Vertex> input3 = Arrays.asList(new Vertex(1, 1), new Vertex(2, 2));
+        List<UAEVertex> input3 = Arrays.asList(new UAEVertex(1, 1), new UAEVertex(2, 2));
         List<Edge> output3 = Arrays.asList(new Edge(input3.get(0), input3.get(1)), new Edge(input3.get(1), input3.get(0)));
         List<Edge> expected3 = DT.convert(uae.solve(input3).e1);
         assertEqualDT(expected3, output3);
@@ -97,14 +97,14 @@ public class UAE2DTest {
 
         double[][] points1 = new double[][]{{1, 1}, {2, 2}, {3, 1}};
         double[][] edges1 = new double[][]{{1, 1, 2, 2}, {2, 2, 3, 1}, {3, 1, 1, 1}};
-        List<Vertex> input1 = readPoints(points1);
+        List<UAEVertex> input1 = readPoints(points1);
         List<Edge> output1 = readEdges(edges1);
         List<Edge> actual1 = DT.convert(uae.solve(input1).e1);
         assertEqualDT(output1, actual1);
 
         double[][] points2 = new double[][]{{1, 1}, {2, 2}, {3, 3}};
         double[][] edges2 = new double[][]{{1, 1, 2, 2}, {2, 2, 3, 3}};
-        List<Vertex> input2 = readPoints(points2);
+        List<UAEVertex> input2 = readPoints(points2);
         List<Edge> output2 = readEdges(edges2);
         List<Edge> actual2 = DT.convert(uae.solve(input2).e1);
         assertEqualDT(output2, actual2);
@@ -116,7 +116,7 @@ public class UAE2DTest {
 
         double[][] points1 = new double[][]{{1, 1}, {2, 4}, {7, 6}, {6, 0}};
         double[][] edges1 = new double[][]{{1, 1, 2, 4}, {1, 1, 6, 0}, {2, 4, 6, 0}, {2, 4, 7, 6}, {7, 6, 6, 0}};
-        List<Vertex> input1 = readPoints(points1);
+        List<UAEVertex> input1 = readPoints(points1);
         List<Edge> output1 = readEdges(edges1);
         List<Edge> actual1 = DT.convert(uae.solve(input1).e1);
         assertEqualDT(output1, actual1);
@@ -126,7 +126,7 @@ public class UAE2DTest {
                 {1, 1, 4, 6}, {1, 1, 4, 3}, {1, 1, 7, 1},
                 {4, 3, 4, 6}, {4, 3, 7, 1},
                 {4, 6, 7, 1}};
-        List<Vertex> input2 = readPoints(points2);
+        List<UAEVertex> input2 = readPoints(points2);
         List<Edge> output2 = readEdges(edges2);
         List<Edge> actual2 = DT.convert(uae.solve(input2).e1);
         assertEqualDT(output2, actual2);
@@ -135,88 +135,88 @@ public class UAE2DTest {
 
     @Test
     public void testRemoveDuplicated() {
-        List<Vertex> points1 = new ArrayList<>();
-        UAE2D.removeDuplicated(points1, Vertex::compareTo);
+        List<UAEVertex> points1 = new ArrayList<>();
+        UAE2D.removeDuplicated(points1, UAEVertex::compareTo);
         assertTrue(points1.isEmpty());
 
-        List<Vertex> points2 = new ArrayList<>();
-        points2.add(new Vertex(1, 1));
-        UAE2D.removeDuplicated(points2, Vertex::compareTo);
+        List<UAEVertex> points2 = new ArrayList<>();
+        points2.add(new UAEVertex(1, 1));
+        UAE2D.removeDuplicated(points2, UAEVertex::compareTo);
         assertEquals(Collections.singletonList(
-                new Vertex(1, 1)
+                new UAEVertex(1, 1)
         ), points2);
 
-        List<Vertex> points3 = new ArrayList<>();
-        points3.add(new Vertex(1, 1));
-        points3.add(new Vertex(1, 1));
-        UAE2D.removeDuplicated(points3, Vertex::compareTo);
+        List<UAEVertex> points3 = new ArrayList<>();
+        points3.add(new UAEVertex(1, 1));
+        points3.add(new UAEVertex(1, 1));
+        UAE2D.removeDuplicated(points3, UAEVertex::compareTo);
         assertEquals(Arrays.asList(
-                new Vertex(1, 1),
-                new Vertex(1, 1)
+                new UAEVertex(1, 1),
+                new UAEVertex(1, 1)
         ), points3);
 
-        List<Vertex> points4 = new ArrayList<>();
-        points4.add(new Vertex(1, 1));
-        points4.add(new Vertex(1, 2));
-        UAE2D.removeDuplicated(points4, Vertex::compareTo);
+        List<UAEVertex> points4 = new ArrayList<>();
+        points4.add(new UAEVertex(1, 1));
+        points4.add(new UAEVertex(1, 2));
+        UAE2D.removeDuplicated(points4, UAEVertex::compareTo);
         assertEquals(Arrays.asList(
-                new Vertex(1, 1),
-                new Vertex(1, 2)
+                new UAEVertex(1, 1),
+                new UAEVertex(1, 2)
         ), points4);
 
 
-        List<Vertex> points5 = new ArrayList<>();
-        points5.add(new Vertex(1, 1));
-        points5.add(new Vertex(1, 1));
-        points5.add(new Vertex(1, 1));
-        UAE2D.removeDuplicated(points5, Vertex::compareTo);
+        List<UAEVertex> points5 = new ArrayList<>();
+        points5.add(new UAEVertex(1, 1));
+        points5.add(new UAEVertex(1, 1));
+        points5.add(new UAEVertex(1, 1));
+        UAE2D.removeDuplicated(points5, UAEVertex::compareTo);
         assertEquals(Arrays.asList(
-                new Vertex(1, 1),
-                new Vertex(1, 1)
+                new UAEVertex(1, 1),
+                new UAEVertex(1, 1)
         ), points5);
 
 
-        List<Vertex> points6 = new ArrayList<>();
-        points6.add(new Vertex(1, 1));
-        points6.add(new Vertex(1, 1));
-        points6.add(new Vertex(1, 1));
-        points6.add(new Vertex(2, 2));
-        points6.add(new Vertex(2, 2));
-        points6.add(new Vertex(2, 2));
-        points6.add(new Vertex(3, 3));
-        points6.add(new Vertex(3, 3));
-        points6.add(new Vertex(4, 4));
-        UAE2D.removeDuplicated(points6, Vertex::compareTo);
+        List<UAEVertex> points6 = new ArrayList<>();
+        points6.add(new UAEVertex(1, 1));
+        points6.add(new UAEVertex(1, 1));
+        points6.add(new UAEVertex(1, 1));
+        points6.add(new UAEVertex(2, 2));
+        points6.add(new UAEVertex(2, 2));
+        points6.add(new UAEVertex(2, 2));
+        points6.add(new UAEVertex(3, 3));
+        points6.add(new UAEVertex(3, 3));
+        points6.add(new UAEVertex(4, 4));
+        UAE2D.removeDuplicated(points6, UAEVertex::compareTo);
         assertEquals(Arrays.asList(
-                new Vertex(1, 1),
-                new Vertex(1, 1),
-                new Vertex(2, 2),
-                new Vertex(2, 2),
-                new Vertex(3, 3),
-                new Vertex(3, 3),
-                new Vertex(4, 4)
+                new UAEVertex(1, 1),
+                new UAEVertex(1, 1),
+                new UAEVertex(2, 2),
+                new UAEVertex(2, 2),
+                new UAEVertex(3, 3),
+                new UAEVertex(3, 3),
+                new UAEVertex(4, 4)
         ), points6);
 
 
-        List<Vertex> points7 = new ArrayList<>();
-        points7.add(new Vertex(1, 1));
-        points7.add(new Vertex(2, 2));
-        points7.add(new Vertex(3, 3));
-        points7.add(new Vertex(3, 3));
-        points7.add(new Vertex(3, 3));
-        points7.add(new Vertex(4, 4));
-        points7.add(new Vertex(5, 5));
-        points7.add(new Vertex(5, 5));
-        points7.add(new Vertex(5, 5));
-        UAE2D.removeDuplicated(points7, Vertex::compareTo);
+        List<UAEVertex> points7 = new ArrayList<>();
+        points7.add(new UAEVertex(1, 1));
+        points7.add(new UAEVertex(2, 2));
+        points7.add(new UAEVertex(3, 3));
+        points7.add(new UAEVertex(3, 3));
+        points7.add(new UAEVertex(3, 3));
+        points7.add(new UAEVertex(4, 4));
+        points7.add(new UAEVertex(5, 5));
+        points7.add(new UAEVertex(5, 5));
+        points7.add(new UAEVertex(5, 5));
+        UAE2D.removeDuplicated(points7, UAEVertex::compareTo);
         assertEquals(Arrays.asList(
-                new Vertex(1, 1),
-                new Vertex(2, 2),
-                new Vertex(3, 3),
-                new Vertex(3, 3),
-                new Vertex(4, 4),
-                new Vertex(5, 5),
-                new Vertex(5, 5)
+                new UAEVertex(1, 1),
+                new UAEVertex(2, 2),
+                new UAEVertex(3, 3),
+                new UAEVertex(3, 3),
+                new UAEVertex(4, 4),
+                new UAEVertex(5, 5),
+                new UAEVertex(5, 5)
         ), points7);
     }
 
@@ -239,8 +239,8 @@ public class UAE2DTest {
         String inputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/100_d/input/348";
         String chDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/100_d/ch/348";
 
-        List<Vertex> input = TestUtils.readPointsFile(inputDir);
-        List<Vertex> expectedCH = TestUtils.readPointsFile(chDir);
+        List<UAEVertex> input = TestUtils.readPointsFile(inputDir);
+        List<UAEVertex> expectedCH = TestUtils.readPointsFile(chDir);
 
         ConvexHull actualCH = new SequentialUAE2D().solve(input).convexHull;
         assertEqualCH(expectedCH, actualCH);
@@ -252,7 +252,7 @@ public class UAE2DTest {
         String outputDir = "/home/semen/drive/java/computational-geometry/src/test/resources/testcases/40/dt/287";
         String path = "/home/semen/drive/python/points-visualization/uaeDT";
 
-        List<Vertex> input = TestUtils.readPointsFile(inputDir);
+        List<UAEVertex> input = TestUtils.readPointsFile(inputDir);
         List<Edge> expectedDT = TestUtils.readEdgesFile(outputDir);
         TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalDT", expectedDT);
 
@@ -262,7 +262,7 @@ public class UAE2DTest {
     }
 
 
-    private void testConvexHull(DaCExecutionSpecifics<List<Vertex>, UAEResult> specifics) {
+    private void testConvexHull(DaCExecutionSpecifics<List<UAEVertex>, UAEResult> specifics) {
         for (int i = 0; i < PointsGenerator.testDirs.length; ++i) {
             String testDir = PointsGenerator.testDirs[i];
             String inputDir = testDir + PointsGenerator.subdirs[0];
@@ -271,8 +271,8 @@ public class UAE2DTest {
 
             System.out.println(inputDir);
 
-            List<List<Vertex>> inputs = TestUtils.readPointsDir(inputDir);
-            List<List<Vertex>> expectedCHs = TestUtils.readPointsDir(chDir);
+            List<List<UAEVertex>> inputs = TestUtils.readPointsDir(inputDir);
+            List<List<UAEVertex>> expectedCHs = TestUtils.readPointsDir(chDir);
             List<List<Edge>> expectedDTs = TestUtils.readEdgesDir(dtDir);
 
             for (int j = 0; j < inputs.size(); ++j) {
@@ -282,8 +282,8 @@ public class UAE2DTest {
                 }
                 System.out.println(j);
 
-                List<Vertex> input = inputs.get(j);
-                List<Vertex> expectedCH = expectedCHs.get(j);
+                List<UAEVertex> input = inputs.get(j);
+                List<UAEVertex> expectedCH = expectedCHs.get(j);
                 List<Edge> expectedDT = expectedDTs.get(j);
 
                 System.out.println(input);
@@ -298,12 +298,12 @@ public class UAE2DTest {
         }
     }
 
-    private void assertEqualCH(List<Vertex> expectedCH, ConvexHull actualCH) {
-        List<Vertex> actualList = CH.convert(actualCH);
+    private void assertEqualCH(List<UAEVertex> expectedCH, ConvexHull actualCH) {
+        List<UAEVertex> actualList = CH.convert(actualCH);
         actualList = removeCollinear(actualList);
 
-        Set<Vertex> expectedPoints = new HashSet<>(expectedCH);
-        Set<Vertex> actualPoints = new HashSet<>(actualList);
+        Set<UAEVertex> expectedPoints = new HashSet<>(expectedCH);
+        Set<UAEVertex> actualPoints = new HashSet<>(actualList);
 
         assertEquals(expectedPoints, actualPoints);
     }
@@ -325,10 +325,10 @@ public class UAE2DTest {
     }
 
 
-    private List<Vertex> readPoints(double[][] points) {
-        List<Vertex> result = new ArrayList<>(points.length);
+    private List<UAEVertex> readPoints(double[][] points) {
+        List<UAEVertex> result = new ArrayList<>(points.length);
         for (double[] point : points) {
-            result.add(new Vertex(point[0], point[1]));
+            result.add(new UAEVertex(point[0], point[1]));
         }
         return result;
     }
@@ -336,8 +336,8 @@ public class UAE2DTest {
     private List<Edge> readEdges(double[][] points) {
         List<Edge> result = new ArrayList<>(points.length);
         for (double[] point : points) {
-            Vertex org = new Vertex(point[0], point[1]);
-            Vertex dest = new Vertex(point[2], point[3]);
+            UAEVertex org = new UAEVertex(point[0], point[1]);
+            UAEVertex dest = new UAEVertex(point[2], point[3]);
             result.add(new Edge(org, dest));
             result.add(new Edge(dest, org));
         }
@@ -345,26 +345,26 @@ public class UAE2DTest {
     }
 
 
-    private List<Vertex> removeCollinear(List<Vertex> points) {
+    private List<UAEVertex> removeCollinear(List<UAEVertex> points) {
         boolean[] removed = new boolean[points.size()];
         for (int i = 0; i + 2 < points.size(); ++i) {
-            Vertex a = points.get(i);
-            Vertex b = points.get(i + 1);
-            Vertex c = points.get(i + 2);
+            UAEVertex a = points.get(i);
+            UAEVertex b = points.get(i + 1);
+            UAEVertex c = points.get(i + 2);
             if (a.x >= b.x && b.x >= c.x) {
-                Vertex tmp = a;
+                UAEVertex tmp = a;
                 a = c;
                 c = tmp;
             }
             if (a.x <= b.x && b.x <= c.x) {
-                double slope1 = Vertex.getSlope(a, b);
-                double slope2 = Vertex.getSlope(b, c);
+                double slope1 = UAEVertex.getSlope(a, b);
+                double slope2 = UAEVertex.getSlope(b, c);
                 if (slope1 == slope2) {
                     removed[i + 1] = true;
                 }
             }
         }
-        List<Vertex> result = new ArrayList<>();
+        List<UAEVertex> result = new ArrayList<>();
         for (int i = 0; i < points.size(); ++i) {
             if (!removed[i]) {
                 result.add(points.get(i));

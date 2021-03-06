@@ -1,7 +1,7 @@
 package com.chudakov.visualisation;
 
 import com.chudakov.uae.impl.SequentialUAE2D;
-import com.chudakov.uae.impl.Vertex;
+import com.chudakov.uae.impl.UAEVertex;
 import com.chudakov.uae.impl.ConvexHull;
 
 import java.awt.BorderLayout;
@@ -21,7 +21,7 @@ public class Main {
                 int width = panel.getWidth();
                 int height = panel.getHeight();
 
-                List<Vertex> generated = generatePoints(numOfPoints, width, height);
+                List<UAEVertex> generated = generatePoints(numOfPoints, width, height);
                 panel.generated = generated;
                 panel.convexHull = null;
                 panel.paintComponent(panel.getGraphics());
@@ -34,9 +34,9 @@ public class Main {
 
                 SequentialUAE2D convexHull = new SequentialUAE2D();
                 ConvexHull hull = convexHull.solve(generated).getConvexHull();
-                List<Vertex> convex = new ArrayList<>();
-                for (Vertex vertex : hull) {
-                    convex.add(vertex);
+                List<UAEVertex> convex = new ArrayList<>();
+                for (UAEVertex UAEVertex : hull) {
+                    convex.add(UAEVertex);
                 }
                 panel.convexHull = convex;
                 panel.paintComponent(panel.getGraphics());
@@ -49,10 +49,10 @@ public class Main {
         }).run();
     }
 
-    private static List<Vertex> generatePoints(int size, int width, int height) {
-        List<Vertex> result = new ArrayList<>(size);
+    private static List<UAEVertex> generatePoints(int size, int width, int height) {
+        List<UAEVertex> result = new ArrayList<>(size);
         for (int i = 0; i < size; ++i) {
-            result.add(new Vertex(
+            result.add(new UAEVertex(
                     (int) (Math.random() * width),
                     (int) (Math.random() * height)
             ));
