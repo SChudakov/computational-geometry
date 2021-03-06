@@ -1,14 +1,15 @@
 package com.chudakov.uae.impl;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConcatenableQueueTest {
 
@@ -79,10 +80,12 @@ public class ConcatenableQueueTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCutLeft1() {
-        ConcatenableQueue<Integer> queue = new ConcatenableQueue<>();
-        queue.cutLeft(1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            ConcatenableQueue<Integer> queue = new ConcatenableQueue<>();
+            queue.cutLeft(1);
+        });
     }
 
     @Test
@@ -145,10 +148,12 @@ public class ConcatenableQueueTest {
         CQUtil.assertSameFields(queue2.root, null, node2_3, node2_6, leaf2_12, 4, false);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCutRight1() {
-        ConcatenableQueue<Integer> queue = new ConcatenableQueue<>();
-        queue.cutRight(1);
+        assertThrows(IllegalArgumentException.class, () -> {
+            ConcatenableQueue<Integer> queue = new ConcatenableQueue<>();
+            queue.cutRight(1);
+        });
     }
 
     @Test
