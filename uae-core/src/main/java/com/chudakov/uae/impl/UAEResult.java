@@ -1,5 +1,8 @@
 package com.chudakov.uae.impl;
 
+import lombok.Getter;
+
+@Getter
 public class UAEResult {
     ConvexHull convexHull;
 

@@ -1,18 +1,14 @@
 package com.chudakov.simple.ch;
 
 import com.chudakov.uae.impl.UAEVertex;
+import lombok.AllArgsConstructor;
 
 import java.util.Objects;
 
+@AllArgsConstructor
 public class Point implements Comparable<Point> {
     public final double x;
     public final double y;
-
-    public Point(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-
 
     public static double getSlope(UAEVertex left, UAEVertex right) {
         if (right.x - left.x < 0) {
@@ -20,7 +16,6 @@ public class Point implements Comparable<Point> {
         }
         return (right.y - left.y) / (right.x - left.x);
     }
-
 
     @Override
     public boolean equals(Object o) {

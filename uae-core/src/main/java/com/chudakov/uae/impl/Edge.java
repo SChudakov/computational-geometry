@@ -1,16 +1,11 @@
 package com.chudakov.uae.impl;
 
+import lombok.Getter;
+
+@Getter
 public class Edge {
     UAEVertex org;
     UAEVertex dest;
-
-    public UAEVertex getOrg() {
-        return org;
-    }
-
-    public UAEVertex getDest() {
-        return dest;
-    }
 
     public Edge(UAEVertex org, UAEVertex dest) {
         this.org = org;
@@ -37,6 +32,6 @@ public class Edge {
 
     @Override
     public String toString() {
-        return "[" + org + " - " + dest + ']';
+        return "[" + org + " -> " + dest + ']';
     }
 }
