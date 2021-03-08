@@ -41,6 +41,112 @@ public class DT {
     }
 
 
+    static Pair<QuadEdge, QuadEdge> baseCaseDT(List<UAEVertex> points) {
+        if (points.size() == 0 || points.size() == 1) {
+            return Pair.of(null, null);
+        }
+
+        if (points.size() == 2) {
+            QuadEdge e = DT.makeEdge(points.get(0), points.get(1));
+            return Pair.of(e, e.sym);
+        }
+
+        // points size = 3
+        UAEVertex p1 = points.get(0);
+        UAEVertex p2 = points.get(1);
+        UAEVertex p3 = points.get(2);
+
+        QuadEdge a = DT.makeEdge(p1, p2);
+        QuadEdge b = DT.makeEdge(p2, p3);
+        DT.splice(a.sym, b);
+
+        // Close the triangle.
+        if (DT.rightOf(p3, a)) {
+            DT.connect(b, a);
+            return Pair.of(a, b.sym);
+        } else if (DT.leftOf(p3, a)) {
+            QuadEdge c = DT.connect(b, a);
+            return Pair.of(c.sym, c);
+        } else { // the three points are collinear
+            return Pair.of(a, b.sym);
+        }
+    }
+
+    static Pair<QuadEdge, QuadEdge> mergeDT(UAEResult left, UAEResult right) {
+        QuadEdge ldo = left.e1;
+        QuadEdge ldi = left.e2;
+
+        QuadEdge rdi = right.e1;
+        QuadEdge rdo = right.e2;
+
+        // Compute the upper common tangent of L and R.
+        while (true) {
+            if (DT.rightOf(rdi.org, ldi)) {
+                ldi = ldi.sym.onext;
+            } else if (DT.leftOf(ldi.org, rdi)) {
+                rdi = rdi.sym.oprev;
+            } else {
+                break;
+            }
+        }
+
+        // Create a first cross edge base from rdi.org to ldi.org.
+        QuadEdge base = DT.connect(ldi.sym, rdi);
+
+        // Adjust ldo and rdo
+        if (ldi.org.x == ldo.org.x && ldi.org.y == ldo.org.y) {
+            ldo = base;
+        }
+        if (rdi.org.x == rdo.org.x && rdi.org.y == rdo.org.y) {
+            rdo = base.sym;
+        }
+
+        // Merge
+        while (true) {
+            // Locate the first R and L points to be encountered by the diving bubble.
+            QuadEdge rcand = base.sym.onext;
+            QuadEdge lcand = base.oprev;
+
+            // If both lcand and rcand are invalid, then base is the lower common tangent.
+            boolean v_rcand = DT.rightOf(rcand.dest, base);
+            boolean v_lcand = DT.rightOf(lcand.dest, base);
+            if (!(v_rcand || v_lcand)) {
+                break;
+            }
+
+            // Delete R edges out of base.dest that fail the circle test.
+            if (v_rcand) {
+                while (DT.rightOf(rcand.onext.dest, base) &&
+                        DT.inCircle(base.dest, base.org, rcand.dest, rcand.onext.dest)) {
+                    QuadEdge t = rcand.onext;
+                    DT.deleteEdge(rcand);
+                    rcand = t;
+                }
+            }
+            // Symmetrically, delete L edges.
+            if (v_lcand) {
+                while (DT.rightOf(lcand.oprev.dest, base) &&
+                        DT.inCircle(base.dest, base.org, lcand.dest, lcand.oprev.dest)) {
+                    QuadEdge t = lcand.oprev;
+                    DT.deleteEdge(lcand);
+                    lcand = t;
+                }
+            }
+            // The next cross edge is to be connected to either lcand.dest or rcand.dest.
+            // If both are valid, then choose the appropriate one using the in_circle test.
+            if (!v_rcand ||
+                    (v_lcand && DT.inCircle(rcand.dest, rcand.org, lcand.org, lcand.dest))) {
+                // Add cross edge base from rcand.dest to base.dest.
+                base = DT.connect(lcand, base.sym);
+            } else {
+                // Add cross edge base from base.org to lcand.dest
+                base = DT.connect(base.sym, rcand.sym);
+            }
+        }
+        return Pair.of(ldo, rdo);
+    }
+
+
     static QuadEdge makeEdge(UAEVertex org, UAEVertex dest) {
         QuadEdge edge = new QuadEdge(org, dest);
         QuadEdge symEdge = new QuadEdge(dest, org);

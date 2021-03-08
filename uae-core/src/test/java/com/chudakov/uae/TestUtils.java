@@ -67,7 +67,7 @@ public class TestUtils {
 
     public static List<List<Edge>> readEdgesDir(String directory) {
         File[] files = new File(directory).listFiles();
-        if(files == null){
+        if (files == null) {
             return Collections.emptyList();
         }
 
@@ -198,6 +198,17 @@ public class TestUtils {
         for (String s : file.list()) {
             String absolutePath = Paths.get(directory, s).toString();
             new File(absolutePath).delete();
+        }
+    }
+
+    public static void createDirIfNotExists(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            System.out.println("Creating directory: " + path);
+            boolean success = file.mkdirs();
+            if (!success) {
+                throw new RuntimeException("failed to create directory: " + path);
+            }
         }
     }
 }

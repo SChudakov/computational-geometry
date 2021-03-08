@@ -23,6 +23,98 @@ public class CH {
     }
 
 
+    static ConvexHull baseCaseCH(List<UAEVertex> points) {
+        int size = points.size();
+
+        ConcatenableQueue<UAEVertex> upper = new ConcatenableQueue<>();
+        ConcatenableQueue<UAEVertex> lower = new ConcatenableQueue<>();
+        if (size == 1) {
+            upper.add(points.get(0));
+        } else if (size == 2) {
+            if (points.get(0).y <= points.get(1).y) {
+                lower.add(points.get(0));
+                upper.add(points.get(1));
+            } else {
+                lower.add(points.get(1));
+                upper.add(points.get(0));
+            }
+        } else if (size == 3) {
+            UAEVertex first = points.get(0);
+            UAEVertex second = points.get(1);
+            UAEVertex third = points.get(2);
+            double leftSlope = UAEVertex.getSlope(first, second);
+            double rightSlope = UAEVertex.getSlope(second, third);
+            if (leftSlope < rightSlope) {
+                if (first.y < second.y) {
+                    upper.add(first);
+                    upper.add(third);
+                    lower.add(second);
+                } else {
+                    upper.add(first);
+                    upper.add(third);
+                    lower.add(second);
+                }
+            } else {//leftSlope > rightSlope
+                if (first.y < second.y) {
+                    upper.add(second);
+                    upper.add(third);
+                    lower.add(first);
+                } else {
+                    upper.add(first);
+                    upper.add(second);
+                    lower.add(third);
+                }
+            }
+        }
+
+        ConvexSubhull upperSubhull = new ConvexSubhull(upper, ConvexSubhull.Type.UPPER);
+        ConvexSubhull lowerSubhull = new ConvexSubhull(lower, ConvexSubhull.Type.LOWER);
+
+        return new ConvexHull(upperSubhull, lowerSubhull);
+    }
+
+    static ConvexHull mergeCH(UAEResult left, UAEResult right) {
+        ConcatenableQueue<UAEVertex> leftUpper = left.convexHull.upperSubhull.subhull;
+        ConcatenableQueue<UAEVertex> leftLower = left.convexHull.lowerSubhull.subhull;
+        ConcatenableQueue<UAEVertex> rightUpper = right.convexHull.upperSubhull.subhull;
+        ConcatenableQueue<UAEVertex> rightLower = right.convexHull.lowerSubhull.subhull;
+
+        // 1. move utmost points up and compute upper tangent
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p1 = CH.moveUtmostPointsUp(leftUpper, leftLower);
+        leftUpper = p1.getLeft();
+        leftLower = p1.getRight();
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p2 = CH.moveUtmostPointsUp(rightUpper, rightLower);
+        rightUpper = p2.getLeft();
+        rightLower = p2.getRight();
+        Pair<CQVertex<UAEVertex>, CQVertex<UAEVertex>> upperTangent = CH.tangent(leftUpper, rightUpper, CH::getUpperTangentCase);
+
+        // 2. move utmost points down and compute lower tangent
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p3 = CH.moveUtmostPointsDown(leftUpper, leftLower);
+        leftUpper = p3.getLeft();
+        leftLower = p3.getRight();
+        Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p4 = CH.moveUtmostPointsDown(rightUpper, rightLower);
+        rightUpper = p4.getLeft();
+        rightLower = p4.getRight();
+        Pair<CQVertex<UAEVertex>, CQVertex<UAEVertex>> lowerTangent = CH.tangent(leftLower, rightLower, CH::getLowerTangentCase);
+
+        // 4. cut convex hull w.r.t the tangents
+        CutData data = CH.cutSubhulls(leftUpper, leftLower, rightUpper, rightLower, upperTangent, lowerTangent);
+        leftUpper = data.leftUpper;
+        leftLower = data.leftLower;
+        rightUpper = data.rightUpper;
+        rightLower = data.rightLower;
+
+        // 5. concatenate upper and lower queue
+        ConcatenableQueue<UAEVertex> upperResult = ConcatenableQueue.concatenate(leftUpper, rightUpper);
+        ConcatenableQueue<UAEVertex> lowerResult = ConcatenableQueue.concatenate(leftLower, rightLower);
+
+        // 6. create sub-hulls and convex hull
+        ConvexSubhull upperSubhull = new ConvexSubhull(upperResult, ConvexSubhull.Type.UPPER);
+        ConvexSubhull lowerSubhull = new ConvexSubhull(lowerResult, ConvexSubhull.Type.LOWER);
+        return new ConvexHull(upperSubhull, lowerSubhull);
+    }
+
+
     static CutData cutSubhulls(ConcatenableQueue<UAEVertex> leftUpper,
                                ConcatenableQueue<UAEVertex> leftLower,
                                ConcatenableQueue<UAEVertex> rightUpper,

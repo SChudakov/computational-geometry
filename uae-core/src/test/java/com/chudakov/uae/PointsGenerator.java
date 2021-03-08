@@ -1,17 +1,17 @@
 package com.chudakov.uae;
 
 public class PointsGenerator {
-    private static final String root = "./src/test/resources/testcases/";
+    private static final String TESTCASES_ROOT = "./uae-core/src/test/resources/testcases/";
     public static final String[] testDirs = {
-            root + "5/",
-            root + "10/",
-            root + "10_d/",
-            root + "20/",
-            root + "20_d/",
-            root + "40/",
-            root + "40_d/",
-            root + "100/",
-            root + "100_d/",
+            TESTCASES_ROOT + "5/",
+            TESTCASES_ROOT + "10/",
+            TESTCASES_ROOT + "10_d/",
+            TESTCASES_ROOT + "20/",
+            TESTCASES_ROOT + "20_d/",
+            TESTCASES_ROOT + "40/",
+            TESTCASES_ROOT + "40_d/",
+            TESTCASES_ROOT + "100/",
+            TESTCASES_ROOT + "100_d/",
     };
     public static final String[] subdirs = {
             "input/",
@@ -19,15 +19,15 @@ public class PointsGenerator {
             "dt/"
     };
     private static final int[][] filesData = {
-            {1000, 5, 0},
-            {1000, 10, 0},
-            {1000, 10, 1},
-            {1000, 20, 0},
-            {1000, 20, 1},
-            {1000, 40, 0},
-            {1000, 40, 1},
-            {1000, 100, 0},
-            {1000, 100, 1}
+            {10, 5, 0},
+            {10, 10, 0},
+            {10, 10, 1},
+            {10, 20, 0},
+            {10, 20, 1},
+            {10, 40, 0},
+            {10, 40, 1},
+            {10, 100, 0},
+            {10, 100, 1}
     };
 
     public static void main(String[] args) {
@@ -36,6 +36,10 @@ public class PointsGenerator {
             String inputDir = testDir + subdirs[0];
             String chDir = testDir + subdirs[1];
             String dtDir = testDir + subdirs[2];
+
+            TestUtils.createDirIfNotExists(inputDir);
+            TestUtils.createDirIfNotExists(chDir);
+            TestUtils.createDirIfNotExists(dtDir);
 
             TestUtils.cleanDirectory(inputDir);
             TestUtils.cleanDirectory(chDir);
