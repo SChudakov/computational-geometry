@@ -1,7 +1,9 @@
 package com.chudakov.uae.impl;
 
 
+import com.chudakov.simple.ch.Point;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,12 +13,12 @@ import java.util.Set;
 
 public class DT {
 
-    public static List<Edge> convert(QuadEdge quadEdge) {
+    public static List<UAEEdge> convert(QuadEdge quadEdge) {
         if (quadEdge == null) {
             return Collections.emptyList();
         }
 
-        List<Edge> result = new ArrayList<>();
+        List<UAEEdge> result = new ArrayList<>();
         Set<UAEVertex> visited = new HashSet<>();
 
         dfs(quadEdge, visited, result);
@@ -24,17 +26,17 @@ public class DT {
         return result;
     }
 
-    private static void dfs(QuadEdge quadEdge, Set<UAEVertex> visited, List<Edge> result) {
+    private static void dfs(QuadEdge quadEdge, Set<UAEVertex> visited, List<UAEEdge> result) {
         if (visited.contains(quadEdge.org)) {
             return;
         }
         visited.add(quadEdge.org);
-        result.add(new Edge(quadEdge.org, quadEdge.dest));
+        result.add(new UAEEdge(quadEdge.org, quadEdge.dest));
         dfs(quadEdge.sym, visited, result);
 
         QuadEdge it = quadEdge.onext;
         while (!it.equals(quadEdge)) {
-            result.add(new Edge(it.org, it.dest));
+            result.add(new UAEEdge(it.org, it.dest));
             dfs(it.sym, visited, result);
             it = it.onext;
         }
@@ -48,6 +50,7 @@ public class DT {
 
         if (points.size() == 2) {
             QuadEdge e = DT.makeEdge(points.get(0), points.get(1));
+            setDualEdge(e);
             return Pair.of(e, e.sym);
         }
 
@@ -62,14 +65,193 @@ public class DT {
 
         // Close the triangle.
         if (DT.rightOf(p3, a)) {
-            DT.connect(b, a);
+            QuadEdge c = DT.connect(b, a);
+            setDualEdges(a, b, c);
             return Pair.of(a, b.sym);
         } else if (DT.leftOf(p3, a)) {
             QuadEdge c = DT.connect(b, a);
+            setDualEdges(a, b, c);
             return Pair.of(c.sym, c);
         } else { // the three points are collinear
+            setDualEdge(a);
+            setDualEdge(b);
             return Pair.of(a, b.sym);
         }
+    }
+
+    static Point middle(QuadEdge edge) {
+        return middle(edge.org, edge.dest);
+    }
+
+    static Point middle(Point a, Point b) {
+        double x = (a.x + b.x) / 2;
+        double y = (a.y + b.y) / 2;
+        return new Point(x, y);
+    }
+
+    static void setDualEdge(QuadEdge edge, Point dualOrg, Point dualDest) {
+        edge.dualOrg = dualOrg;
+        edge.dualDest = dualDest;
+        edge.sym.dualOrg = dualOrg;
+        edge.sym.dualDest = dualDest;
+    }
+
+    static void setDualEdge(QuadEdge a) {
+        Point middle = middle(a);
+        setDualEdge(a, middle, middle);
+    }
+
+    static void setDualEdgeOnDelete(QuadEdge delete, QuadEdge b, QuadEdge c) {
+        Point center = circumCenter(delete, b);
+
+        // set dual edge for b
+        if (b.dualOrg.toleranceEquals(center)) {
+            setDualEdge(b, middle(b), b.dualDest);
+        } else if (b.dualDest.toleranceEquals(center)) {
+            setDualEdge(b, b.dualOrg, middle(b));
+        } else {
+            throw new RuntimeException();
+        }
+
+        // set dual edge for c
+        if (c.dualOrg.toleranceEquals(center)) {
+            setDualEdge(c, middle(c), c.dualDest);
+        } else if (c.dualDest.toleranceEquals(center)) {
+            setDualEdge(c, c.dualOrg, middle(c));
+        } else {
+            throw new RuntimeException();
+        }
+    }
+
+    static Triple<Point, Point, Point> trianglePoints(QuadEdge a, QuadEdge b) {
+        Point ap = a.org;
+        Point bp = a.dest;
+        Point cp;
+        if (b.org.toleranceEquals(ap) || b.org.toleranceEquals(bp)) {
+            cp = b.dest;
+        } else {
+            cp = b.org;
+        }
+        return Triple.of(ap, bp, cp);
+    }
+
+    public static boolean outOf(Point a, Point b, Point o, Point p) {
+        boolean first = ccw(a, b, o);
+        boolean second = ccw(a, b, p);
+        return (!first && second) || (first && !second);
+    }
+
+    static Point third(QuadEdge a, QuadEdge b) {
+        if (b.org.toleranceEquals(a.org) || b.org.toleranceEquals(a.dest)) {
+            return b.dest;
+        } else {
+            return b.org;
+        }
+    }
+
+    static void setDualEdges(QuadEdge a, QuadEdge b, QuadEdge c) {
+        Point centre = circumCenter(a, b);
+
+        Point aMiddle = middle(a);
+        if (outOf(a.org, a.dest, third(a, b), centre)) {
+            setDualEdge(a, centre, centre);
+        } else {
+            setDualEdge(a, centre, aMiddle);
+        }
+
+        Point bMiddle = middle(b);
+        if (outOf(b.org, b.dest, third(b, a), centre)) {
+            setDualEdge(b, centre, centre);
+        } else {
+            setDualEdge(b, centre, bMiddle);
+        }
+
+        Point cMiddle = middle(c);
+        if (outOf(c.org, c.dest, third(c, a), centre)) {
+            setDualEdge(c, centre, centre);
+        } else {
+            setDualEdge(c, centre, cMiddle);
+        }
+    }
+
+    static Point mergeSetDualEdges(QuadEdge base, QuadEdge nextBase, QuadEdge c, Point prev) {
+        Point center = circumCenter(base, nextBase);
+
+        // set dual edges for base
+        if (outOf(base.org, base.dest, third(base, nextBase), center)) {
+            if (base.dualOrg == null && base.dualDest == null) {
+                setDualEdge(base, center, center);
+            } else {
+                setDualEdge(base, center, prev);
+            }
+        } else {
+            setDualEdge(base, center, prev);
+        }
+
+        // set dual edges for c
+        if (outOf(c.org, c.dest, third(c, base), center)) {
+            if (c.dualOrg.toleranceEquals(middle(c)) && c.dualDest.toleranceEquals(middle(c))) {
+                setDualEdge(c, center, center);
+            } else if (c.dualOrg.toleranceEquals(middle(c))) {
+                setDualEdge(c, center, c.dualDest);
+            } else if (c.dualDest.toleranceEquals(middle(c))) {
+                setDualEdge(c, center, c.dualOrg);
+            } else {
+                if (!c.dualOrg.toleranceEquals(c.dualDest)) {
+                    throw new RuntimeException();
+                }
+                setDualEdge(c, center, c.dualOrg);
+            }
+        } else {
+            if (c.dualOrg.toleranceEquals(middle(c)) && c.dualDest.toleranceEquals(middle(c))) {
+                setDualEdge(c, center, middle(c));
+            } else if (c.dualOrg.toleranceEquals(middle(c))) {
+                setDualEdge(c, center, c.dualDest);
+            } else if (c.dualDest.toleranceEquals(middle(c))) {
+                setDualEdge(c, center, c.dualOrg);
+            } else {
+                if (!c.dualOrg.toleranceEquals(c.dualDest)) {
+                    throw new RuntimeException();
+                }
+                setDualEdge(c, center, c.dualOrg);
+            }
+        }
+
+        // set dual edges for next base
+        if (outOf(nextBase.org, nextBase.dest, third(nextBase, base), center)) {
+            setDualEdge(nextBase, center, center);
+        } else {
+            setDualEdge(nextBase, center, middle(nextBase));
+        }
+
+        return center;
+    }
+
+    static Point circumCenter(QuadEdge a, QuadEdge b) {
+        Triple<Point, Point, Point> points = trianglePoints(a, b);
+        return circumCenter(points.getLeft(), points.getMiddle(), points.getRight());
+    }
+
+    static Point circumCenter(Point p0, Point p1, Point p2) {
+        double xl = p0.x;
+        double yl = p0.y;
+        double xk = p1.x;
+        double yk = p1.y;
+        double xm = p2.x;
+        double ym = p2.y;
+
+        double xlk = xl - xk;
+        double ylk = yl - yk;
+        double xmk = xm - xk;
+        double ymk = ym - yk;
+        double det = xlk * ymk - xmk * ylk;
+
+        double detinv = 0.5 / det;
+        double rlksq = xlk * xlk + ylk * ylk;
+        double rmksq = xmk * xmk + ymk * ymk;
+        double xcc = detinv * (rlksq * ymk - rmksq * ylk);
+        double ycc = detinv * (xlk * rmksq - xmk * rlksq);
+        return new Point(xcc + xk, ycc + yk);
     }
 
     static Pair<QuadEdge, QuadEdge> mergeDT(UAEResult left, UAEResult right) {
@@ -92,6 +274,7 @@ public class DT {
 
         // Create a first cross edge base from rdi.org to ldi.org.
         QuadEdge base = DT.connect(ldi.sym, rdi);
+        Point p = middle(base);
 
         // Adjust ldo and rdo
         if (ldi.org.x == ldo.org.x && ldi.org.y == ldo.org.y) {
@@ -118,6 +301,7 @@ public class DT {
             if (v_rcand) {
                 while (DT.rightOf(rcand.onext.dest, base) &&
                         DT.inCircle(base.dest, base.org, rcand.dest, rcand.onext.dest)) {
+                    setDualEdgeOnDelete(rcand, rcand.onext, rcand.sym.oprev);
                     QuadEdge t = rcand.onext;
                     DT.deleteEdge(rcand);
                     rcand = t;
@@ -127,6 +311,7 @@ public class DT {
             if (v_lcand) {
                 while (DT.rightOf(lcand.oprev.dest, base) &&
                         DT.inCircle(base.dest, base.org, lcand.dest, lcand.oprev.dest)) {
+                    setDualEdgeOnDelete(lcand, lcand.oprev, lcand.sym.onext);
                     QuadEdge t = lcand.oprev;
                     DT.deleteEdge(lcand);
                     lcand = t;
@@ -134,18 +319,26 @@ public class DT {
             }
             // The next cross edge is to be connected to either lcand.dest or rcand.dest.
             // If both are valid, then choose the appropriate one using the in_circle test.
+            QuadEdge nextBase;
             if (!v_rcand ||
                     (v_lcand && DT.inCircle(rcand.dest, rcand.org, lcand.org, lcand.dest))) {
                 // Add cross edge base from rcand.dest to base.dest.
-                base = DT.connect(lcand, base.sym);
+                nextBase = DT.connect(lcand, base.sym);
+                p = mergeSetDualEdges(base, nextBase, lcand, p);
             } else {
                 // Add cross edge base from base.org to lcand.dest
-                base = DT.connect(base.sym, rcand.sym);
+                nextBase = DT.connect(base.sym, rcand.sym);
+                p = mergeSetDualEdges(base, nextBase, rcand, p);
             }
+            base = nextBase;
         }
         return Pair.of(ldo, rdo);
     }
 
+    public static boolean ccw(Point a, Point b, Point c) {
+        double area2 = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+        return !(area2 <= 0);
+    }
 
     static QuadEdge makeEdge(UAEVertex org, UAEVertex dest) {
         QuadEdge edge = new QuadEdge(org, dest);

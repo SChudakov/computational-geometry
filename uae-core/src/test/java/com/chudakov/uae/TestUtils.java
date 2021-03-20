@@ -1,6 +1,6 @@
 package com.chudakov.uae;
 
-import com.chudakov.uae.impl.Edge;
+import com.chudakov.uae.impl.UAEEdge;
 import com.chudakov.uae.impl.UAE2D;
 import com.chudakov.uae.impl.UAEVertex;
 
@@ -65,35 +65,35 @@ public class TestUtils {
         return result;
     }
 
-    public static List<List<Edge>> readEdgesDir(String directory) {
+    public static List<List<UAEEdge>> readEdgesDir(String directory) {
         File[] files = new File(directory).listFiles();
         if (files == null) {
             return Collections.emptyList();
         }
 
-        List<List<Edge>> result = new ArrayList<>(Collections.nCopies(files.length, null));
+        List<List<UAEEdge>> result = new ArrayList<>(Collections.nCopies(files.length, null));
         for (File file : files) {
             String filePath = file.getAbsolutePath();
             String fileName = file.getName();
             int fileIndex = fileIndex(fileName);
 
-            List<Edge> edges = readEdgesFile(filePath);
-            result.set(fileIndex, edges);
+            List<UAEEdge> UAEEdges = readEdgesFile(filePath);
+            result.set(fileIndex, UAEEdges);
         }
 
         return result;
     }
 
-    public static List<Edge> readEdgesFile(String file) {
-        List<Edge> result = new ArrayList<>();
+    public static List<UAEEdge> readEdgesFile(String file) {
+        List<UAEEdge> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] coordinates = line.split(" ");
                 UAEVertex org = new UAEVertex(Double.parseDouble(coordinates[0]), Double.parseDouble(coordinates[1]));
                 UAEVertex dest = new UAEVertex(Double.parseDouble(coordinates[2]), Double.parseDouble(coordinates[3]));
-                Edge edge = new Edge(org, dest);
-                result.add(edge);
+                UAEEdge UAEEdge = new UAEEdge(org, dest);
+                result.add(UAEEdge);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -126,27 +126,27 @@ public class TestUtils {
         }
     }
 
-    public static void writeEdgesDir(String directory, List<List<Edge>> edges) {
+    public static void writeEdgesDir(String directory, List<List<UAEEdge>> edges) {
         for (int i = 0; i < edges.size(); ++i) {
             String fileName = fileName(i);
             String filePath = Paths.get(directory, fileName).toString();
 
-            List<Edge> es = edges.get(i);
+            List<UAEEdge> es = edges.get(i);
             writeEdgesFile(filePath, es);
         }
     }
 
 
-    public static void writeEdgesFile(String file, List<Edge> edges) {
+    public static void writeEdgesFile(String file, List<UAEEdge> UAEEdges) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (Edge edge : edges) {
-                writer.write(String.valueOf(edge.getOrg().x));
+            for (UAEEdge UAEEdge : UAEEdges) {
+                writer.write(String.valueOf(UAEEdge.getOrg().x));
                 writer.write(' ');
-                writer.write(String.valueOf(edge.getOrg().y));
+                writer.write(String.valueOf(UAEEdge.getOrg().y));
                 writer.write(' ');
-                writer.write(String.valueOf(edge.getDest().x));
+                writer.write(String.valueOf(UAEEdge.getDest().x));
                 writer.write(' ');
-                writer.write(String.valueOf(edge.getDest().y));
+                writer.write(String.valueOf(UAEEdge.getDest().y));
                 writer.write('\n');
             }
         } catch (IOException e) {

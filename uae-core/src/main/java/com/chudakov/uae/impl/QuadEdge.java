@@ -1,8 +1,11 @@
 package com.chudakov.uae.impl;
 
+import com.chudakov.simple.ch.Point;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class QuadEdge {
     UAEVertex org;
     UAEVertex dest;
@@ -11,6 +14,9 @@ public class QuadEdge {
     QuadEdge oprev;
 
     QuadEdge sym;
+
+    Point dualOrg;
+    Point dualDest;
 
     public QuadEdge(UAEVertex org, UAEVertex dest) {
         this.org = org;

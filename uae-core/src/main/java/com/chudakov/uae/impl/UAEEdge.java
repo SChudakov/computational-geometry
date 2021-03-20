@@ -3,11 +3,11 @@ package com.chudakov.uae.impl;
 import lombok.Getter;
 
 @Getter
-public class Edge {
+public class UAEEdge {
     UAEVertex org;
     UAEVertex dest;
 
-    public Edge(UAEVertex org, UAEVertex dest) {
+    public UAEEdge(UAEVertex org, UAEVertex dest) {
         this.org = org;
         this.dest = dest;
     }
@@ -17,10 +17,10 @@ public class Edge {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Edge edge = (Edge) o;
+        UAEEdge UAEEdge = (UAEEdge) o;
 
-        if (!org.equals(edge.org)) return false;
-        return dest.equals(edge.dest);
+        if (!org.equals(UAEEdge.org)) return false;
+        return dest.equals(UAEEdge.dest);
     }
 
     @Override
