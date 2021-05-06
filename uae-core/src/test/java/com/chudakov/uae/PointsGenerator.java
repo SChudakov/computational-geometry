@@ -1,7 +1,9 @@
 package com.chudakov.uae;
 
+import java.nio.file.Paths;
+
 public class PointsGenerator {
-    private static final String TESTCASES_ROOT = "./uae-core/src/test/resources/testcases/";
+    private static final String TESTCASES_ROOT = "/home/semen/drive/university/extra/3_masters-diploma-work/computational-geometry/uae-core/src/test/resources/testcases/";
     public static final String[] testDirs = {
             TESTCASES_ROOT + "5/",
             TESTCASES_ROOT + "10/",
@@ -16,34 +18,38 @@ public class PointsGenerator {
     public static final String[] subdirs = {
             "input/",
             "ch/",
-            "dt/"
+            "dt/",
+            "vd/"
     };
     private static final int[][] filesData = {
-            {10, 5, 0},
-            {10, 10, 0},
-            {10, 10, 1},
-            {10, 20, 0},
-            {10, 20, 1},
-            {10, 40, 0},
-            {10, 40, 1},
-            {10, 100, 0},
-            {10, 100, 1}
+            {100, 5, 0},
+            {100, 10, 0},
+            {100, 10, 1},
+            {100, 20, 0},
+            {100, 20, 1},
+            {100, 40, 0},
+            {100, 40, 1},
+            {100, 100, 0},
+            {100, 1000, 1}
     };
 
     public static void main(String[] args) {
         for (int i = 0; i < testDirs.length; ++i) {
             String testDir = testDirs[i];
-            String inputDir = testDir + subdirs[0];
-            String chDir = testDir + subdirs[1];
-            String dtDir = testDir + subdirs[2];
+            String inputDir = Paths.get(testDir, subdirs[0]).toString();
+            String chDir = Paths.get(testDir, subdirs[1]).toString();
+            String dtDir = Paths.get(testDir, subdirs[2]).toString();
+            String vdDir = Paths.get(testDir, subdirs[3]).toString();
 
             TestUtils.createDirIfNotExists(inputDir);
             TestUtils.createDirIfNotExists(chDir);
             TestUtils.createDirIfNotExists(dtDir);
+            TestUtils.createDirIfNotExists(vdDir);
 
             TestUtils.cleanDirectory(inputDir);
             TestUtils.cleanDirectory(chDir);
             TestUtils.cleanDirectory(dtDir);
+            TestUtils.cleanDirectory(vdDir);
 
             int numberOfFiles = filesData[i][0];
             int numberOfPoints = filesData[i][1];

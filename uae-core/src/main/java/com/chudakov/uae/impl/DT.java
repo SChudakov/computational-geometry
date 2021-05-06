@@ -197,10 +197,10 @@ public class DT {
             } else if (c.dualDest.toleranceEquals(middle(c))) {
                 setDualEdge(c, center, c.dualOrg);
             } else {
-                if (!c.dualOrg.toleranceEquals(c.dualDest)) {
-                    throw new RuntimeException();
-                }
-                setDualEdge(c, center, c.dualOrg);
+//                if (!c.dualOrg.toleranceEquals(c.dualDest)) {
+//                    throw new RuntimeException();
+//                }
+                setDualEdge(c, center, c.dualDest);
             }
         } else {
             if (c.dualOrg.toleranceEquals(middle(c)) && c.dualDest.toleranceEquals(middle(c))) {
@@ -210,9 +210,9 @@ public class DT {
             } else if (c.dualDest.toleranceEquals(middle(c))) {
                 setDualEdge(c, center, c.dualOrg);
             } else {
-                if (!c.dualOrg.toleranceEquals(c.dualDest)) {
-                    throw new RuntimeException();
-                }
+//                if (!c.dualOrg.toleranceEquals(c.dualDest)) {
+//                    throw new RuntimeException();
+//                }
                 setDualEdge(c, center, c.dualOrg);
             }
         }

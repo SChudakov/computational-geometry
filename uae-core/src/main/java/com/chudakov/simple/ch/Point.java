@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 public class Point implements Comparable<Point> {
-    private static final double DEFAULT_EPSILON = 1e-10;
+    private static final double DEFAULT_EPSILON = 1e-6;
 
     public final double x;
     public final double y;

@@ -1,7 +1,7 @@
 package com.chudakov.uae;
 
-import com.chudakov.uae.impl.UAEEdge;
 import com.chudakov.uae.impl.UAE2D;
+import com.chudakov.uae.impl.UAEEdge;
 import com.chudakov.uae.impl.UAEVertex;
 
 import java.io.BufferedReader;
@@ -171,8 +171,8 @@ public class TestUtils {
                 x = random.nextInt(1000);
                 y = random.nextInt(1000);
             } else {
-                x = trimDouble(random.nextDouble());
-                y = trimDouble(random.nextDouble());
+                x = trimDouble(random.nextDouble()*1000);
+                y = trimDouble(random.nextDouble()*1000);
             }
             UAEVertex point = new UAEVertex(x, y);
             result.add(point);
@@ -197,7 +197,10 @@ public class TestUtils {
         }
         for (String s : file.list()) {
             String absolutePath = Paths.get(directory, s).toString();
-            new File(absolutePath).delete();
+            boolean success = new File(absolutePath).delete();
+            if (!success) {
+                throw new RuntimeException("Failed to delete file: " + absolutePath);
+            }
         }
     }
 
