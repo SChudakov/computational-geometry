@@ -1,5 +1,6 @@
 package com.chudakov.uae.impl;
 
+import com.chudakov.simple.ch.Point;
 import com.chudakov.uae.PointsGenerator;
 import com.chudakov.uae.TestUtils;
 import com.chudakov.uae.core.DaCExecutionSpecifics;
@@ -11,9 +12,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class UAE2DTest {
 
@@ -75,20 +79,20 @@ public class UAE2DTest {
 
         List<UAEVertex> input1 = Collections.emptyList();
         List<UAEEdge> output1 = Collections.emptyList();
-        List<UAEEdge> expected1 = DT.convert(uae.solve(input1).e1);
-        assertEqualEdgesLists(expected1, output1);
+        List<UAEEdge> expected1 = UAEConverter.convert(uae.solve(input1)).delaunayTriangulation;
+        assertEqualEdgesLists(expected1, output1, this::edgesEqual);
 
 
         List<UAEVertex> input2 = Collections.singletonList(new UAEVertex(1, 1));
         List<UAEEdge> output2 = Collections.emptyList();
-        List<UAEEdge> expected2 = DT.convert(uae.solve(input2).e1);
-        assertEqualEdgesLists(expected2, output2);
+        List<UAEEdge> expected2 = UAEConverter.convert(uae.solve(input2)).delaunayTriangulation;
+        assertEqualEdgesLists(expected2, output2, this::edgesEqual);
 
 
         List<UAEVertex> input3 = Arrays.asList(new UAEVertex(1, 1), new UAEVertex(2, 2));
         List<UAEEdge> output3 = Arrays.asList(new UAEEdge(input3.get(0), input3.get(1)), new UAEEdge(input3.get(1), input3.get(0)));
-        List<UAEEdge> expected3 = DT.convert(uae.solve(input3).e1);
-        assertEqualEdgesLists(expected3, output3);
+        List<UAEEdge> expected3 = UAEConverter.convert(uae.solve(input3)).delaunayTriangulation;
+        assertEqualEdgesLists(expected3, output3, this::edgesEqual);
     }
 
     @Test
@@ -99,15 +103,15 @@ public class UAE2DTest {
         double[][] edges1 = new double[][]{{1, 1, 2, 2}, {2, 2, 3, 1}, {3, 1, 1, 1}};
         List<UAEVertex> input1 = readPoints(points1);
         List<UAEEdge> output1 = readEdges(edges1);
-        List<UAEEdge> actual1 = DT.convert(uae.solve(input1).e1);
-        assertEqualEdgesLists(output1, actual1);
+        List<UAEEdge> actual1 = UAEConverter.convert(uae.solve(input1)).delaunayTriangulation;
+        assertEqualEdgesLists(output1, actual1, this::edgesEqual);
 
         double[][] points2 = new double[][]{{1, 1}, {2, 2}, {3, 3}};
         double[][] edges2 = new double[][]{{1, 1, 2, 2}, {2, 2, 3, 3}};
         List<UAEVertex> input2 = readPoints(points2);
         List<UAEEdge> output2 = readEdges(edges2);
-        List<UAEEdge> actual2 = DT.convert(uae.solve(input2).e1);
-        assertEqualEdgesLists(output2, actual2);
+        List<UAEEdge> actual2 = UAEConverter.convert(uae.solve(input2)).delaunayTriangulation;
+        assertEqualEdgesLists(output2, actual2, this::edgesEqual);
     }
 
     @Test
@@ -118,8 +122,8 @@ public class UAE2DTest {
         double[][] edges1 = new double[][]{{1, 1, 2, 4}, {1, 1, 6, 0}, {2, 4, 6, 0}, {2, 4, 7, 6}, {7, 6, 6, 0}};
         List<UAEVertex> input1 = readPoints(points1);
         List<UAEEdge> output1 = readEdges(edges1);
-        List<UAEEdge> actual1 = DT.convert(uae.solve(input1).e1);
-        assertEqualEdgesLists(output1, actual1);
+        List<UAEEdge> actual1 = UAEConverter.convert(uae.solve(input1)).delaunayTriangulation;
+        assertEqualEdgesLists(output1, actual1, this::edgesEqual);
 
         double[][] points2 = new double[][]{{1, 1}, {4, 3}, {4, 6}, {7, 1}};
         double[][] edges2 = new double[][]{
@@ -128,8 +132,8 @@ public class UAE2DTest {
                 {4, 6, 7, 1}};
         List<UAEVertex> input2 = readPoints(points2);
         List<UAEEdge> output2 = readEdges(edges2);
-        List<UAEEdge> actual2 = DT.convert(uae.solve(input2).e1);
-        assertEqualEdgesLists(output2, actual2);
+        List<UAEEdge> actual2 = UAEConverter.convert(uae.solve(input2)).delaunayTriangulation;
+        assertEqualEdgesLists(output2, actual2, this::edgesEqual);
     }
 
 
@@ -256,9 +260,9 @@ public class UAE2DTest {
         List<UAEEdge> expectedDT = TestUtils.readEdgesFile(outputDir);
         TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalDT", expectedDT);
 
-        List<UAEEdge> actualDT = DT.convert(new SequentialUAE2D().solve(input).e1);
+        List<UAEEdge> actualDT = UAEConverter.convert(new SequentialUAE2D().solve(input)).delaunayTriangulation;
         TestUtils.writeEdgesFile(path, actualDT);
-        assertEqualEdgesLists(expectedDT, actualDT);
+        assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
     }
 
     @Test
@@ -274,24 +278,15 @@ public class UAE2DTest {
         TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalDT", expectedDT);
         TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalVD", expectedVD);
 
-        UAEResult result = new SequentialUAE2D().solve(points);
-        List<UAEEdge> actualDT = DT.convert(result.e1);
-        List<UAEEdge> actualVD = VD.convert(result.e1);
+        UAEOutput output = UAEConverter.convert(new SequentialUAE2D().solve(points));
+        List<UAEEdge> actualDT = output.delaunayTriangulation;
+        List<UAEEdge> actualVD = output.voronoiDiagram;
 
         TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/uaeDT", actualDT);
         TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/uaeVD", actualVD);
 
-        assertEqualEdgesLists(expectedDT, actualDT);
-        assertEqualEdgesLists(expectedVD, actualVD);
-    }
-
-    private boolean edgesEqual(UAEEdge e1, UAEEdge e2) {
-        return (pointsEqual(e1.org, e2.org) && pointsEqual(e1.dest, e2.dest))
-                || (pointsEqual(e1.org, e2.dest) && pointsEqual(e1.dest, e2.org));
-    }
-
-    private boolean pointsEqual(UAEVertex v1, UAEVertex v2) {
-        return Math.abs(v1.x - v2.y) < 1e-3 && Math.abs(v1.y - v2.y) < 1e-3;
+//        assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
+//        assertEqualEdgesLists(expectedVD, actualVD, this::edgesEqual);
     }
 
 
@@ -322,16 +317,16 @@ public class UAE2DTest {
                 List<UAEEdge> expectedDT = expectedDTs.get(j);
                 List<UAEEdge> expectedVD = expectedVDs.get(j);
 
-                System.out.println(input);
 
-                UAEResult result = specifics.solve(input);
-                ConvexHull actualCH = result.convexHull;
-                List<UAEEdge> actualDT = DT.convert(result.e1);
-                List<UAEEdge> actualVD = VD.convert(result.e1);
+                UAEOutput output = UAEConverter.convert(specifics.solve(input));
+                List<UAEVertex> actualCH = output.convexHull;
+                List<UAEEdge> actualDT = output.delaunayTriangulation;
+                List<UAEEdge> actualVD = output.voronoiDiagram;
+                expectedVD = expectedVD.stream().filter(e->!e.org.equals(e.dest)).collect(Collectors.toList());
 
-                assertEqualCH(expectedCH, actualCH);
-//                assertEqualEdgesLists(expectedDT, actualDT);
-                assertEqualEdgesLists(expectedVD, actualVD);
+                assertEqualEdgesLists(expectedCH, actualCH, Point::equals);
+                assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
+                assertEqualEdgesLists(expectedVD, actualVD, this::edgesEqual);
             }
         }
     }
@@ -346,27 +341,32 @@ public class UAE2DTest {
         assertEquals(expectedPoints, actualPoints);
     }
 
-//    private void assertEqualDT(List<UAEEdge> expectedDT, List<UAEEdge> actualDT) {
-//        Set<UAEEdge> expectedDTSet = new HashSet<>(expectedDT);
-//        Set<UAEEdge> actualDTSet = new HashSet<>(actualDT);
-//        assertEquals(expectedDTSet, actualDTSet);
-//    }
-
-    private void assertEqualEdgesLists(List<UAEEdge> expected, List<UAEEdge> actual) {
-        for (UAEEdge expectedEdge : expected) {
+    private <T> void assertEqualEdgesLists(List<T> expected, List<T> actual, BiFunction<T, T, Boolean> equals) {
+        for (T expectedT : expected) {
             boolean found = false;
-            for (UAEEdge actualEdge : actual) {
-                if (edgesEqual(expectedEdge, actualEdge)) {
+            for (T actualT : actual) {
+                if (equals.apply(expectedT, actualT)) {
                     found = true;
                 }
             }
-            if (found) {
-                System.out.println(expected + " is not contained in the actual set of edges");
+            if (!found) {
+                System.out.println("Expected: " + expected);
+                System.out.println("Actual: " + actual);
+                fail(expectedT + " is not contained in the actual set of edges");
             }
         }
     }
 
-    private Set<UAEEdge> rest(Set<UAEEdge> of, Set<UAEEdge> in) {
+    private boolean edgesEqual(UAEEdge e1, UAEEdge e2) {
+        return (pointsEqual(e1.org, e2.org) && pointsEqual(e1.dest, e2.dest))
+                || (pointsEqual(e1.org, e2.dest) && pointsEqual(e1.dest, e2.org));
+    }
+
+    private boolean pointsEqual(UAEVertex v1, UAEVertex v2) {
+        return Math.abs(v1.x - v2.x) < 1 && Math.abs(v1.y - v2.y) < 1;
+    }
+
+    private Set<UAEEdge> restOfSet(Set<UAEEdge> of, Set<UAEEdge> in) {
         Set<UAEEdge> result = new HashSet<>();
         for (UAEEdge UAEEdge : of) {
             if (!in.contains(UAEEdge)) {
@@ -395,7 +395,6 @@ public class UAE2DTest {
         }
         return result;
     }
-
 
     private List<UAEVertex> removeCollinear(List<UAEVertex> points) {
         boolean[] removed = new boolean[points.size()];

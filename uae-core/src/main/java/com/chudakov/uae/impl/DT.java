@@ -12,37 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 public class DT {
-
-    public static List<UAEEdge> convert(QuadEdge quadEdge) {
-        if (quadEdge == null) {
-            return Collections.emptyList();
-        }
-
-        List<UAEEdge> result = new ArrayList<>();
-        Set<UAEVertex> visited = new HashSet<>();
-
-        dfs(quadEdge, visited, result);
-
-        return result;
-    }
-
-    private static void dfs(QuadEdge quadEdge, Set<UAEVertex> visited, List<UAEEdge> result) {
-        if (visited.contains(quadEdge.org)) {
-            return;
-        }
-        visited.add(quadEdge.org);
-        result.add(new UAEEdge(quadEdge.org, quadEdge.dest));
-        dfs(quadEdge.sym, visited, result);
-
-        QuadEdge it = quadEdge.onext;
-        while (!it.equals(quadEdge)) {
-            result.add(new UAEEdge(it.org, it.dest));
-            dfs(it.sym, visited, result);
-            it = it.onext;
-        }
-    }
-
-
     static Pair<QuadEdge, QuadEdge> baseCaseDT(List<UAEVertex> points) {
         if (points.size() == 0 || points.size() == 1) {
             return Pair.of(null, null);
