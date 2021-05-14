@@ -1,8 +1,9 @@
 package com.chudakov.uae.impl;
 
 import java.util.Iterator;
+import static com.chudakov.uae.impl.ConcatenableQueue.CQVertex;
 
-public class ConvexHull implements Iterable<UAEVertex> {
+public class ConvexHull implements Iterable<CQVertex<UAEVertex>> {
     enum Position {LEFT, RIGHT}
 
     final ConvexSubhull upperSubhull;
@@ -22,7 +23,7 @@ public class ConvexHull implements Iterable<UAEVertex> {
 
     @Override
     public String toString() {
-        Iterator<UAEVertex> iterator = this.iterator();
+        Iterator<CQVertex<UAEVertex>> iterator = this.iterator();
         if (!iterator.hasNext()) {
             return "[]";
         } else {
@@ -30,7 +31,7 @@ public class ConvexHull implements Iterable<UAEVertex> {
             result.append('[');
 
             while (true) {
-                UAEVertex element = iterator.next();
+                UAEVertex element = iterator.next().value;
                 result.append(element);
                 if (!iterator.hasNext()) {
                     return result.append(']').toString();
@@ -42,13 +43,13 @@ public class ConvexHull implements Iterable<UAEVertex> {
     }
 
     @Override
-    public Iterator<UAEVertex> iterator() {
+    public Iterator<CQVertex<UAEVertex>> iterator() {
         return new CHIterator();
     }
 
 
-    private class CHIterator implements Iterator<UAEVertex> {
-        Iterator<UAEVertex> iterator;
+    private class CHIterator implements Iterator<CQVertex<UAEVertex>> {
+        Iterator<CQVertex<UAEVertex>> iterator;
         ConvexSubhull.Type hullType;
 
         CHIterator() {
@@ -64,7 +65,7 @@ public class ConvexHull implements Iterable<UAEVertex> {
         }
 
         @Override
-        public UAEVertex next() {
+        public CQVertex<UAEVertex> next() {
             changeIteratorIfNeeded();
             return iterator.next();
         }

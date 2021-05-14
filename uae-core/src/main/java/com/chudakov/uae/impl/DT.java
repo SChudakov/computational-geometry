@@ -49,13 +49,7 @@ public class DT {
     }
 
     static Point middle(QuadEdge edge) {
-        return middle(edge.org, edge.dest);
-    }
-
-    static Point middle(Point a, Point b) {
-        double x = (a.x + b.x) / 2;
-        double y = (a.y + b.y) / 2;
-        return new Point(x, y);
+        return Point.middle(edge.org, edge.dest);
     }
 
     static void setDualEdge(QuadEdge edge, Point dualOrg, Point dualDest) {
@@ -432,15 +426,11 @@ public class DT {
     }
 
     private static double angle(QuadEdge e1, QuadEdge e2) {
-        double a = distance(e1.org, e1.dest);
-        double b = distance(e2.org, e2.dest);
-        double c = distance(e1.dest, e2.dest);
+        double a = Point.distance(e1.org, e1.dest);
+        double b = Point.distance(e2.org, e2.dest);
+        double c = Point.distance(e1.dest, e2.dest);
 
         double cosAlpha = (a * a + b * b + c * c) / 2 * a * b;
         return Math.acos(cosAlpha);
-    }
-
-    private static double distance(UAEVertex a, UAEVertex b) {
-        return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
     }
 }

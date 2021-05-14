@@ -77,8 +77,10 @@ public class UAE2D implements DaCAlgorithm<List<UAEVertex>, UAEResult> {
     @Override
     public UAEResult solveBaseCase(List<UAEVertex> points) {
         ConvexHull convexHull = CH.baseCaseCH(points);
-        Pair<QuadEdge, QuadEdge> p = DT.baseCaseDT(points);
-        return new UAEResult(convexHull, p.getLeft(), p.getRight());
+        Pair<QuadEdge, QuadEdge> delaunayTriangulation = DT.baseCaseDT(points);
+        Pair<UAEVertex, UAEVertex> closestPair = CP.baseCaseCP(points);
+        return new UAEResult(convexHull, delaunayTriangulation.getLeft(),
+                delaunayTriangulation.getRight(), closestPair);
     }
 
 
@@ -93,7 +95,8 @@ public class UAE2D implements DaCAlgorithm<List<UAEVertex>, UAEResult> {
     public UAEResult merge(UAEResult left, UAEResult right) {
         ConvexHull mergedCH = CH.mergeCH(left, right);
         Pair<QuadEdge, QuadEdge> mergedDT = DT.mergeDT(left, right);
-        return new UAEResult(mergedCH, mergedDT.getLeft(), mergedDT.getRight());
+        Pair<UAEVertex, UAEVertex> closestPair = CP.mergeCP(left, right);
+        return new UAEResult(mergedCH, mergedDT.getLeft(), mergedDT.getRight(), closestPair);
     }
 
 

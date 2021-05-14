@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class ConcatenableQueue<T> implements Iterable<T> {
+public class ConcatenableQueue<T> implements Iterable<ConcatenableQueue.CQVertex<T>> {
 
     CQVertex<T> root;
 
@@ -288,16 +288,16 @@ public class ConcatenableQueue<T> implements Iterable<T> {
 
 
     @Override
-    public Iterator<T> iterator() {
+    public Iterator<CQVertex<T>> iterator() {
         return new CQIterator();
     }
 
-    public Iterator<T> reverseIterator() {
+    public Iterator<CQVertex<T>> reverseIterator() {
         return new CQReverseIterator();
     }
 
 
-    private class CQIterator implements Iterator<T> {
+    private class CQIterator implements Iterator<CQVertex<T>> {
         private CQVertex<T> nextNode;
 
         CQIterator() {
@@ -310,17 +310,17 @@ public class ConcatenableQueue<T> implements Iterable<T> {
         }
 
         @Override
-        public T next() {
+        public CQVertex<T> next() {
             if (nextNode == null) {
                 throw new NoSuchElementException();
             }
-            T result = nextNode.value;
+            CQVertex<T> result = nextNode;
             nextNode = nextNode.rSon;
             return result;
         }
     }
 
-    private class CQReverseIterator implements Iterator<T> {
+    private class CQReverseIterator implements Iterator<CQVertex<T>> {
         private CQVertex<T> nextNode;
 
         CQReverseIterator() {
@@ -333,11 +333,11 @@ public class ConcatenableQueue<T> implements Iterable<T> {
         }
 
         @Override
-        public T next() {
+        public CQVertex<T> next() {
             if (nextNode == null) {
                 throw new NoSuchElementException();
             }
-            T result = nextNode.value;
+            CQVertex<T> result = nextNode;
             nextNode = nextNode.lSon;
             return result;
         }

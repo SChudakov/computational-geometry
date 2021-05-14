@@ -12,11 +12,21 @@ public class Point implements Comparable<Point> {
     public final double x;
     public final double y;
 
-    public static double getSlope(UAEVertex left, UAEVertex right) {
+    public static double getSlope(Point left, Point right) {
         if (right.x - left.x < 0) {
             throw new IllegalArgumentException("invalid positioning of points");
         }
         return (right.y - left.y) / (right.x - left.x);
+    }
+
+    public static double distance(Point a, Point b) {
+        return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+    }
+
+    public static Point middle(Point a, Point b) {
+        double x = (a.x + b.x) / 2;
+        double y = (a.y + b.y) / 2;
+        return new Point(x, y);
     }
 
     public boolean toleranceEquals(Object o) {
@@ -33,6 +43,7 @@ public class Point implements Comparable<Point> {
         }
         return a - b;
     }
+
 
     @Override
     public boolean equals(Object o) {
