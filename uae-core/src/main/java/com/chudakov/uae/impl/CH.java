@@ -16,8 +16,8 @@ public class CH {
 
     public static List<UAEVertex> convert(ConvexHull convexHull) {
         List<UAEVertex> result = new ArrayList<>();
-        for (UAEVertex point : convexHull) {
-            result.add(point);
+        for (CQVertex<UAEVertex> cqVertex : convexHull) {
+            result.add(cqVertex.value);
         }
         return result;
     }

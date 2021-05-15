@@ -34,7 +34,7 @@ public class CP {
     public static Pair<UAEVertex, UAEVertex> mergeCP(final UAEResult left, final UAEResult right) {
         UAEVertex rightmostLeft = getRightmost(left.convexHull);
         UAEVertex leftmostRight = getLeftmost(right.convexHull);
-        Point middle = Point.middle(rightmostLeft, leftmostRight);
+        double middleLine = (rightmostLeft.x + leftmostRight.x) / 2;
         double leftDistance = Point.distance(left.closestPair.getLeft(), left.closestPair.getRight());
         double rightDistance = Point.distance(right.closestPair.getLeft(), right.closestPair.getRight());
         double minimumDistance = Math.min(leftDistance, rightDistance);
@@ -46,8 +46,8 @@ public class CP {
         }
 
         List<UAEVertex> strip = new ArrayList<>();
-        getPointsCloserThan(left.convexHull, middle.x, minimumDistance, strip);
-        getPointsCloserThan(right.convexHull, middle.x, minimumDistance, strip);
+        getPointsCloserThan(left.convexHull, middleLine, minimumDistance, strip);
+        getPointsCloserThan(right.convexHull, middleLine, minimumDistance, strip);
 
         Pair<UAEVertex, UAEVertex> stripClosesPair = getClosestInString(strip, minimumDistance);
         if (stripClosesPair == null) {
@@ -76,8 +76,7 @@ public class CP {
         return result;
     }
 
-    private static void getPointsCloserThan(ConvexHull ch, double fromX,
-                                            double distance, List<UAEVertex> result) {
+    private static void getPointsCloserThan(ConvexHull ch, double fromX, double distance, List<UAEVertex> result) {
         for (CQVertex<UAEVertex> cqVertex : ch) {
             if (Math.abs(fromX - cqVertex.value.x) <= distance) {
                 result.add(cqVertex.value);

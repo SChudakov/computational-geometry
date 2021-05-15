@@ -19,7 +19,8 @@ public class PointsGenerator {
             "input/",
             "ch/",
             "dt/",
-            "vd/"
+            "vd/",
+            "cp/"
     };
     private static final int[][] filesData = {
             {100, 5, 0},
@@ -30,26 +31,19 @@ public class PointsGenerator {
             {100, 40, 0},
             {100, 40, 1},
             {100, 100, 0},
-            {100, 1000, 1}
+            {100, 100, 1}
     };
 
     public static void main(String[] args) {
         for (int i = 0; i < testDirs.length; ++i) {
             String testDir = testDirs[i];
             String inputDir = Paths.get(testDir, subdirs[0]).toString();
-            String chDir = Paths.get(testDir, subdirs[1]).toString();
-            String dtDir = Paths.get(testDir, subdirs[2]).toString();
-            String vdDir = Paths.get(testDir, subdirs[3]).toString();
 
-            TestUtils.createDirIfNotExists(inputDir);
-            TestUtils.createDirIfNotExists(chDir);
-            TestUtils.createDirIfNotExists(dtDir);
-            TestUtils.createDirIfNotExists(vdDir);
-
-            TestUtils.cleanDirectory(inputDir);
-            TestUtils.cleanDirectory(chDir);
-            TestUtils.cleanDirectory(dtDir);
-            TestUtils.cleanDirectory(vdDir);
+            for (int j = 0; j < subdirs.length; ++j) {
+                String problemDir = Paths.get(testDir, subdirs[j]).toString();
+                TestUtils.createDirIfNotExists(problemDir);
+                TestUtils.cleanDirectory(problemDir);
+            }
 
             int numberOfFiles = filesData[i][0];
             int numberOfPoints = filesData[i][1];

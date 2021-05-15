@@ -8,17 +8,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import static com.chudakov.uae.impl.ConcatenableQueue.CQVertex;
+
 
 public class UAEConverter {
     public static UAEOutput convert(final UAEResult uaeResult) {
         Pair<List<UAEEdge>, List<UAEEdge>> dtAndVd = convertUAE(uaeResult.e1);
-        return new UAEOutput(getConvexHull(uaeResult), dtAndVd.getLeft(), dtAndVd.getRight());
+        return new UAEOutput(getConvexHull(uaeResult), dtAndVd.getLeft(), dtAndVd.getRight(), uaeResult.closestPair);
     }
 
     private static List<UAEVertex> getConvexHull(final UAEResult uaeResult) {
         List<UAEVertex> ch = new ArrayList<>();
-        for (UAEVertex uaeVertex : uaeResult.convexHull) {
-            ch.add(uaeVertex);
+        for (CQVertex<UAEVertex> cqVertex : uaeResult.convexHull) {
+            ch.add(cqVertex.value);
         }
         return ch;
     }

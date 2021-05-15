@@ -265,28 +265,48 @@ public class UAE2DTest {
         assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
     }
 
+//    @Test
+//    public void helperVD() {
+//        String pointFile = "./src/test/resources/testcases/100/input/11";
+//        String dtFile = "./src/test/resources/testcases/100/dt/11";
+//        String vdFile = "./src/test/resources/testcases/100/vd/11";
+//
+//        List<UAEVertex> points = TestUtils.readPointsFile(pointFile);
+//        List<UAEEdge> expectedDT = TestUtils.readEdgesFile(dtFile);
+//        List<UAEEdge> expectedVD = TestUtils.readEdgesFile(vdFile);
+//        TestUtils.writePoints("/home/semen/drive/python/points-visualization/points", points);
+//        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalDT", expectedDT);
+//        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalVD", expectedVD);
+//
+//        UAEOutput output = UAEConverter.convert(new SequentialUAE2D().solve(points));
+//        List<UAEEdge> actualDT = output.delaunayTriangulation;
+//        List<UAEEdge> actualVD = output.voronoiDiagram;
+//
+//        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/uaeDT", actualDT);
+//        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/uaeVD", actualVD);
+//
+////        assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
+////        assertEqualEdgesLists(expectedVD, actualVD, this::edgesEqual);
+//    }
+
     @Test
-    public void helperVD() {
-        String pointFile = "./src/test/resources/testcases/100/input/11";
-        String dtFile = "./src/test/resources/testcases/100/dt/11";
-        String vdFile = "./src/test/resources/testcases/100/vd/11";
+    public void helperCP() {
+        String testDir = "10";
+        String testIndex = "31";
+        String pointFile = String.format("./src/test/resources/testcases/%s/input/%s", testDir, testIndex);
+        String cpFile = String.format("./src/test/resources/testcases/%s/cp/%s", testDir, testIndex);
 
         List<UAEVertex> points = TestUtils.readPointsFile(pointFile);
-        List<UAEEdge> expectedDT = TestUtils.readEdgesFile(dtFile);
-        List<UAEEdge> expectedVD = TestUtils.readEdgesFile(vdFile);
-        TestUtils.writePoints("/home/semen/drive/python/points-visualization/points", points);
-        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalDT", expectedDT);
-        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/cgalVD", expectedVD);
+        List<UAEVertex> expectedCP = TestUtils.readPointsFile(cpFile);
 
         UAEOutput output = UAEConverter.convert(new SequentialUAE2D().solve(points));
-        List<UAEEdge> actualDT = output.delaunayTriangulation;
-        List<UAEEdge> actualVD = output.voronoiDiagram;
+        List<UAEVertex> actualCP = Arrays.asList(output.closesPair.getLeft(), output.closesPair.getRight());
 
-        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/uaeDT", actualDT);
-        TestUtils.writeEdgesFile("/home/semen/drive/python/points-visualization/uaeVD", actualVD);
+        TestUtils.writePoints("/home/semen/drive/python/points-visualization/points", points);
+        TestUtils.writePoints("/home/semen/drive/python/points-visualization/cgalCP", expectedCP);
+        TestUtils.writePoints("/home/semen/drive/python/points-visualization/uaeCP", actualCP);
 
-//        assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
-//        assertEqualEdgesLists(expectedVD, actualVD, this::edgesEqual);
+        assertEqualEdgesLists(expectedCP, actualCP, Point::equals);
     }
 
 
@@ -297,6 +317,7 @@ public class UAE2DTest {
             String chDir = testDir + PointsGenerator.subdirs[1];
             String dtDir = testDir + PointsGenerator.subdirs[2];
             String vdDir = testDir + PointsGenerator.subdirs[3];
+            String cpDir = testDir + PointsGenerator.subdirs[4];
 
             System.out.println(inputDir);
 
@@ -304,6 +325,7 @@ public class UAE2DTest {
             List<List<UAEVertex>> expectedCHs = TestUtils.readPointsDir(chDir);
             List<List<UAEEdge>> expectedDTs = TestUtils.readEdgesDir(dtDir);
             List<List<UAEEdge>> expectedVDs = TestUtils.readEdgesDir(vdDir);
+            List<List<UAEVertex>> expectedCPs = TestUtils.readPointsDir(cpDir);
 
             for (int j = 0; j < inputs.size(); ++j) {
                 // TODO: find why collinear points are present in expected test case
@@ -316,17 +338,20 @@ public class UAE2DTest {
                 List<UAEVertex> expectedCH = expectedCHs.get(j);
                 List<UAEEdge> expectedDT = expectedDTs.get(j);
                 List<UAEEdge> expectedVD = expectedVDs.get(j);
+                expectedVD = expectedVD.stream().filter(e -> !e.org.equals(e.dest)).collect(Collectors.toList());
+                List<UAEVertex> expectedCP = expectedCPs.get(j);
 
 
                 UAEOutput output = UAEConverter.convert(specifics.solve(input));
                 List<UAEVertex> actualCH = output.convexHull;
                 List<UAEEdge> actualDT = output.delaunayTriangulation;
                 List<UAEEdge> actualVD = output.voronoiDiagram;
-                expectedVD = expectedVD.stream().filter(e->!e.org.equals(e.dest)).collect(Collectors.toList());
+                List<UAEVertex> actualCP = Arrays.asList(output.closesPair.getLeft(), output.closesPair.getRight());
 
-                assertEqualEdgesLists(expectedCH, actualCH, Point::equals);
-                assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
-                assertEqualEdgesLists(expectedVD, actualVD, this::edgesEqual);
+//                assertEqualEdgesLists(expectedCH, actualCH, Point::equals);
+//                assertEqualEdgesLists(expectedDT, actualDT, this::edgesEqual);
+//                assertEqualEdgesLists(expectedVD, actualVD, this::edgesEqual);
+                assertEqualEdgesLists(expectedCP, actualCP, Point::equals);
             }
         }
     }

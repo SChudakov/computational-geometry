@@ -93,9 +93,9 @@ public class UAE2D implements DaCAlgorithm<List<UAEVertex>, UAEResult> {
 
     @Override
     public UAEResult merge(UAEResult left, UAEResult right) {
+        Pair<UAEVertex, UAEVertex> closestPair = CP.mergeCP(left, right);
         ConvexHull mergedCH = CH.mergeCH(left, right);
         Pair<QuadEdge, QuadEdge> mergedDT = DT.mergeDT(left, right);
-        Pair<UAEVertex, UAEVertex> closestPair = CP.mergeCP(left, right);
         return new UAEResult(mergedCH, mergedDT.getLeft(), mergedDT.getRight(), closestPair);
     }
 
