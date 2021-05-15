@@ -73,7 +73,7 @@ public class CH {
         return new ConvexHull(upperSubhull, lowerSubhull);
     }
 
-    static ConvexHull mergeCH(UAEResult left, UAEResult right) {
+    static ConvexHull mergeCH(UAEState left, UAEState right) {
         ConcatenableQueue<UAEVertex> leftUpper = left.convexHull.upperSubhull.subhull;
         ConcatenableQueue<UAEVertex> leftLower = left.convexHull.lowerSubhull.subhull;
         ConcatenableQueue<UAEVertex> rightUpper = right.convexHull.upperSubhull.subhull;

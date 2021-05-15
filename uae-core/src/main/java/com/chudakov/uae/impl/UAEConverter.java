@@ -12,14 +12,14 @@ import static com.chudakov.uae.impl.ConcatenableQueue.CQVertex;
 
 
 public class UAEConverter {
-    public static UAEOutput convert(final UAEResult uaeResult) {
-        Pair<List<UAEEdge>, List<UAEEdge>> dtAndVd = convertUAE(uaeResult.e1);
-        return new UAEOutput(getConvexHull(uaeResult), dtAndVd.getLeft(), dtAndVd.getRight(), uaeResult.closestPair);
+    public static UAESolutions convert(final UAEState uaeState) {
+        Pair<List<UAEEdge>, List<UAEEdge>> dtAndVd = convertUAE(uaeState.e1);
+        return new UAESolutions(getConvexHull(uaeState), dtAndVd.getLeft(), dtAndVd.getRight(), uaeState.closestPair);
     }
 
-    private static List<UAEVertex> getConvexHull(final UAEResult uaeResult) {
+    private static List<UAEVertex> getConvexHull(final UAEState uaeState) {
         List<UAEVertex> ch = new ArrayList<>();
-        for (CQVertex<UAEVertex> cqVertex : uaeResult.convexHull) {
+        for (CQVertex<UAEVertex> cqVertex : uaeState.convexHull) {
             ch.add(cqVertex.value);
         }
         return ch;

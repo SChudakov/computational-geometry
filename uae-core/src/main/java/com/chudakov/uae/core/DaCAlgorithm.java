@@ -1,17 +1,20 @@
 package com.chudakov.uae.core;
 
+import com.chudakov.simple.ch.Point;
+import com.chudakov.uae.impl.UAEState;
+import com.chudakov.uae.impl.UAEVertex;
 import org.apache.commons.lang3.tuple.Pair;
 
-public interface DaCAlgorithm<IT, OT> {
-    boolean isBaseCase(IT input);
+import java.util.List;
 
-    int inputSize(IT input);
+public interface DaCAlgorithm {
+    boolean isBaseCase(final List<UAEVertex> points);
 
-    IT precompute(IT input);
+    List<UAEVertex> precompute(final List<UAEVertex> points);
 
-    OT solveBaseCase(IT input);
+    UAEState solveBaseCase(final List<UAEVertex> points);
 
-    Pair<IT, IT> divide(IT input);
+    Pair<List<UAEVertex>, List<UAEVertex>> divide(final List<UAEVertex> points);
 
-    OT merge(OT first, OT second);
+    UAEState merge(UAEState first, UAEState second);
 }

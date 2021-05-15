@@ -31,7 +31,7 @@ public class CP {
         throw new RuntimeException();
     }
 
-    public static Pair<UAEVertex, UAEVertex> mergeCP(final UAEResult left, final UAEResult right) {
+    public static Pair<UAEVertex, UAEVertex> mergeCP(final UAEState left, final UAEState right) {
         UAEVertex rightmostLeft = getRightmost(left.convexHull);
         UAEVertex leftmostRight = getLeftmost(right.convexHull);
         double middleLine = (rightmostLeft.x + leftmostRight.x) / 2;

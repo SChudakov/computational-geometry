@@ -5,11 +5,7 @@ import com.chudakov.simple.ch.Point;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class DT {
     static Pair<QuadEdge, QuadEdge> baseCaseDT(List<UAEVertex> points) {
@@ -217,7 +213,7 @@ public class DT {
         return new Point(xcc + xk, ycc + yk);
     }
 
-    static Pair<QuadEdge, QuadEdge> mergeDT(UAEResult left, UAEResult right) {
+    static Pair<QuadEdge, QuadEdge> mergeDT(UAEState left, UAEState right) {
         QuadEdge ldo = left.e1;
         QuadEdge ldi = left.e2;
 

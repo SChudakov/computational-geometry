@@ -1,26 +1,31 @@
 package com.chudakov.uae.core;
 
 
+import com.chudakov.uae.impl.UAEState;
+import com.chudakov.uae.impl.UAEVertex;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class SequentialDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpecifics<IT, OT> {
-    protected SequentialDaCExecutionSpecifics(DaCAlgorithm<IT, OT> algorithmSpecifics) {
+import java.util.List;
+
+public class SequentialDaCExecutionSpecifics extends BaseDaCExecutionSpecifics {
+    protected SequentialDaCExecutionSpecifics(DaCAlgorithm algorithmSpecifics) {
         super(algorithmSpecifics);
     }
 
     @Override
-    protected OT solveRecursively(IT input) {
-        if (algorithmSpecifics.isBaseCase(input)) {
-            return algorithmSpecifics.solveBaseCase(input);
+    protected UAEState solveRecursively(final List<UAEVertex> points) {
+        if (algorithmSpecifics.isBaseCase(points)) {
+            return algorithmSpecifics.solveBaseCase(points);
         }
 
-        Pair<IT, IT> p = algorithmSpecifics.divide(input);
-        IT left = p.getLeft();
-        IT right = p.getRight();
+        Pair<List<UAEVertex>, List<UAEVertex>> p = algorithmSpecifics.divide(points);
+        List<UAEVertex> left = p.getLeft();
+        List<UAEVertex> right = p.getRight();
 
-        OT leftHull = solveRecursively(left);
-        OT rightHull = solveRecursively(right);
-
-        return algorithmSpecifics.merge(leftHull, rightHull);
+        UAEState leftState = solveRecursively(left);
+        UAEState rightState = solveRecursively(right);
+        UAEState mergedState = algorithmSpecifics.merge(leftState, rightState);
+        mergedState.setPoints(points);
+        return mergedState;
     }
 }

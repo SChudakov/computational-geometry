@@ -9,15 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
-public class UAE2D implements DaCAlgorithm<List<UAEVertex>, UAEResult> {
+public class UAE2D implements DaCAlgorithm {
     @Override
     public boolean isBaseCase(List<UAEVertex> points) {
         return points.size() <= 3;
-    }
-
-    @Override
-    public int inputSize(List<UAEVertex> input) {
-        return input.size();
     }
 
     @Override
@@ -73,13 +68,12 @@ public class UAE2D implements DaCAlgorithm<List<UAEVertex>, UAEResult> {
         }
     }
 
-
     @Override
-    public UAEResult solveBaseCase(List<UAEVertex> points) {
+    public UAEState solveBaseCase(List<UAEVertex> points) {
+        Pair<UAEVertex, UAEVertex> closestPair = CP.baseCaseCP(points);
         ConvexHull convexHull = CH.baseCaseCH(points);
         Pair<QuadEdge, QuadEdge> delaunayTriangulation = DT.baseCaseDT(points);
-        Pair<UAEVertex, UAEVertex> closestPair = CP.baseCaseCP(points);
-        return new UAEResult(convexHull, delaunayTriangulation.getLeft(),
+        return new UAEState(points, convexHull, delaunayTriangulation.getLeft(),
                 delaunayTriangulation.getRight(), closestPair);
     }
 
@@ -90,13 +84,12 @@ public class UAE2D implements DaCAlgorithm<List<UAEVertex>, UAEResult> {
         return Pair.of(input.subList(0, mid), input.subList(mid, input.size()));
     }
 
-
     @Override
-    public UAEResult merge(UAEResult left, UAEResult right) {
+    public UAEState merge(UAEState left, UAEState right) {
         Pair<UAEVertex, UAEVertex> closestPair = CP.mergeCP(left, right);
         ConvexHull mergedCH = CH.mergeCH(left, right);
         Pair<QuadEdge, QuadEdge> mergedDT = DT.mergeDT(left, right);
-        return new UAEResult(mergedCH, mergedDT.getLeft(), mergedDT.getRight(), closestPair);
+        return new UAEState(null, mergedCH, mergedDT.getLeft(), mergedDT.getRight(), closestPair);
     }
 
 

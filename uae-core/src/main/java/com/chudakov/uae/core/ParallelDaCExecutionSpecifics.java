@@ -1,19 +1,22 @@
 package com.chudakov.uae.core;
 
+import com.chudakov.uae.impl.UAEState;
+import com.chudakov.uae.impl.UAEVertex;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-public class ParallelDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpecifics<IT, OT> {
+public class ParallelDaCExecutionSpecifics extends BaseDaCExecutionSpecifics {
     private static final int DEFAULT_INPUT_SIZE_THRESHOLD = 1 << 15; // 32768
     private long inputSizeThreshold;
 
-    protected ParallelDaCExecutionSpecifics(DaCAlgorithm<IT, OT> algorithmSpecifics) {
+    protected ParallelDaCExecutionSpecifics(DaCAlgorithm algorithmSpecifics) {
         this(algorithmSpecifics, DEFAULT_INPUT_SIZE_THRESHOLD);
     }
 
-    protected ParallelDaCExecutionSpecifics(DaCAlgorithm<IT, OT> algorithmSpecifics, int inputSizeThreshold) {
+    protected ParallelDaCExecutionSpecifics(DaCAlgorithm algorithmSpecifics, int inputSizeThreshold) {
         super(algorithmSpecifics);
         if (inputSizeThreshold <= 0) {
             throw new IllegalArgumentException("inputSizeThreshold should be positive!");
@@ -22,7 +25,7 @@ public class ParallelDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpeci
     }
 
     @Override
-    protected OT solveRecursively(IT points) {
+    protected UAEState solveRecursively(final List<UAEVertex> points) {
         ExecutionTask task = new ExecutionTask(points);
 
         ForkJoinPool.commonPool().submit(task);
@@ -30,31 +33,33 @@ public class ParallelDaCExecutionSpecifics<IT, OT> extends BaseDaCExecutionSpeci
         return task.join();
     }
 
-    private class ExecutionTask extends RecursiveTask<OT> {
-        IT input;
-        SequentialDaCExecutionSpecifics<IT, OT> sequentialExecution;
+    private class ExecutionTask extends RecursiveTask<UAEState> {
+        List<UAEVertex> points;
+        SequentialDaCExecutionSpecifics sequentialExecution;
 
-        ExecutionTask(IT input) {
-            this.input = input;
-            this.sequentialExecution = new SequentialDaCExecutionSpecifics<>(algorithmSpecifics);
+        ExecutionTask(final List<UAEVertex> points) {
+            this.points = points;
+            this.sequentialExecution = new SequentialDaCExecutionSpecifics(algorithmSpecifics);
         }
 
         @Override
-        protected OT compute() {
-            if (algorithmSpecifics.inputSize(input) <= inputSizeThreshold) {
-                return sequentialExecution.solveRecursively(input);
+        protected UAEState compute() {
+            if (points.size() <= inputSizeThreshold) {
+                return sequentialExecution.solveRecursively(points);
             } else {
-                Pair<IT, IT> p = algorithmSpecifics.divide(input);
-                IT left = p.getLeft();
-                IT right = p.getRight();
+                Pair<List<UAEVertex>, List<UAEVertex>> p = algorithmSpecifics.divide(points);
+                List<UAEVertex> left = p.getLeft();
+                List<UAEVertex> right = p.getRight();
 
                 ExecutionTask t1 = new ExecutionTask(left);
                 t1.fork();
                 ExecutionTask t2 = new ExecutionTask(right);
 
-                OT rightResult = t2.compute();
-                OT leftResult = t1.join();
-                return algorithmSpecifics.merge(leftResult, rightResult);
+                UAEState rightResult = t2.compute();
+                UAEState leftResult = t1.join();
+                UAEState merged = algorithmSpecifics.merge(leftResult, rightResult);
+                merged.setPoints(points);
+                return merged;
             }
         }
     }

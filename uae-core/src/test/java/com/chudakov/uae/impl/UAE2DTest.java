@@ -299,7 +299,7 @@ public class UAE2DTest {
         List<UAEVertex> points = TestUtils.readPointsFile(pointFile);
         List<UAEVertex> expectedCP = TestUtils.readPointsFile(cpFile);
 
-        UAEOutput output = UAEConverter.convert(new SequentialUAE2D().solve(points));
+        UAESolutions output = UAEConverter.convert(new SequentialUAE2D().solve(points));
         List<UAEVertex> actualCP = Arrays.asList(output.closesPair.getLeft(), output.closesPair.getRight());
 
         TestUtils.writePoints("/home/semen/drive/python/points-visualization/points", points);
@@ -310,7 +310,7 @@ public class UAE2DTest {
     }
 
 
-    private void testE2E(DaCExecutionSpecifics<List<UAEVertex>, UAEResult> specifics) {
+    private void testE2E(DaCExecutionSpecifics specifics) {
         for (int i = 0; i < PointsGenerator.testDirs.length; ++i) {
             String testDir = PointsGenerator.testDirs[i];
             String inputDir = testDir + PointsGenerator.subdirs[0];
@@ -342,7 +342,7 @@ public class UAE2DTest {
                 List<UAEVertex> expectedCP = expectedCPs.get(j);
 
 
-                UAEOutput output = UAEConverter.convert(specifics.solve(input));
+                UAESolutions output = UAEConverter.convert(specifics.solve(input));
                 List<UAEVertex> actualCH = output.convexHull;
                 List<UAEEdge> actualDT = output.delaunayTriangulation;
                 List<UAEEdge> actualVD = output.voronoiDiagram;

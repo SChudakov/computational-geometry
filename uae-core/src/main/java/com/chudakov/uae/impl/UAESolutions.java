@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UAEOutput {
+public class UAESolutions {
     List<UAEVertex> convexHull;
     List<UAEEdge> delaunayTriangulation;
     List<UAEEdge> voronoiDiagram;

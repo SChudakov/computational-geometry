@@ -5,6 +5,8 @@ package com.chudakov.visualisation;/*
  */
 
 import com.chudakov.uae.impl.SequentialUAE2D;
+import com.chudakov.uae.impl.UAEConverter;
+import com.chudakov.uae.impl.UAESolutions;
 import com.chudakov.uae.impl.UAEVertex;
 import com.chudakov.uae.impl.ConvexHull;
 
@@ -172,12 +174,8 @@ public class JFrame extends javax.swing.JFrame {
 
     private void buildButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         if (generated != null) {
-            List<UAEVertex> convexHullPoints = new ArrayList<>();
-            ConvexHull hull = this.convexHull2D.solve(this.generated).getConvexHull();
-            for (UAEVertex UAEVertex : hull) {
-                convexHullPoints.add(UAEVertex);
-            }
-            pointsPanel.convexHull = convexHullPoints;
+            UAESolutions solutions = UAEConverter.convert(this.convexHull2D.solve(this.generated));
+            pointsPanel.convexHull = solutions.getConvexHull();
             new Thread(() -> {
                 pointsPanel.paintComponent(pointsPanel.getGraphics());
                 pointsPanel.repaint();

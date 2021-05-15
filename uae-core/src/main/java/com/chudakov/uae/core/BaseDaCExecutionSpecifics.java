@@ -1,17 +1,22 @@
 package com.chudakov.uae.core;
 
-public abstract class BaseDaCExecutionSpecifics<IT, OT> implements DaCExecutionSpecifics<IT, OT> {
-    protected DaCAlgorithm<IT, OT> algorithmSpecifics;
+import com.chudakov.uae.impl.UAEState;
+import com.chudakov.uae.impl.UAEVertex;
 
-    protected BaseDaCExecutionSpecifics(DaCAlgorithm<IT, OT> algorithmSpecifics) {
+import java.util.List;
+
+public abstract class BaseDaCExecutionSpecifics implements DaCExecutionSpecifics {
+    protected DaCAlgorithm algorithmSpecifics;
+
+    protected BaseDaCExecutionSpecifics(DaCAlgorithm algorithmSpecifics) {
         this.algorithmSpecifics = algorithmSpecifics;
     }
 
     @Override
-    public OT solve(IT points) {
+    public UAEState solve(List<UAEVertex> points) {
         points = algorithmSpecifics.precompute(points);
         return solveRecursively(points);
     }
 
-    protected abstract OT solveRecursively(IT points);
+    protected abstract UAEState solveRecursively(final List<UAEVertex> points);
 }

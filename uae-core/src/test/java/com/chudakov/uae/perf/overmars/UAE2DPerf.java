@@ -2,7 +2,7 @@ package com.chudakov.uae.perf.overmars;
 
 import com.chudakov.uae.impl.ParallelUAE2D;
 import com.chudakov.uae.impl.SequentialUAE2D;
-import com.chudakov.uae.impl.UAEResult;
+import com.chudakov.uae.impl.UAEState;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -25,12 +25,12 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class UAE2DPerf {
     @Benchmark
-    public UAEResult benchmarkSequential(SequentialState state) {
+    public UAEState benchmarkSequential(SequentialState state) {
         return new SequentialUAE2D().solve(new ArrayList<>(state.vertices));
     }
 
     @Benchmark
-    public UAEResult benchmarkParallel(ParallelState state) {
+    public UAEState benchmarkParallel(ParallelState state) {
         return new ParallelUAE2D(state.inputSizeThreshold).solve(new ArrayList<>(state.vertices));
     }
 

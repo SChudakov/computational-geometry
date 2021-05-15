@@ -4,7 +4,7 @@ import com.chudakov.uae.core.SequentialDaCExecutionSpecifics;
 
 import java.util.List;
 
-public class SequentialUAE2D extends SequentialDaCExecutionSpecifics<List<UAEVertex>, UAEResult> {
+public class SequentialUAE2D extends SequentialDaCExecutionSpecifics {
     public SequentialUAE2D() {
         super(new UAE2D());
     }

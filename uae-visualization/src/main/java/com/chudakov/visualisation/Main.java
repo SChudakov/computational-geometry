@@ -1,6 +1,10 @@
 package com.chudakov.visualisation;
 
+import com.chudakov.uae.impl.ConcatenableQueue;
 import com.chudakov.uae.impl.SequentialUAE2D;
+import com.chudakov.uae.impl.UAEConverter;
+import com.chudakov.uae.impl.UAESolutions;
+import com.chudakov.uae.impl.UAEState;
 import com.chudakov.uae.impl.UAEVertex;
 import com.chudakov.uae.impl.ConvexHull;
 
@@ -33,12 +37,9 @@ public class Main {
                 }
 
                 SequentialUAE2D convexHull = new SequentialUAE2D();
-                ConvexHull hull = convexHull.solve(generated).getConvexHull();
-                List<UAEVertex> convex = new ArrayList<>();
-                for (UAEVertex UAEVertex : hull) {
-                    convex.add(UAEVertex);
-                }
-                panel.convexHull = convex;
+                UAEState state = convexHull.solve(generated);
+                UAESolutions solutions = UAEConverter.convert(state);
+                panel.convexHull = solutions.getConvexHull();
                 panel.paintComponent(panel.getGraphics());
                 try {
                     Thread.sleep(3000);
