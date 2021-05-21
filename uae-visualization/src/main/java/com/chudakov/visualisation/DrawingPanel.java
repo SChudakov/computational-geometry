@@ -47,7 +47,6 @@ public class DrawingPanel extends JPanel {
             drawLinesPoints(graphics, voronoiDiagram, DEFAULT_VD_POINTS_COLOR);
         }
         if (closesPair != null) {
-            System.out.println(closesPair.getLeft() + " " + closesPair.getRight());
             drawPoint(graphics, closesPair.getLeft(), DEFAULT_CP_POINTS_COLOR, CP_POINT_DIAMETER);
             drawPoint(graphics, closesPair.getRight(), DEFAULT_CP_POINTS_COLOR, CP_POINT_DIAMETER);
         }

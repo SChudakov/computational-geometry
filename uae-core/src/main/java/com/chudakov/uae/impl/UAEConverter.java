@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import static com.chudakov.uae.impl.ConcatenableQueue.CQVertex;
 
 
@@ -45,65 +46,49 @@ public class UAEConverter {
         }
         visited.add(quadEdge.org);
         dt.add(new UAEEdge(quadEdge.org, quadEdge.dest));
-        vd.add(new UAEEdge(toUAEVertex(quadEdge.dualOrg), toUAEVertex(quadEdge.dualDest)));
+        vd.add(getVDEdge(quadEdge, quadEdge.dualOrg, quadEdge.dualDest));
         dfsUAE(quadEdge.sym, visited, dt, vd);
 
         QuadEdge it = quadEdge.onext;
         while (!it.equals(quadEdge)) {
             dt.add(new UAEEdge(it.org, it.dest));
-            vd.add(new UAEEdge(toUAEVertex(it.dualOrg), toUAEVertex(it.dualDest)));
+            vd.add(getVDEdge(it, it.dualOrg, it.dualDest));
             dfsUAE(it.sym, visited, dt, vd);
             it = it.onext;
         }
     }
 
+    private static UAEEdge getVDEdge(QuadEdge dtEdge, Point vdOrg, Point vdDest) {
+        Point resultOrg = vdOrg;
+        Point resultDest = vdDest;
+        Point dtMiddle = DT.middle(dtEdge);
+        Point direction = new Point(dtEdge.org.y - dtEdge.dest.y, dtEdge.dest.x - dtEdge.org.x);
+//      ccw(dtEdge.org, direction, dtEdge.dest) = false
+        if (vdOrg.equals(vdDest)) {
+            if (DT.ccw(dtEdge.org, vdOrg, dtEdge.dest)) {
+                resultDest = resultDest.subtract(direction.mult(100));
+            } else {
+                resultDest = resultDest.add(direction.mult(100));
+            }
+        } else {
+            if (vdOrg.equals(dtMiddle) || vdDest.equals(dtMiddle)){
+                if (vdOrg.equals(dtMiddle)) {
+                    Point tmp = vdOrg;
+                    vdOrg = vdDest;
+                    vdDest = tmp;
+                }
+
+                if (DT.ccw(dtEdge.org, vdOrg, dtEdge.dest)) {
+                    resultDest = resultDest.add(direction.mult(100));
+                } else {
+                    resultDest = resultDest.subtract(direction.mult(100));
+                }
+            }
+        }
+        return new UAEEdge(toUAEVertex(resultOrg), toUAEVertex(resultDest));
+    }
+
     private static UAEVertex toUAEVertex(Point p) {
         return new UAEVertex(p.x, p.y);
     }
-
-//    private static void dfsDT(QuadEdge quadEdge, Set<UAEVertex> visited, List<UAEEdge> result) {
-//        if (visited.contains(quadEdge.org)) {
-//            return;
-//        }
-//        visited.add(quadEdge.org);
-//        result.add(new UAEEdge(quadEdge.org, quadEdge.dest));
-//        dfsDT(quadEdge.sym, visited, result);
-//
-//        QuadEdge it = quadEdge.onext;
-//        while (!it.equals(quadEdge)) {
-//            result.add(new UAEEdge(it.org, it.dest));
-//            dfsDT(it.sym, visited, result);
-//            it = it.onext;
-//        }
-//    }
-
-
-//    public static List<UAEEdge> convertVD(QuadEdge quadEdge) {
-//        if (quadEdge == null) {
-//            return Collections.emptyList();
-//        }
-//
-//        List<UAEEdge> result = new ArrayList<>();
-//        Set<UAEVertex> visited = new HashSet<>();
-//
-//        dfsVD(quadEdge, visited, result);
-//
-//        return result;
-//    }
-
-//    private static void dfsVD(QuadEdge quadEdge, Set<UAEVertex> visited, List<UAEEdge> result) {
-//        if (visited.contains(quadEdge.org)) {
-//            return;
-//        }
-//        visited.add(quadEdge.org);
-//        result.add(new UAEEdge(toUAEVertex(quadEdge.dualOrg), toUAEVertex(quadEdge.dualDest)));
-//        dfsVD(quadEdge.sym, visited, result);
-//
-//        QuadEdge it = quadEdge.onext;
-//        while (!it.equals(quadEdge)) {
-//            result.add(new UAEEdge(toUAEVertex(it.dualOrg), toUAEVertex(it.dualDest)));
-//            dfsVD(it.sym, visited, result);
-//            it = it.onext;
-//        }
-//    }
 }

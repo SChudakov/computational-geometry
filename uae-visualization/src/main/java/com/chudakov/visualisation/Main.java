@@ -17,7 +17,7 @@ public class Main {
     private static final Random RND = new Random(SEED);
 
     private static final int NUMBER_OF_ITERATIONS = 10;
-    private static final int NUMBER_OF_POINTS = 10;
+    private static final int NUMBER_OF_POINTS = 100;
 
 
     public static void main(String[] args) {

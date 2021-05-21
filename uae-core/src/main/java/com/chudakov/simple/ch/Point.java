@@ -1,6 +1,5 @@
 package com.chudakov.simple.ch;
 
-import com.chudakov.uae.impl.UAEVertex;
 import lombok.AllArgsConstructor;
 
 import java.util.Objects;
@@ -44,6 +43,17 @@ public class Point implements Comparable<Point> {
         return a - b;
     }
 
+    public Point add(Point other) {
+        return new Point(x + other.x, y + other.y);
+    }
+
+    public Point subtract(Point other) {
+        return new Point(x - other.x, y - other.y);
+    }
+
+    public Point mult(double factor) {
+        return new Point(x * factor, y * factor);
+    }
 
     @Override
     public boolean equals(Object o) {
