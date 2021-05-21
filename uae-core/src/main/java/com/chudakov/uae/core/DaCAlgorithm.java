@@ -1,6 +1,5 @@
 package com.chudakov.uae.core;
 
-import com.chudakov.simple.ch.Point;
 import com.chudakov.uae.impl.UAEState;
 import com.chudakov.uae.impl.UAEVertex;
 import org.apache.commons.lang3.tuple.Pair;
