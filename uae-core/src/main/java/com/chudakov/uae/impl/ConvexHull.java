@@ -11,10 +11,10 @@ public class ConvexHull implements Iterable<CQVertex<UAEVertex>> {
 
     public ConvexHull(ConvexSubhull upperSubhull, ConvexSubhull lowerSubhull) {
         if (!upperSubhull.type.equals(ConvexSubhull.Type.UPPER)) {
-            throw new IllegalArgumentException("upper sub-hull improper type");
+            throw new IllegalArgumentException("invalid type of upper sub-hull");
         }
         if (!lowerSubhull.type.equals(ConvexSubhull.Type.LOWER)) {
-            throw new IllegalArgumentException("lower sub-hull improper type");
+            throw new IllegalArgumentException("invalid type of lower sub-hull");
         }
         this.upperSubhull = upperSubhull;
         this.lowerSubhull = lowerSubhull;

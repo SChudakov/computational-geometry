@@ -13,7 +13,7 @@ public class ConvexHullVisualisation extends JFrame {
     public ConvexHullVisualisation() throws HeadlessException {
         super();
         configureFrameSize();
-        setTitle("Convex hull visualisation");
+        setTitle("UAE visualisation");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }

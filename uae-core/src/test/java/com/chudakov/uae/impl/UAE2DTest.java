@@ -1,6 +1,5 @@
 package com.chudakov.uae.impl;
 
-import com.chudakov.simple.ch.Point;
 import com.chudakov.uae.PointsGenerator;
 import com.chudakov.uae.TestUtils;
 import com.chudakov.uae.core.DaCExecutionSpecifics;

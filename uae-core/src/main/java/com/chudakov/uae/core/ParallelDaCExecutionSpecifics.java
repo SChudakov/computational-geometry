@@ -10,7 +10,7 @@ import java.util.concurrent.RecursiveTask;
 
 public class ParallelDaCExecutionSpecifics extends BaseDaCExecutionSpecifics {
     private static final int DEFAULT_INPUT_SIZE_THRESHOLD = 1 << 15; // 32768
-    private long inputSizeThreshold;
+    private final long inputSizeThreshold;
 
     protected ParallelDaCExecutionSpecifics(DaCAlgorithm algorithmSpecifics) {
         this(algorithmSpecifics, DEFAULT_INPUT_SIZE_THRESHOLD);

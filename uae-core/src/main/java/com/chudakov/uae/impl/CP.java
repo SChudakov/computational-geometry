@@ -1,6 +1,5 @@
 package com.chudakov.uae.impl;
 
-import com.chudakov.simple.ch.Point;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import java.util.List;
 import static com.chudakov.uae.impl.ConcatenableQueue.CQVertex;
 
 public class CP {
-    public static Pair<UAEVertex, UAEVertex> baseCaseCP(final List<UAEVertex> vertices) {
+    public static Pair<UAEVertex, UAEVertex> baseCase(final List<UAEVertex> vertices) {
         if (vertices.size() == 2) {
             return Pair.of(vertices.get(0), vertices.get(1));
         } else if (vertices.size() == 3) {
@@ -31,14 +30,14 @@ public class CP {
         throw new RuntimeException();
     }
 
-    public static Pair<UAEVertex, UAEVertex> mergeCP(final UAEState left, final UAEState right) {
+    public static Pair<UAEVertex, UAEVertex> merge(final UAEState left, final UAEState right) {
         UAEVertex rightmostLeft = getRightmost(left.convexHull);
         UAEVertex leftmostRight = getLeftmost(right.convexHull);
         double middleLine = (rightmostLeft.x + leftmostRight.x) / 2;
         double leftDistance = Point.distance(left.closestPair.getLeft(), left.closestPair.getRight());
         double rightDistance = Point.distance(right.closestPair.getLeft(), right.closestPair.getRight());
         double minimumDistance = Math.min(leftDistance, rightDistance);
-        Pair<UAEVertex, UAEVertex> closesPair = null;
+        Pair<UAEVertex, UAEVertex> closesPair;
         if (minimumDistance == leftDistance) {
             closesPair = left.closestPair;
         } else {

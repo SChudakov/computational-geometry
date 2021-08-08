@@ -1,6 +1,5 @@
 package com.chudakov.uae.impl;
 
-import com.chudakov.simple.ch.Point;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -61,11 +60,11 @@ public class UAEConverter {
     private static UAEEdge getVDEdge(QuadEdge dtEdge, Point vdOrg, Point vdDest) {
         Point resultOrg = vdOrg;
         Point resultDest = vdDest;
-        Point dtMiddle = DT.middle(dtEdge);
+        Point dtMiddle = dtEdge.middle();
         Point direction = new Point(dtEdge.org.y - dtEdge.dest.y, dtEdge.dest.x - dtEdge.org.x);
-//      ccw(dtEdge.org, direction, dtEdge.dest) = false
+
         if (vdOrg.equals(vdDest)) {
-            if (DT.ccw(dtEdge.org, vdOrg, dtEdge.dest)) {
+            if (Point.ccw(dtEdge.org, vdOrg, dtEdge.dest)) {
                 resultDest = resultDest.subtract(direction.mult(100));
             } else {
                 resultDest = resultDest.add(direction.mult(100));
@@ -78,7 +77,7 @@ public class UAEConverter {
                     vdDest = tmp;
                 }
 
-                if (DT.ccw(dtEdge.org, vdOrg, dtEdge.dest)) {
+                if (Point.ccw(dtEdge.org, vdOrg, dtEdge.dest)) {
                     resultDest = resultDest.add(direction.mult(100));
                 } else {
                     resultDest = resultDest.subtract(direction.mult(100));

@@ -3,7 +3,7 @@ package com.chudakov.uae.perf.overmars;
 import com.chudakov.simple.ch.Graham;
 import com.chudakov.simple.ch.Jarvis;
 import com.chudakov.simple.ch.QuickHull;
-import com.chudakov.simple.ch.Point;
+import com.chudakov.uae.impl.Point;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;

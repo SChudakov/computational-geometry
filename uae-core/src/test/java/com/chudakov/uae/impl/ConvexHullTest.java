@@ -119,186 +119,152 @@ public class ConvexHullTest {
 
 //      ----------------------------------   one point case -------------------------------------------------
 
-        ConcatenableQueue.CQVertex<UAEVertex> node1_1 = new ConcatenableQueue.CQVertex<>(new UAEVertex(1, 1));
-        CQUtil.setFields(node1_1, null, null, node1_1, 0, true);
+        ConcatenableQueue.CQVertex<UAEVertex> vertex1_1 = new ConcatenableQueue.CQVertex<>(new UAEVertex(1, 1));
+        CQUtil.setFields(vertex1_1, null, null, vertex1_1, 0, true);
 
 
-        assertEquals(0, CH.getUpperTangentCase(node1_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getUpperTangentCase(node1_1, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getUpperTangentCase(vertex1_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getUpperTangentCase(vertex1_1, 0, ConvexHull.Position.RIGHT));
 
-        assertEquals(0, CH.getLowerTangentCase(node1_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerTangentCase(node1_1, 0, ConvexHull.Position.RIGHT));
-
-        assertEquals(0, CH.getLowerBaseCase(node1_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerBaseCase(node1_1, 0, ConvexHull.Position.RIGHT));
-
+        assertEquals(0, CH.getLowerTangentCase(vertex1_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getLowerTangentCase(vertex1_1, 0, ConvexHull.Position.RIGHT));
 
 //        ----------------------------------   two point case -------------------------------------------------
 
 
-        ConcatenableQueue.CQVertex<UAEVertex> node2_1 = new ConcatenableQueue.CQVertex<>();
-        ConcatenableQueue.CQVertex<UAEVertex> node2_2 = new ConcatenableQueue.CQVertex<>();
-        CQUtil.setFields(node2_1, null, node2_2, node2_1, 0, true);
-        CQUtil.setFields(node2_2, node2_1, null, node2_2, 0, true);
+        ConcatenableQueue.CQVertex<UAEVertex> vertex2_1 = new ConcatenableQueue.CQVertex<>();
+        ConcatenableQueue.CQVertex<UAEVertex> vertex2_2 = new ConcatenableQueue.CQVertex<>();
+        CQUtil.setFields(vertex2_1, null, vertex2_2, vertex2_1, 0, true);
+        CQUtil.setFields(vertex2_2, vertex2_1, null, vertex2_2, 0, true);
 
-        node2_1.value = new UAEVertex(1, 1);
-        node2_2.value = new UAEVertex(2, 2);
+        vertex2_1.value = new UAEVertex(1, 1);
+        vertex2_2.value = new UAEVertex(2, 2);
 
-        assertEquals(-1, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(0, CH.getUpperTangentCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getUpperTangentCase(node2_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(-1, CH.getUpperTangentCase(vertex2_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getUpperTangentCase(vertex2_1, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getUpperTangentCase(vertex2_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getUpperTangentCase(vertex2_2, 0, ConvexHull.Position.RIGHT));
 
-        assertEquals(0, CH.getLowerTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(+1, CH.getLowerTangentCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(+1, CH.getLowerTangentCase(node2_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getLowerTangentCase(vertex2_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getLowerTangentCase(vertex2_1, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getLowerTangentCase(vertex2_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(+1, CH.getLowerTangentCase(vertex2_2, 0, ConvexHull.Position.RIGHT));
 
-        assertEquals(0, CH.getLowerBaseCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerBaseCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(+1, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(+1, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.RIGHT));
+        vertex2_1.value = new UAEVertex(2, 2);
+        vertex2_2.value = new UAEVertex(3, 2);
 
-        node2_1.value = new UAEVertex(2, 2);
-        node2_2.value = new UAEVertex(3, 2);
+        assertEquals(0, CH.getUpperTangentCase(vertex2_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getUpperTangentCase(vertex2_1, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getUpperTangentCase(vertex2_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getUpperTangentCase(vertex2_2, 0, ConvexHull.Position.RIGHT));
 
-        assertEquals(0, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(+1, CH.getUpperTangentCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getUpperTangentCase(node2_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getLowerTangentCase(vertex2_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getLowerTangentCase(vertex2_1, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getLowerTangentCase(vertex2_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getLowerTangentCase(vertex2_2, 0, ConvexHull.Position.RIGHT));
 
-        assertEquals(0, CH.getLowerTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getLowerTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(+1, CH.getLowerTangentCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerTangentCase(node2_2, 0, ConvexHull.Position.RIGHT));
+        vertex2_1.value = new UAEVertex(2, 2);
+        vertex2_2.value = new UAEVertex(3, 1);
 
-        assertEquals(-1, CH.getLowerBaseCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerBaseCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(0, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(+1, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getUpperTangentCase(vertex2_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getUpperTangentCase(vertex2_1, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getUpperTangentCase(vertex2_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(+1, CH.getUpperTangentCase(vertex2_2, 0, ConvexHull.Position.RIGHT));
 
-        node2_1.value = new UAEVertex(2, 2);
-        node2_2.value = new UAEVertex(3, 1);
-
-        assertEquals(0, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getUpperTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(+1, CH.getUpperTangentCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(+1, CH.getUpperTangentCase(node2_2, 0, ConvexHull.Position.RIGHT));
-
-        assertEquals(-1, CH.getLowerTangentCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getLowerTangentCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(0, CH.getLowerTangentCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerTangentCase(node2_2, 0, ConvexHull.Position.RIGHT));
-
-        assertEquals(-1, CH.getLowerBaseCase(node2_1, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getLowerBaseCase(node2_1, 0, ConvexHull.Position.RIGHT));
-        assertEquals(0, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerBaseCase(node2_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(-1, CH.getLowerTangentCase(vertex2_1, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getLowerTangentCase(vertex2_1, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getLowerTangentCase(vertex2_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getLowerTangentCase(vertex2_2, 0, ConvexHull.Position.RIGHT));
 
 
 //      ----------------------------------   three point case -------------------------------------------------
 
 
-        ConcatenableQueue.CQVertex<UAEVertex> node3_1 = new ConcatenableQueue.CQVertex<>();
-        ConcatenableQueue.CQVertex<UAEVertex> node3_2 = new ConcatenableQueue.CQVertex<>();
-        ConcatenableQueue.CQVertex<UAEVertex> node3_3 = new ConcatenableQueue.CQVertex<>();
-        CQUtil.setFields(node3_1, null, node3_2, node3_1, 0, true);
-        CQUtil.setFields(node3_2, node3_1, node3_3, node3_2, 0, true);
-        CQUtil.setFields(node3_3, node3_2, null, node3_3, 0, true);
+        ConcatenableQueue.CQVertex<UAEVertex> vertex3_1 = new ConcatenableQueue.CQVertex<>();
+        ConcatenableQueue.CQVertex<UAEVertex> vertex3_2 = new ConcatenableQueue.CQVertex<>();
+        ConcatenableQueue.CQVertex<UAEVertex> vertex3_3 = new ConcatenableQueue.CQVertex<>();
+        CQUtil.setFields(vertex3_1, null, vertex3_2, vertex3_1, 0, true);
+        CQUtil.setFields(vertex3_2, vertex3_1, vertex3_3, vertex3_2, 0, true);
+        CQUtil.setFields(vertex3_3, vertex3_2, null, vertex3_3, 0, true);
 
 
 //      ---------------------------------------      1st row     -----------------------------------------------------
 
 
-        node3_1.value = new UAEVertex(1, 1);
-        node3_2.value = new UAEVertex(2, 3);
-        node3_3.value = new UAEVertex(3, 4);
+        vertex3_1.value = new UAEVertex(1, 1);
+        vertex3_2.value = new UAEVertex(2, 3);
+        vertex3_3.value = new UAEVertex(3, 4);
 
-        assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
-
-
-        node3_1.value = new UAEVertex(1, 1);
-        node3_2.value = new UAEVertex(2, 3);
-        node3_3.value = new UAEVertex(3, 3);
-
-        assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(-1, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.value = new UAEVertex(1, 1);
-        node3_2.value = new UAEVertex(2, 2);
-        node3_3.value = new UAEVertex(3, 1);
+        vertex3_1.value = new UAEVertex(1, 1);
+        vertex3_2.value = new UAEVertex(2, 3);
+        vertex3_3.value = new UAEVertex(3, 3);
 
-        assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
+
+
+        vertex3_1.value = new UAEVertex(1, 1);
+        vertex3_2.value = new UAEVertex(2, 2);
+        vertex3_3.value = new UAEVertex(3, 1);
+
+        assertEquals(0, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
 
 //        ---------------------------------------      2nd row     -----------------------------------------------------
 
-        node3_1.value = new UAEVertex(1, 2);
-        node3_2.value = new UAEVertex(2, 2);
-        node3_3.value = new UAEVertex(3, 3);
+        vertex3_1.value = new UAEVertex(1, 2);
+        vertex3_2.value = new UAEVertex(2, 2);
+        vertex3_3.value = new UAEVertex(3, 3);
 
-        assertEquals(+1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
-
-        assertEquals(0, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(+1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.value = new UAEVertex(1, 2);
-        node3_2.value = new UAEVertex(2, 2);
-        node3_3.value = new UAEVertex(3, 2);
+        vertex3_1.value = new UAEVertex(1, 2);
+        vertex3_2.value = new UAEVertex(2, 2);
+        vertex3_3.value = new UAEVertex(3, 2);
 
-        assertEquals(+1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
-        assertEquals(+1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
-
-        assertEquals(-1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(+1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.value = new UAEVertex(1, 2);
-        node3_2.value = new UAEVertex(2, 2);
-        node3_3.value = new UAEVertex(3, 1);
+        vertex3_1.value = new UAEVertex(1, 2);
+        vertex3_2.value = new UAEVertex(2, 2);
+        vertex3_3.value = new UAEVertex(3, 1);
 
-        assertEquals(+1, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getUpperTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(+1, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getUpperTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
 
 
 //      ---------------------------------------      3rd row     -----------------------------------------------------
 
 
-        node3_1.value = new UAEVertex(1, 2);
-        node3_2.value = new UAEVertex(2, 1);
-        node3_3.value = new UAEVertex(3, 2);
+        vertex3_1.value = new UAEVertex(1, 2);
+        vertex3_2.value = new UAEVertex(2, 1);
+        vertex3_3.value = new UAEVertex(3, 2);
 
-        assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(0, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
 
-        assertEquals(0, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        vertex3_1.value = new UAEVertex(1, 2);
+        vertex3_2.value = new UAEVertex(2, 1);
+        vertex3_3.value = new UAEVertex(3, 1);
 
-        node3_1.value = new UAEVertex(1, 2);
-        node3_2.value = new UAEVertex(2, 1);
-        node3_3.value = new UAEVertex(3, 1);
-
-        assertEquals(0, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
-
-        assertEquals(-1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(0, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(0, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
 
 
-        node3_1.value = new UAEVertex(1, 2);
-        node3_2.value = new UAEVertex(2, 1);
-        node3_3.value = new UAEVertex(3, 0);
+        vertex3_1.value = new UAEVertex(1, 2);
+        vertex3_2.value = new UAEVertex(2, 1);
+        vertex3_3.value = new UAEVertex(3, 0);
 
-        assertEquals(-1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getLowerTangentCase(node3_2, 0, ConvexHull.Position.RIGHT));
-
-        assertEquals(-1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.LEFT));
-        assertEquals(-1, CH.getLowerBaseCase(node3_2, 0, ConvexHull.Position.RIGHT));
+        assertEquals(-1, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.LEFT));
+        assertEquals(-1, CH.getLowerTangentCase(vertex3_2, 0, ConvexHull.Position.RIGHT));
     }
 }

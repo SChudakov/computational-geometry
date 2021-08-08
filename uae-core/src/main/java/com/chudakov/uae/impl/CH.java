@@ -9,7 +9,6 @@ import static com.chudakov.uae.impl.ConcatenableQueue.CQVertex;
 import static com.chudakov.uae.impl.ConvexHull.Position;
 
 public class CH {
-    @FunctionalInterface
     interface TriFunction<A, B, C, R> {
         R apply(A a, B b, C c);
     }
@@ -23,7 +22,7 @@ public class CH {
     }
 
 
-    static ConvexHull baseCaseCH(List<UAEVertex> points) {
+    static ConvexHull baseCase(List<UAEVertex> points) {
         int size = points.size();
 
         ConcatenableQueue<UAEVertex> upper = new ConcatenableQueue<>();
@@ -73,7 +72,7 @@ public class CH {
         return new ConvexHull(upperSubhull, lowerSubhull);
     }
 
-    static ConvexHull mergeCH(UAEState left, UAEState right) {
+    static ConvexHull merge(UAEState left, UAEState right) {
         ConcatenableQueue<UAEVertex> leftUpper = left.convexHull.upperSubhull.subhull;
         ConcatenableQueue<UAEVertex> leftLower = left.convexHull.lowerSubhull.subhull;
         ConcatenableQueue<UAEVertex> rightUpper = right.convexHull.upperSubhull.subhull;
@@ -127,10 +126,10 @@ public class CH {
         CQVertex<UAEVertex> lr = lowerTangent.getRight();
 
         // 1. cut left subhulls
-        if (ul.equals(leftLower.minNode)) {
+        if (ul.equals(leftLower.minVertex)) {
             leftUpper.clear();
             leftLower.cutRight(ll.value);
-        } else if (ul.equals(leftLower.maxNode)) {
+        } else if (ul.equals(leftLower.maxVertex)) {
             Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p = moveRightmostPointUp(leftUpper, leftLower);
             leftUpper = p.getLeft();
             leftLower = p.getRight();
@@ -141,12 +140,12 @@ public class CH {
         }
 
         // 2. cut right subhulls
-        if (ur.equals(rightLower.minNode)) {
+        if (ur.equals(rightLower.minVertex)) {
             Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>> p = moveLeftmostPointUp(rightUpper, rightLower);
             rightUpper = p.getLeft();
             rightLower = p.getRight();
             rightLower.cutLeft(lr.value);
-        } else if (ur.equals(rightLower.maxNode)) {
+        } else if (ur.equals(rightLower.maxVertex)) {
             rightUpper.clear();
             rightLower.cutLeft(lr.value);
         } else {
@@ -169,20 +168,20 @@ public class CH {
     static Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>>
     moveUtmostPointsDown(ConcatenableQueue<UAEVertex> upper, ConcatenableQueue<UAEVertex> lower) {
         ConcatenableQueue<UAEVertex> upperRest1 = upper;
-        boolean moveLeftmostPoint = upper.minNode != null && lower.minNode == null;
-        moveLeftmostPoint |= upper.minNode != null && lower.minNode != null
-                && upper.minNode.value.x < lower.minNode.value.x;
+        boolean moveLeftmostPoint = upper.minVertex != null && lower.minVertex == null;
+        moveLeftmostPoint |= upper.minVertex != null && lower.minVertex != null
+                && upper.minVertex.value.x < lower.minVertex.value.x;
         if (moveLeftmostPoint) {
-            upperRest1 = upper.cutRight(upper.minNode.value);
+            upperRest1 = upper.cutRight(upper.minVertex.value);
             lower = ConcatenableQueue.concatenate(upper, lower);
         }
 
         ConcatenableQueue<UAEVertex> upperRest2 = upperRest1;
-        boolean moveRightmostPoint = upperRest1.maxNode != null && lower.maxNode == null;
-        moveRightmostPoint |= upperRest1.maxNode != null && lower.maxNode != null
-                && upperRest1.maxNode.value.x > lower.maxNode.value.x;
+        boolean moveRightmostPoint = upperRest1.maxVertex != null && lower.maxVertex == null;
+        moveRightmostPoint |= upperRest1.maxVertex != null && lower.maxVertex != null
+                && upperRest1.maxVertex.value.x > lower.maxVertex.value.x;
         if (moveRightmostPoint) {
-            upperRest2 = upperRest1.cutLeft(upperRest1.maxNode.value);
+            upperRest2 = upperRest1.cutLeft(upperRest1.maxVertex.value);
             lower = ConcatenableQueue.concatenate(lower, upperRest1);
         }
         return Pair.of(upperRest2, lower);
@@ -191,11 +190,11 @@ public class CH {
     static Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>>
     moveLeftmostPointUp(ConcatenableQueue<UAEVertex> upper, ConcatenableQueue<UAEVertex> lower) {
         ConcatenableQueue<UAEVertex> lowerRest = lower;
-        boolean moveLeftmostPoint = lower.minNode != null && upper.minNode == null;
-        moveLeftmostPoint |= lower.minNode != null && upper.minNode != null
-                && lower.minNode.value.x < upper.minNode.value.x;
+        boolean moveLeftmostPoint = lower.minVertex != null && upper.minVertex == null;
+        moveLeftmostPoint |= lower.minVertex != null && upper.minVertex != null
+                && lower.minVertex.value.x < upper.minVertex.value.x;
         if (moveLeftmostPoint) {
-            lowerRest = lower.cutRight(lower.minNode.value);
+            lowerRest = lower.cutRight(lower.minVertex.value);
             upper = ConcatenableQueue.concatenate(lower, upper);
         }
         return Pair.of(upper, lowerRest);
@@ -204,11 +203,11 @@ public class CH {
     static Pair<ConcatenableQueue<UAEVertex>, ConcatenableQueue<UAEVertex>>
     moveRightmostPointUp(ConcatenableQueue<UAEVertex> upper, ConcatenableQueue<UAEVertex> lower) {
         ConcatenableQueue<UAEVertex> lowerRest = lower;
-        boolean moveRightmostPoint = lower.maxNode != null && upper.maxNode == null;
-        moveRightmostPoint |= lower.maxNode != null && upper.minNode != null
-                && lower.maxNode.value.x > upper.maxNode.value.x;
+        boolean moveRightmostPoint = lower.maxVertex != null && upper.maxVertex == null;
+        moveRightmostPoint |= lower.maxVertex != null && upper.minVertex != null
+                && lower.maxVertex.value.x > upper.maxVertex.value.x;
         if (moveRightmostPoint) {
-            lowerRest = lower.cutLeft(lower.maxNode.value);
+            lowerRest = lower.cutLeft(lower.maxVertex.value);
             upper = ConcatenableQueue.concatenate(upper, lower);
         }
         return Pair.of(upper, lowerRest);
@@ -241,7 +240,7 @@ public class CH {
         CQVertex<UAEVertex> rightIterator = rightHull.root;
 
         boolean done = false;
-        double middleX = (leftHull.maxNode.value.x + rightHull.minNode.value.x) / 2.0;
+        double middleX = (leftHull.maxVertex.value.x + rightHull.minVertex.value.x) / 2.0;
 
         while (!done) {
             double tangentSlope = getSlope(leftIterator.leftSubtreeMax, rightIterator.leftSubtreeMax);
@@ -301,26 +300,26 @@ public class CH {
     }
 
 
-    static double getSlope(CQVertex<UAEVertex> leftNode, CQVertex<UAEVertex> rightNode) {
-        return UAEVertex.getSlope(leftNode.value, rightNode.value);
+    static double getSlope(CQVertex<UAEVertex> leftVertex, CQVertex<UAEVertex> rightVertex) {
+        return UAEVertex.getSlope(leftVertex.value, rightVertex.value);
     }
 
 
-    static int getUpperTangentCase(CQVertex<UAEVertex> node, double tangentSlope,
+    static int getUpperTangentCase(CQVertex<UAEVertex> vertex, double tangentSlope,
                                    Position subHullPosition) {
         boolean leftSlopeGreater = true;
         boolean rightSlopeGreater = false;
 
-        if (node.lSon != null) {
-            double leftSlope = getSlope(node.lSon, node);
+        if (vertex.lSon != null) {
+            double leftSlope = getSlope(vertex.lSon, vertex);
             if ((subHullPosition.equals(Position.LEFT) && leftSlope <= tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && leftSlope < tangentSlope)) {
                 leftSlopeGreater = false;
             }
         }
 
-        if (node.rSon != null) {
-            double rightSlope = getSlope(node, node.rSon);
+        if (vertex.rSon != null) {
+            double rightSlope = getSlope(vertex, vertex.rSon);
             if ((subHullPosition.equals(Position.LEFT) && rightSlope > tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && rightSlope >= tangentSlope)) {
                 rightSlopeGreater = true;
@@ -339,111 +338,23 @@ public class CH {
         }
     }
 
-    static int getLowerTangentCase(CQVertex<UAEVertex> node, double tangentSlope,
+    static int getLowerTangentCase(CQVertex<UAEVertex> vertex, double tangentSlope,
                                    Position subHullPosition) {
         boolean leftSlopeGreater = false;
         boolean rightSlopeGreater = true;
 
-        if (node.lSon != null) {
-            double leftSlope = getSlope(node.lSon, node);
+        if (vertex.lSon != null) {
+            double leftSlope = getSlope(vertex.lSon, vertex);
             if ((subHullPosition.equals(Position.LEFT) && leftSlope >= tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && leftSlope > tangentSlope)) {
                 leftSlopeGreater = true;
             }
         }
 
-        if (node.rSon != null) {
-            double rightSlope = getSlope(node, node.rSon);
+        if (vertex.rSon != null) {
+            double rightSlope = getSlope(vertex, vertex.rSon);
             if ((subHullPosition.equals(Position.LEFT) && rightSlope < tangentSlope) ||
                     (subHullPosition.equals(Position.RIGHT) && rightSlope <= tangentSlope)) {
-                rightSlopeGreater = false;
-            }
-        }
-
-        if (leftSlopeGreater && rightSlopeGreater) {
-            return +1;
-        } else if (!leftSlopeGreater && !rightSlopeGreater) {
-            return -1;
-        } else {
-            if (leftSlopeGreater && !rightSlopeGreater) {
-                throw new IllegalArgumentException("concave hull segment");
-            }
-            return 0;
-        }
-    }
-
-
-    static ConcatenableQueue<UAEVertex> adjustLowerHull(ConcatenableQueue<UAEVertex> upperHull,
-                                                        ConcatenableQueue<UAEVertex> lowerHull) {
-        if (lowerHull.root == null) {
-            return lowerHull;
-        }
-        CQVertex<UAEVertex> leftBaseNode = getBaseNode(lowerHull, upperHull.minNode, Position.LEFT);
-        CQVertex<UAEVertex> rightBaseNode = getBaseNode(lowerHull, upperHull.maxNode, Position.RIGHT);
-
-        // corner case
-        if (leftBaseNode.value.compareTo(rightBaseNode.value) > 0) {
-            return new ConcatenableQueue<>(lowerHull.cmp);
-        }
-
-        lowerHull.cutLeft(leftBaseNode.value);
-        lowerHull.cutRight(rightBaseNode.value);
-
-        double leftSlope = getSlope(upperHull.minNode, lowerHull.minNode);
-        double rightSlope = getSlope(lowerHull.maxNode, upperHull.maxNode);
-
-        if (leftSlope >= rightSlope) {
-            return new ConcatenableQueue<>(lowerHull.cmp);
-        }
-
-        return lowerHull;
-    }
-
-
-    static CQVertex<UAEVertex> getBaseNode(ConcatenableQueue<UAEVertex> lowerHull,
-                                           CQVertex<UAEVertex> compareNode,
-                                           Position compareNodePosition) {
-        CQVertex<UAEVertex> hullIterator = lowerHull.root;
-
-        boolean done = false;
-        while (!done) {
-            double tangentSlope;
-            if (compareNodePosition.equals(Position.LEFT)) {
-                tangentSlope = getSlope(compareNode, hullIterator.leftSubtreeMax);
-            } else {
-                tangentSlope = getSlope(hullIterator.leftSubtreeMax, compareNode);
-            }
-            int slopeCase = getLowerBaseCase(hullIterator.leftSubtreeMax, tangentSlope, compareNodePosition);
-
-            if (slopeCase == -1) {
-                hullIterator = hullIterator.rSon;
-            } else if (slopeCase == 0) { // done
-                done = true;
-                hullIterator = hullIterator.leftSubtreeMax;
-            } else { // slopeCase == 1
-                hullIterator = hullIterator.lSon;
-            }
-        }
-        return hullIterator;
-    }
-
-
-    static int getLowerBaseCase(CQVertex<UAEVertex> node, double tangentSlope, Position nodePosition) {
-        boolean leftSlopeGreater = false;
-        boolean rightSlopeGreater = true;
-
-        if (node.lSon != null) {
-            double leftSlope = getSlope(node.lSon, node);
-            if ((nodePosition.equals(Position.LEFT) && leftSlope > tangentSlope) ||
-                    (nodePosition.equals(Position.RIGHT) && leftSlope >= tangentSlope)) {
-                leftSlopeGreater = true;
-            }
-        }
-
-        if (node.rSon != null) {
-            double rightSlope = getSlope(node, node.rSon);
-            if ((nodePosition.equals(Position.LEFT) && rightSlope <= tangentSlope) ||
-                    (nodePosition.equals(Position.RIGHT) && rightSlope < tangentSlope)) {
                 rightSlopeGreater = false;
             }
         }

@@ -1,6 +1,6 @@
 package com.chudakov.uae.perf.overmars;
 
-import com.chudakov.simple.ch.Point;
+import com.chudakov.uae.impl.Point;
 import com.chudakov.uae.impl.UAEVertex;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;

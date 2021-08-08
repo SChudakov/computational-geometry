@@ -1,5 +1,7 @@
 package com.chudakov.simple.ch;
 
+import com.chudakov.uae.impl.Point;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +32,10 @@ public class QuickHull implements ConvexHullAlgorithm {
         points.remove(A);
         points.remove(B);
 
-        ArrayList<Point> leftSet = new ArrayList<Point>();
-        ArrayList<Point> rightSet = new ArrayList<Point>();
+        ArrayList<Point> leftSet = new ArrayList<>();
+        ArrayList<Point> rightSet = new ArrayList<>();
 
-        for (int i = 0; i < points.size(); i++) {
-            Point p = points.get(i);
+        for (Point p : points) {
             if (pointLocation(A, B, p) == -1)
                 leftSet.add(p);
             else if (pointLocation(A, B, p) == 1)
@@ -81,18 +82,16 @@ public class QuickHull implements ConvexHullAlgorithm {
         hull.add(insertPosition, P);
 
         // Determine who's to the left of AP
-        ArrayList<Point> leftSetAP = new ArrayList<Point>();
-        for (int i = 0; i < set.size(); i++) {
-            Point M = set.get(i);
+        ArrayList<Point> leftSetAP = new ArrayList<>();
+        for (Point M : set) {
             if (pointLocation(A, P, M) == 1) {
                 leftSetAP.add(M);
             }
         }
 
         // Determine who's to the left of PB
-        ArrayList<Point> leftSetPB = new ArrayList<Point>();
-        for (int i = 0; i < set.size(); i++) {
-            Point M = set.get(i);
+        ArrayList<Point> leftSetPB = new ArrayList<>();
+        for (Point M : set) {
             if (pointLocation(P, B, M) == 1) {
                 leftSetPB.add(M);
             }

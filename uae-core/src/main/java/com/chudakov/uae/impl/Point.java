@@ -1,4 +1,4 @@
-package com.chudakov.simple.ch;
+package com.chudakov.uae.impl;
 
 import lombok.AllArgsConstructor;
 
@@ -20,12 +20,6 @@ public class Point implements Comparable<Point> {
 
     public static double distance(Point a, Point b) {
         return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
-    }
-
-    public static Point middle(Point a, Point b) {
-        double x = (a.x + b.x) / 2;
-        double y = (a.y + b.y) / 2;
-        return new Point(x, y);
     }
 
     public boolean toleranceEquals(Object o) {
@@ -53,6 +47,17 @@ public class Point implements Comparable<Point> {
 
     public Point mult(double factor) {
         return new Point(x * factor, y * factor);
+    }
+
+    public static UAEVertex middle(UAEVertex a, UAEVertex b) {
+        double x = (a.x + b.x) / 2;
+        double y = (a.y + b.y) / 2;
+        return new UAEVertex(x, y);
+    }
+
+    public static boolean ccw(Point a, Point b, Point c) {
+        double area2 = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+        return !(area2 <= 0);
     }
 
     @Override

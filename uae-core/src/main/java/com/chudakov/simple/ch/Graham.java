@@ -1,5 +1,7 @@
 package com.chudakov.simple.ch;
 
+import com.chudakov.uae.impl.Point;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
