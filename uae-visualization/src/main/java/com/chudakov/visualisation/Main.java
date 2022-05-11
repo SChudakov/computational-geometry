@@ -46,7 +46,7 @@ public class Main {
                 panel.closesPair = null;
                 panel.paintComponent(panel.getGraphics());
 
-                sleep(3000);
+                sleep(2000);
 
                 SequentialUAE2D convexHull = new SequentialUAE2D();
                 UAEState state = convexHull.solve(generated);
@@ -57,7 +57,7 @@ public class Main {
                 panel.closesPair = solutions.getClosesPair();
                 panel.paintComponent(panel.getGraphics());
 
-                sleep(10000);
+                sleep(2000);
             }
         }).start();
     }

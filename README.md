@@ -20,14 +20,6 @@ An algorithm can be executed either sequentially with `SequentialDaCExecutionSpe
 in parallel with `ParallelDaCExecutionSpecifics`. Creating and managing threads is delegated to 
 the `ForkJoinPool`.
 
-## Algorithm
-
-This project provides efficient algorithm for convex hull problem on a static set of points.
-
-The concatenable queue implementation in this project is mainly derived from A. V. Aho and 
-J. E. Hopcroft. The Design and Analysis of Computer Algorithms. Addison-Wesley Longman 
-Publishing Co., Inc., Boston, MA, USA, 1st edition, 1974.
-
 ## Demo
 
 ### Download
