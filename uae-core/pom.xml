@@ -19,7 +19,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
 
-        <common.lang.3.version>3.10</common.lang.3.version>
+        <common.lang.3.version>3.18.0</common.lang.3.version>
         <lombok.version>1.18.18</lombok.version>
         <junit.version>5.5.2</junit.version>
         <jmh.core.version>1.21</jmh.core.version>
